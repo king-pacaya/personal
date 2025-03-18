@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Meta -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Page Icon -->
+  <link rel="shortcut icon" href="favicon.svg">
+  <!-- CSS Documents -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Montserrat', sans-serif;
+    }
+    .center-text { text-align: center; }
+    .day-column { width: auto; }
+    /* Estilos responsivos */
+    @media (max-width: 768px) {
+      table {
+        font-size: 0.9rem;
+      }
+      .day-column {
+        width: 50px;
+      }
+    }
+    @media (max-width: 480px) {
+      .day-column {
+        width: 40px;
+      }
+      .center-text {
+        font-size: 0.85rem;
+      }
+      table {
+        font-size: 0.8rem;
+      }
+      .table-container {
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+    }
+  </style>
+  <title>Cronograma de Pagos</title>
+</head>
+<body class="bg-[#0D0D0D] p-6">
+  <div class="max-w-4xl mx-auto bg-[#F2F2F2] p-8 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-semibold text-center text-[#0D0D0D]">Cronograma de Pagos</h1>
+    <p class="text-center text-lg text-[#0D0D0D]">
+      Prestataria: <strong>MIRTHA LILIANA SALGADO CACERES</strong>
+    </p>
+
+    <div id="scheduleTable" class="mt-8 table-container">
+      <h2 class="text-xl font-semibold text-[#0D0D0D]">Tabla de Pagos</h2>
+      <table class="w-full mt-4 table-auto border-collapse">
+        <thead>
+          <tr>
+            <th class="border border-[#0D0D0D] px-4 py-2 text-center text-[#0D0D0D]">Número de Día</th>
+            <th class="border border-[#0D0D0D] px-4 py-2 text-center text-[#0D0D0D]">Fecha</th>
+            <th class="border border-[#0D0D0D] px-4 py-2 text-center text-[#0D0D0D]">Estatus</th>
+          </tr>
+        </thead>
+        <tbody id="paymentRows">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Fechas predefinidas
+    const startDate = "2025-02-17"; // Fecha inicial
+    const endDate = "2025-03-12"; // Fecha final
+    const paidDays = 3; // Número de días pagados
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    let currentDate = new Date(start);
+    let scheduleData = [];
+    let dayCount = 1; // Contador de días
+
+    // Generar los datos del cronograma
+    while (currentDate <= end) {
+      scheduleData.push({
+        date: currentDate.toISOString().split('T')[0],
+        status: 'No Pagado',
+        day: dayCount++,
+      });
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    // Marcar los primeros días como "Pagado"
+    for (let i = 0; i < Math.min(paidDays, scheduleData.length); i++) {
+      scheduleData[i].status = 'Pagado';
+    }
+
+    // Función para generar la tabla
+    function generateTable(scheduleData) {
+      const tableBody = document.getElementById('paymentRows');
+      tableBody.innerHTML = '';
+
+      scheduleData.forEach(item => {
+        const row = document.createElement('tr');
+        
+        // Celda "# de Día"
+        const dayCell = document.createElement('td');
+        dayCell.classList.add('border', 'border-[#0D0D0D]', 'px-4', 'py-2', 'center-text', 'day-column');
+        dayCell.textContent = item.day;
+        
+        // Celda "Fecha"
+        const dateCell = document.createElement('td');
+        dateCell.classList.add('border', 'border-[#0D0D0D]', 'px-4', 'py-2', 'center-text');
+        dateCell.textContent = item.date;
+        
+        // Celda "Estatus"
+        const statusCell = document.createElement('td');
+        statusCell.classList.add('border', 'border-[#0D0D0D]', 'px-4', 'py-2', 'center-text');
+        const statusButton = document.createElement('button');
+        statusButton.classList.add('px-4', 'py-2', 'rounded-lg', 'border', 'border-[#0D0D0D]', 'transition');
+        if(item.status === 'Pagado'){
+          statusButton.classList.add('bg-[#0D0D0D]', 'text-[#F2F2F2]');
+        } else {
+          statusButton.classList.add('bg-[#F2F2F2]', 'text-[#0D0D0D]');
+        }
+        statusButton.textContent = item.status;
+        
+        statusCell.appendChild(statusButton);
+        
+        row.appendChild(dayCell);
+        row.appendChild(dateCell);
+        row.appendChild(statusCell);
+        tableBody.appendChild(row);
+      });
+    }
+
+    generateTable(scheduleData);
+  </script>
+</body>
+</html>
