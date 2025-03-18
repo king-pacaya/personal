@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Meta -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Page Icon -->
+  <link rel="shortcut icon" href="favicon.svg">
+  <!-- CSS Documents -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Incluir html2pdf.js para la conversión a PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Montserrat', sans-serif;
+      outline: none;
+    }
+    /* Estilo para inputs */
+    input {
+      border: none;
+      border-bottom: 2px solid #0D0D0D;
+      padding: 8px;
+      transition: border-bottom 0.3s;
+      width: 100%;
+      color: #0D0D0D;
+      background-color: transparent;
+    }
+    input:focus {
+      border-bottom: 2px solid #0D0D0D;
+    }
+    /* Estilo para selects con flecha personalizada */
+    select {
+      border: none;
+      border-bottom: 2px solid #0D0D0D;
+      padding: 8px;
+      transition: border-bottom 0.3s;
+      width: 100%;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: url('data:image/svg+xml;utf8,<svg fill="%230D0D0D" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.516 7.548l4.484 4.484 4.484-4.484L16 8.548l-6 6-6-6z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 12px;
+      color: #0D0D0D;
+      background-color: transparent;
+    }
+    select:focus {
+      border-bottom: 2px solid #0D0D0D;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+      color: #0D0D0D;
+    }
+    /* Botones */
+    button {
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background-color: #0D0D0D;
+      color: #F2F2F2;
+      padding: 8px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    .btn-primary:hover {
+      background-color: #0D0D0D;
+    }
+  </style>
+  <title>Contrato de Préstamo</title>
+</head>
+<body class="bg-[#0D0D0D] p-6">
+  <div class="max-w-2xl mx-auto bg-[#F2F2F2] p-6 rounded-lg shadow-lg">
+    <h1 class="text-2xl font-bold text-center mb-4 text-[#0D0D0D]">CONTRATO DE PRÉSTAMO</h1>
+    <p class="font-bold text-[#0D0D0D]">Fecha: <span id="contractDate"></span></p>
+    
+    <form id="loanForm" class="grid grid-cols-2 gap-4">
+      <!-- Dropdown para seleccionar el Prestamista -->
+      <div>
+        <label for="lender">Nombre del Prestamista</label>
+        <select id="lender" required>
+          <option value="KING ISAAC PACAYA ASTULLA">KING ISAAC PACAYA ASTULLA</option>
+          <option value="JORDY DANIEL PACAYA ASTULLA">JORDY DANIEL PACAYA ASTULLA</option>
+          <option value="CARMEN ROSA ASTULLA FERNANDEZ">CARMEN ROSA ASTULLA FERNANDEZ</option>
+        </select>
+      </div>
+      <!-- Input para el Prestatario -->
+      <div>
+        <label for="borrower">Nombre del Prestatario</label>
+        <input type="text" id="borrower" placeholder="Ingrese el nombre del prestatario" required>
+      </div>
+      <div>
+        <label for="amount">Monto del Préstamo (S/.)</label>
+        <input type="number" id="amount" required>
+      </div>
+      <div>
+        <label for="interest">Interés (%)</label>
+        <input type="number" id="interest" value="20" required>
+      </div>
+      <div>
+        <label for="loanDate">Fecha de Inicio</label>
+        <input type="date" id="loanDate" required>
+      </div>
+      <div>
+        <label for="frequency">Frecuencia</label>
+        <select id="frequency" required>
+          <option value="mensual" selected>Mensual</option>
+          <option value="diario">Diario</option>
+        </select>
+      </div>
+      <div>
+        <label for="duration">Tiempo de préstamo</label>
+        <input type="number" id="duration" placeholder="Ingrese número" required>
+      </div>
+      <div>
+        <label for="finalDate">Fecha de Finalización</label>
+        <input type="date" id="finalDate" readonly>
+      </div>
+      <div class="col-span-2">
+        <label for="lateFee">Cargo por día de mora (S/.)</label>
+        <input type="number" id="lateFee" value="5" required>
+      </div>
+      <div class="col-span-2">
+        <button type="submit" class="w-full btn-primary">Generar Contrato</button>
+      </div>
+    </form>
+
+    <!-- Contenedor donde se mostrará el contrato generado -->
+    <div id="contractOutput" class="mt-6 rounded-lg shadow hidden p-4"></div>
+    <!-- Botón para descargar el contrato en PDF -->
+    <button id="downloadPDF" class="w-full btn-primary mt-4 rounded hidden">Descargar Contrato PDF</button>
+  </div>
+
+  <script type="text/javascript" src="script.js"></script>
+</body>
+</html>
