@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!---Meta--->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="favicon.png">
+  <!-- CSS Documents -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Montserrat (todas las versiones) -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <title>KING PACAYA - CV</title>
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-[#F2F2F2] text-[#0D0D0D]">
+  <div class="container mx-auto px-4 py-8">
+    <!-- Header Section -->
+    <header class="text-center mb-8" id="header">
+      <h1 class="text-3xl md:text-4xl font-bold" id="nombre"></h1>
+      <p class="text-sm md:text-base" id="ubicacion"></p>
+      <div class="flex justify-center space-x-4 mt-2">
+        <a id="email" class="text-sm md:text-base hover:underline">
+          <i class="fas fa-envelope"></i>
+        </a>
+        <a id="telefono" class="text-sm md:text-base hover:underline">
+          <i class="fas fa-phone"></i>
+        </a>
+      </div>
+    </header>
+
+    <!-- Professional Experience Section -->
+    <section class="mb-8" id="experiencia">
+      <h2 class="text-2xl font-bold mb-4">EXPERIENCIA PROFESIONAL</h2>
+      <div class="space-y-6" id="experiencia-list"></div>
+    </section>
+
+    <!-- Education Section -->
+    <section class="mb-8" id="educacion">
+      <h2 class="text-2xl font-bold mb-4">FORMACIÓN ACADÉMICA</h2>
+      <div class="bg-white p-6 rounded-lg shadow-md" id="educacion-list"></div>
+    </section>
+
+    <!-- Skills Section -->
+    <section class="mb-8" id="conocimientos">
+      <h2 class="text-2xl font-bold mb-4">CONOCIMIENTOS COMPLEMENTARIOS</h2>
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="conocimientos-list"></div>
+      </div>
+    </section>
+
+    <!-- Languages and Courses Section -->
+    <section class="mb-8" id="idiomas_cursos">
+      <h2 class="text-2xl font-bold mb-4">IDIOMAS/CURSOS</h2>
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="idiomas-cursos-list"></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Cargar el archivo JSON con la información del CV
+    fetch('info.json')
+      .then(response => response.json())
+      .then(data => {
+        // Header
+        document.getElementById('nombre').textContent = data.nombre;
+        document.getElementById('ubicacion').textContent = data.ubicacion;
+        document.getElementById('email').href = `mailto:${data.email}`;
+        document.getElementById('email').innerHTML += ` ${data.email}`;
+        document.getElementById('telefono').href = `tel:${data.telefono}`;
+        document.getElementById('telefono').innerHTML += ` ${data.telefono}`;
+
+        // Experiencia Profesional
+        const experienciaList = document.getElementById('experiencia-list');
+        data.experiencia.forEach(exp => {
+          const expHtml = `
+            <div class="bg-white p-6 rounded-lg shadow-md">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                <h3 class="text-xl font-semibold">${exp.empresa} (${exp.puesto})</h3>
+                <span class="text-sm sm:text-base mt-2 sm:mt-0">${exp.periodo}</span>
+              </div>
+              <p class="mt-2 text-sm sm:text-base">${exp.descripcion}</p>
+              <ul class="list-disc list-inside mt-2 text-sm sm:text-base">
+                ${exp.logros.map(logro => `<li>${logro}</li>`).join('')}
+              </ul>
+            </div>
+          `;
+          experienciaList.innerHTML += expHtml;
+        });
+
+        // Educación
+        const educacionList = document.getElementById('educacion-list');
+        data.educacion.forEach(edu => {
+          const eduHtml = `
+            <h3 class="text-xl font-semibold">${edu.titulo}</h3>
+            <p class="text-sm sm:text-base">${edu.institucion} <span class="text-sm">${edu.periodo}</span></p>
+            <p class="text-sm sm:text-base">${edu.detalle}</p>
+          `;
+          educacionList.innerHTML += eduHtml;
+        });
+
+        // Conocimientos Complementarios
+        const conocimientosList = document.getElementById('conocimientos-list');
+        data.conocimientos.forEach(conocimiento => {
+          const conocimientoHtml = `
+            <div class="flex items-center space-x-2">
+              <i class="${conocimiento.icono}"></i>
+              <p class="text-sm sm:text-base">${conocimiento.nombre}</p>
+            </div>
+          `;
+          conocimientosList.innerHTML += conocimientoHtml;
+        });
+
+        // Idiomas/Cursos
+        const idiomasCursosList = document.getElementById('idiomas-cursos-list');
+        data.idiomas_cursos.forEach(item => {
+          const itemHtml = `
+            <div class="flex items-center space-x-2">
+              <i class="${item.icono}"></i>
+              <p class="text-sm sm:text-base">${item.nombre}</p>
+            </div>
+          `;
+          idiomasCursosList.innerHTML += itemHtml;
+        });
+      });
+  </script>
+</body>
+</html>

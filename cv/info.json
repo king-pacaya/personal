@@ -1,0 +1,88 @@
+{
+  "nombre": "KING ISAAC PACAYA ASTULLA",
+  "ubicacion": "Ate, Lima-Perú",
+  "email": "kingpacaya@gmail.com",
+  "telefono": "(+51) 966 002 733",
+  "experiencia": [
+    {
+      "empresa": "Backus",
+      "puesto": "Software Developer",
+      "periodo": "2024 - 2025",
+      "descripcion": "Trabajando con Backus tuve un papel muy importante en el desarrollo de un software de recolección y gestión de residuos sólidos, creando un buen diseño en cuando a UI/UX y usando librerías específicas para el funcionamiento correcto del software, además de mejorar mis habilidades en el backend y frontend usando tecnologías como Tailwind, Astro y SQL.",
+      "logros": [
+        "Incrementé la eficiencia de la empresa en un 200%.",
+        "Optimicé la ciberseguridad y rediseñé la interfaz de usuario.",
+        "Implementé librerías especializadas para mejorar la funcionalidad."
+      ]
+    },
+    {
+      "empresa": "Tahuantinsuyo - Agencia Inmobiliaria",
+      "puesto": "Web Developer",
+      "periodo": "2022 - 2023",
+      "descripcion": "En Tahuantinsuyo, desempeñé un papel clave en el desarrollo y mantenimiento de la plataforma web de la inmobiliaria, colaborando con el equipo para crear una interfaz intuitiva y eficiente que mejoró la experiencia del usuario. Aprecié la calidad del equipo y los horarios flexibles, que facilitaron un buen equilibrio entre la vida laboral y personal.",
+      "logros": [
+        "Creé la identidad digital de la empresa.",
+        "Creé una interfaz intuitiva que elevó la experiencia del usuario y mejoró la navegación en la plataforma web y aumentó las ventas de la empresa.",
+        "Colaboré estrechamente con el equipo para implementar mejoras continuas, incrementando la estabilidad y funcionalidad del sitio."
+      ]
+    },
+    {
+      "empresa": "Kesign - Agencia Digital",
+      "puesto": "Web Developer",
+      "periodo": "2021 - 2022",
+      "descripcion": "En Kesign, desempeñé un papel fundamental en el desarrollo de soluciones web personalizadas para nuestros clientes, así como en la creación y mantenimiento de una plataforma interna clave para el funcionamiento de la empresa. Mi experiencia en Kesign me permitió fortalecer mis habilidades en desarrollo web y gestionar proyectos tanto para clientes externos como para las operaciones internas de la empresa, contribuyendo al éxito general de los proyectos.",
+      "logros": [
+        "Diseñé y mantuve una plataforma interna clave que optimizó procesos y mejoró la comunicación entre equipos.",
+        "Fortalecí la infraestructura tecnológica, logrando mejoras en la eficiencia operativa y en la gestión de proyectos.",
+        "Desarrollé soluciones web personalizadas para clientes, lo que se tradujo en mayor satisfacción y fidelización."
+      ]
+    },
+    {
+      "empresa": "Up Bussiness - Agencia Digital",
+      "puesto": "Web Developer",
+      "periodo": "2018 - 2020",
+      "descripcion": "En Up Business, fui responsable de áreas clave en el desarrollo de la identidad digital de las marcas de los clientes, abarcando desde el diseño visual hasta la implementación técnica de soluciones web. Esta experiencia me permitió desarrollar una sólida comprensión de cómo combinar diseño y tecnología para crear soluciones digitales impactantes, y disfrutar de un ambiente de trabajo dinámico y colaborativo.",
+      "logros": [
+        "Implementé estrategias de identidad digital para múltiples marcas, potenciando su presencia en línea y posicionamiento.",
+        "Fusioné el diseño visual con soluciones técnicas innovadoras, generando proyectos digitales de alto impacto.",
+        "Trabajé en equipo para desarrollar soluciones personalizadas que incrementaron la visibilidad y el alcance de los clientes."
+      ]
+    }
+  ],
+  "educacion": [
+    {
+      "titulo": "Ingeniería de Software",
+      "institucion": "Universidad San Ignacio de Loyola",
+      "periodo": "(2020 - Cursando)",
+      "detalle": "Bachiller - Tercio Superior"
+    }
+  ],
+  "conocimientos": [
+    { "nombre": "Boostrap (Intermedio)", "icono": "fab fa-bootstrap" },
+    { "nombre": "Git (Básico)", "icono": "fab fa-git" },
+    { "nombre": "Astro (Intermedio)", "icono": "fas fa-rocket" },
+    { "nombre": "Tailwind (Intermedio)", "icono": "fas fa-palette" },
+    { "nombre": "Adobe Photoshop (Intermedio)", "icono": "fa-solid fa-image" },
+    { "nombre": "Adobe Illustrator (Intermedio)", "icono": "fa-solid fa-bezier-curve" },
+    { "nombre": "Microsoft Excel (Avanzado)", "icono": "fas fa-file-excel" },
+    { "nombre": "Microsoft Power Point (Avanzado)", "icono": "fas fa-file-powerpoint" },
+    { "nombre": "Microsoft Word (Avanzado)", "icono": "fas fa-file-word" }
+  ],
+  "idiomas_cursos": [
+    { "nombre": "C++ (Intermedio)", "icono": "fas fa-code" },
+    { "nombre": "HTML (Avanzado)", "icono": "fab fa-html5" },
+    { "nombre": "JavaScript (Avanzado)", "icono": "fab fa-js" },
+    { "nombre": "PHP (Intermedio)", "icono": "fab fa-php" },
+    { "nombre": "Python (Intermedio)", "icono": "fab fa-python" },
+    { "nombre": "SQL (Intermedio)", "icono": "fas fa-database" },
+    { "nombre": "MySQL (Intermedio)", "icono": "fas fa-database" },
+    { "nombre": "CSS (Experto)", "icono": "fab fa-css3" },
+    { "nombre": "Kotlin (Básico)", "icono": "fas fa-code" },
+    { "nombre": "Inglés (Avanzado)", "icono": "fas fa-language" },
+    { "nombre": "Francés (Básico)", "icono": "fas fa-language" },
+    { "nombre": "Italiano (Básico)", "icono": "fas fa-language" },
+    { "nombre": "E-Commerce (Curso)", "icono": "fas fa-shopping-cart" },
+    { "nombre": "Economía Circular (Curso)", "icono": "fas fa-recycle" },
+    { "nombre": "Desarrollo de Apps móviles (Curso)", "icono": "fas fa-mobile-alt" }
+  ]
+}
