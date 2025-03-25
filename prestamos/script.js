@@ -53,6 +53,8 @@ document.getElementById("loanForm").addEventListener("submit", function(event) {
   const lateFee = parseFloat(document.getElementById("lateFee").value);
   const frequency = document.getElementById("frequency").value;
   const duration = parseInt(document.getElementById("duration").value);
+  const dni = document.getElementById("dni").value;
+  const address = document.getElementById("address").value;
 
   // Cálculo:
   let totalPayable, installment;
@@ -76,7 +78,8 @@ document.getElementById("loanForm").addEventListener("submit", function(event) {
     <h2 class='text-xl font-bold text-center'>CONTRATO DE PRÉSTAMO</h2>
     <p class='font-bold'>${formatDate(loanDateVal)}</p>
     <p>
-      Yo, <strong>${borrower}</strong>, prestatario, recibo de <strong>${lender}</strong>, prestamista, la cantidad de 
+      Yo, <strong>${borrower}</strong>, con DNI <strong>${dni}</strong>, prestatario, residenciado en <strong>${address}</strong>, 
+      recibo de <strong>${lender}</strong>, prestamista, la cantidad de 
       <strong>${amount} nuevos soles (S/.${amount})</strong>. Me comprometo a devolver dicho monto más un 
       <strong>${interestPercent}% de interés</strong>, resultando en un total de 
       <strong>${formatNumber(totalPayable)} nuevos soles (S/.${formatNumber(totalPayable)})</strong>. Dado que el préstamo se otorga por <strong>${duration} ${periodLabel}</strong>, el pago ${periodText} será de 
