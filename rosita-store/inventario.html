@@ -150,9 +150,28 @@
     
     document.getElementById('searchInput').addEventListener('input', renderInventory);
     
-    // Inicialización
-    updateEarningsDisplay();
-    renderInventory();
+    // Inicialización: si no hay inventario en localStorage, cargar el inventario de inventario.json
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!localStorage.getItem(INVENTORY_KEY)) {
+        fetch('inventario.json')
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Error al cargar inventario.json');
+            }
+            return response.json();
+          })
+          .then(data => {
+            saveInventory(data);
+            renderInventory();
+          })
+          .catch(error => {
+            console.error("Error fetching inventario.json:", error);
+          });
+      } else {
+        renderInventory();
+      }
+      updateEarningsDisplay();
+    });
   </script>
 </body>
 </html>
