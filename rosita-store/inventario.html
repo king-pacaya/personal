@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Meta -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Page Icon -->
+  <link rel="shortcut icon" href="favicon.svg">
+  <!-- CSS Documents -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <!-- Scripts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * {
+      font-family: 'Montserrat', sans-serif;
+    }
+    input:focus {
+      outline: none;
+    }
+  </style>
+  <title>Administrar Inventario y Ganancias</title>
+</head>
+<body class="bg-[#F2F2F2] text-[#0D0D0D]">
+  <div class="container mx-auto p-8">
+    <h1 class="text-2xl font-bold text-center mb-8">
+      <i class="fas fa-boxes"></i> Administrar Inventario
+    </h1>
+    
+    <!-- Sección de Ganancias -->
+    <div id="earningsSection" class="mb-8 p-4 border border-[#0D0D0D] rounded">
+      <h2 class="text-xl font-bold flex items-center">
+        <i class="fas fa-dollar-sign mr-2"></i> Ganancias
+      </h2>
+      <p id="earningsDisplay" class="text-lg">$0.00</p>
+    </div>
+    
+    <!-- Buscador de Productos -->
+    <div class="mb-8">
+      <input type="text" id="searchInput" class="w-full border border-[#0D0D0D] p-2 rounded" placeholder="Buscar producto...">
+    </div>
+    
+    <!-- Sección de Inventario -->
+    <div id="inventorySection" class="mb-8">
+      <h2 class="text-xl font-bold mb-4 flex items-center">
+        <i class="fas fa-clipboard-list mr-2"></i> Inventario
+      </h2>
+      <div id="inventoryList" class="flex flex-col gap-4">
+        <!-- Se mostrarán los productos con stock > 0 -->
+      </div>
+    </div>
+    
+    <!-- Sección de Agotados -->
+    <div id="outOfStockSection" class="mb-8">
+      <h2 class="text-xl font-bold mb-4 flex items-center">
+        <i class="fas fa-exclamation-triangle mr-2"></i> Agotados
+      </h2>
+      <div id="outOfStockList" class="flex flex-col gap-4">
+        <!-- Se mostrarán los productos con stock 0 -->
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const INVENTORY_KEY = 'inventory';
+    const EARNINGS_KEY = 'earnings';
+
+    // Funciones para manejar localStorage
+    function loadInventory() {
+      const data = localStorage.getItem(INVENTORY_KEY);
+      return data ? JSON.parse(data) : [];
+    }
+    function saveInventory(inventory) {
+      localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
+    }
+    function loadEarnings() {
+      const data = localStorage.getItem(EARNINGS_KEY);
+      return data ? parseFloat(data) : 0;
+    }
+    function saveEarnings(earnings) {
+      localStorage.setItem(EARNINGS_KEY, earnings.toFixed(2));
+    }
+    
+    function updateEarningsDisplay() {
+      const earnings = loadEarnings();
+      document.getElementById('earningsDisplay').textContent = "$" + earnings.toFixed(2);
+    }
+    
+    // Función para renderizar inventario y agotados según búsqueda
+    function renderInventory() {
+      const inventory = loadInventory();
+      const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+      const inventoryList = document.getElementById('inventoryList');
+      const outOfStockList = document.getElementById('outOfStockList');
+      
+      inventoryList.innerHTML = "";
+      outOfStockList.innerHTML = "";
+      
+      inventory.forEach((item, index) => {
+        if (item.nombre.toLowerCase().includes(searchQuery)) {
+          const card = document.createElement('div');
+          card.className = "border border-[#0D0D0D] p-4 rounded flex justify-between items-center";
+          card.innerHTML = `
+            <div>
+              <p class="font-bold">${item.nombre}</p>
+              <p>Stock: <span class="stock">${item.cantidad}</span></p>
+              <p>Precio: $${item.precio.toFixed(2)}</p>
+            </div>
+            <div class="flex gap-2">
+              <button class="sell-btn bg-[#0D0D0D] text-[#F2F2F2] px-2 py-1 rounded" title="Vender">
+                <i class="fas fa-shopping-cart"></i>
+              </button>
+              <button class="restock-btn bg-[#0D0D0D] text-[#F2F2F2] px-2 py-1 rounded" title="Agregar Stock">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          `;
+          
+          // Botón para vender: disminuye stock y suma ganancias
+          card.querySelector('.sell-btn').addEventListener('click', () => {
+            if(item.cantidad > 0) {
+              item.cantidad -= 1;
+              let earnings = loadEarnings();
+              earnings += item.precio;
+              saveEarnings(earnings);
+              updateEarningsDisplay();
+              saveInventory(inventory);
+              renderInventory();
+            }
+          });
+          
+          // Botón para agregar stock
+          card.querySelector('.restock-btn').addEventListener('click', () => {
+            item.cantidad += 1;
+            saveInventory(inventory);
+            renderInventory();
+          });
+          
+          // Mostrar en Inventario o Agotados según stock
+          if(item.cantidad > 0) {
+            inventoryList.appendChild(card);
+          } else {
+            outOfStockList.appendChild(card);
+          }
+        }
+      });
+    }
+    
+    document.getElementById('searchInput').addEventListener('input', renderInventory);
+    
+    // Inicialización
+    updateEarningsDisplay();
+    renderInventory();
+  </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Meta -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Page Icon -->
+  <link rel="shortcut icon" href="favicon.svg">
+  <!-- CSS Documents -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <!-- Scripts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * {
+      font-family: 'Montserrat', sans-serif;
+    }
+    /* Quitar outline en los inputs */
+    input:focus {
+      outline: none;
+    }
+  </style>
+  <title>Inventario Maker</title>
+</head>
+<body class="bg-[#F2F2F2] text-[#0D0D0D]">
+  <div class="container mx-auto p-8">
+    <!-- Formulario de Inventario -->
+    <form id="inventoryForm" class="bg-[#F2F2F2] border border-[#0D0D0D] rounded-lg p-6 shadow-md max-w-md mx-auto mb-8">
+      <div class="mb-4">
+        <label class="block mb-2" for="nombre">
+          <i class="fas fa-tag"></i> Nombre
+        </label>
+        <!-- El text-transform en CSS es solo visual, el valor se mantiene según lo que el usuario ingrese -->
+        <input 
+          type="text" 
+          id="nombre" 
+          name="nombre" 
+          placeholder="Nombre del producto" 
+          class="w-full border border-[#0D0D0D] rounded p-2"
+          style="text-transform: capitalize;"
+          required>
+      </div>
+      <div class="mb-4">
+        <label class="block mb-2" for="cantidad">
+          <i class="fas fa-sort-numeric-up"></i> Cantidad
+        </label>
+        <input 
+          type="number" 
+          id="cantidad" 
+          name="cantidad" 
+          placeholder="Cantidad" 
+          class="w-full border border-[#0D0D0D] rounded p-2"
+          required>
+      </div>
+      <div class="mb-4">
+        <label class="block mb-2" for="precio">
+          <i class="fas fa-dollar-sign"></i> Precio por unidad
+        </label>
+        <input 
+          type="number" 
+          step="0.01"
+          id="precio" 
+          name="precio" 
+          placeholder="Precio por unidad" 
+          class="w-full border border-[#0D0D0D] rounded p-2"
+          required>
+      </div>
+      <button type="submit" id="submitBtn" class="w-full bg-[#0D0D0D] text-[#F2F2F2] font-bold py-2 px-4 rounded hover:bg-gray-800">
+        <i class="fas fa-check"></i> Agregar
+      </button>
+    </form>
+
+    <!-- Sección de Inventario (ancho 90%) -->
+    <div id="inventoryList" class="bg-[#F2F2F2] border border-[#0D0D0D] rounded-lg p-6 shadow-md w-full mx-auto">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold flex items-center">
+          <i class="fas fa-clipboard-list mr-2"></i> Inventario
+        </h2>
+        <button id="downloadBtn" class="bg-[#0D0D0D] text-[#F2F2F2] py-2 px-4 rounded hover:bg-gray-800" title="Descargar JSON">
+          <i class="fas fa-download"></i> Descargar JSON
+        </button>
+      </div>
+      <div id="inventoryItems" class="flex flex-wrap gap-4 mt-4">
+        <!-- Los items del inventario se mostrarán como tarjetas -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let editIndex = null; // Variable para controlar si se está editando un producto
+
+    // Cargar inventario desde localStorage y mostrarlo en tarjetas
+    function loadInventory() {
+      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+      const inventoryItems = document.getElementById('inventoryItems');
+      inventoryItems.innerHTML = '';
+      inventory.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = "border border-[#0D0D0D] p-4 rounded";
+        card.style.minWidth = "200px";
+        card.innerHTML = `
+          <div>
+            <span class="font-bold">${item.nombre}</span><br>
+            Cantidad: ${item.cantidad} <br>
+            Precio: $${item.precio.toFixed(2)}
+          </div>
+          <div class="mt-2 flex justify-end gap-2">
+            <button type="button" class="edit-btn" data-index="${index}" title="Editar">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button type="button" class="delete-btn" data-index="${index}" title="Eliminar">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        `;
+        // Asignar eventos a los botones de editar y eliminar
+        card.querySelector('.edit-btn').addEventListener('click', function() {
+          editProduct(index);
+        });
+        card.querySelector('.delete-btn').addEventListener('click', function() {
+          deleteProduct(index);
+        });
+        inventoryItems.appendChild(card);
+      });
+    }
+
+    // Guardar inventario en localStorage
+    function saveInventory(inventory) {
+      localStorage.setItem('inventory', JSON.stringify(inventory));
+    }
+
+    // Función para editar un producto
+    function editProduct(index) {
+      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+      const product = inventory[index];
+      document.getElementById('nombre').value = product.nombre;
+      document.getElementById('cantidad').value = product.cantidad;
+      document.getElementById('precio').value = product.precio;
+      editIndex = index;
+      document.getElementById('submitBtn').innerHTML = '<i class="fas fa-edit"></i> Actualizar';
+      document.getElementById('nombre').focus();
+    }
+
+    // Función para eliminar un producto
+    function deleteProduct(index) {
+      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+      inventory.splice(index, 1);
+      saveInventory(inventory);
+      loadInventory();
+    }
+
+    // Evento para el envío del formulario
+    document.getElementById('inventoryForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Obtener valores del formulario tal como ingresados
+      const nombre = document.getElementById('nombre').value.trim();
+      const cantidad = parseInt(document.getElementById('cantidad').value);
+      const precio = parseFloat(document.getElementById('precio').value);
+      
+      const inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+
+      if (editIndex === null) {
+        // Agregar nuevo producto
+        const producto = { nombre, cantidad, precio };
+        inventory.push(producto);
+      } else {
+        // Actualizar producto existente
+        inventory[editIndex] = { nombre, cantidad, precio };
+        editIndex = null;
+        document.getElementById('submitBtn').innerHTML = '<i class="fas fa-check"></i> Agregar';
+      }
+      
+      saveInventory(inventory);
+      loadInventory();
+
+      // Limpiar formulario y enfocar el input "Nombre"
+      this.reset();
+      document.getElementById('nombre').focus();
+    });
+
+    // Función para descargar el inventario como JSON
+    document.getElementById('downloadBtn').addEventListener('click', function() {
+      const inventory = localStorage.getItem('inventory') || '[]';
+      const blob = new Blob([inventory], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'inventario.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    // Inicializar inventario al cargar la página
+    document.addEventListener('DOMContentLoaded', loadInventory);
+  </script>
+</body>
+</html>
