@@ -24,19 +24,40 @@
   <title>Administrar Inventario y Ganancias</title>
 </head>
 <body class="bg-[#F2F2F2] text-[#0D0D0D]">
-  <div class="container mx-auto p-8">
+  <div class="container mx-auto p-8 relative">
+    <!-- Botón de Menú -->
+    <div class="mb-8">
+      <button id="menuButton" class="bg-[#0D0D0D] text-[#F2F2F2] py-2 px-4 rounded flex items-center gap-2">
+        <i class="fas fa-bars"></i> Menú
+      </button>
+      <div id="menuDropdown" class="absolute mt-2 bg-white border border-[#0D0D0D] rounded shadow-lg hidden z-10">
+        <button id="menuInventario" class="block w-full text-left px-4 py-2 hover:bg-gray-200">Inventario</button>
+        <button id="menuAgotados" class="block w-full text-left px-4 py-2 hover:bg-gray-200">Agotados</button>
+        <button id="menuHistorial" class="block w-full text-left px-4 py-2 hover:bg-gray-200">Historial</button>
+      </div>
+    </div>
+
     <h1 class="text-2xl font-bold text-center mb-8">
       <i class="fas fa-boxes"></i> Administrar Inventario
     </h1>
     
-    <!-- Sección de Ganancias -->
-    <div id="earningsSection" class="mb-8 p-4 border border-[#0D0D0D] rounded">
-      <h2 class="text-xl font-bold flex items-center">
-        <i class="fas fa-dollar-sign mr-2"></i> Ganancias
-      </h2>
-      <p id="earningsDisplay" class="text-lg">$0.00</p>
+    <!-- Sección de Ganancias (en columna) -->
+    <div class="mb-8 space-y-4">
+      <div id="earningsSection" class="p-4 border border-[#0D0D0D] rounded">
+        <h2 class="text-xl font-bold flex items-center">
+          <i class="fas fa-dollar-sign mr-2"></i> Ganancias Totales
+        </h2>
+        <p id="earningsDisplay" class="text-lg">S/. 0.00</p>
+      </div>
+      
+      <div id="creditEarningsSection" class="p-4 border border-[#0D0D0D] rounded">
+        <h2 class="text-xl font-bold flex items-center">
+          <i class="fas fa-credit-card mr-2"></i> Ganancias por Crédito
+        </h2>
+        <p id="creditEarningsDisplay" class="text-lg">S/. 0.00</p>
+      </div>
     </div>
-    
+
     <!-- Buscador de Productos -->
     <div class="mb-8">
       <input type="text" id="searchInput" class="w-full border border-[#0D0D0D] p-2 rounded" placeholder="Buscar producto...">
@@ -48,26 +69,58 @@
         <i class="fas fa-clipboard-list mr-2"></i> Inventario
       </h2>
       <div id="inventoryList" class="flex flex-col gap-4">
-        <!-- Se mostrarán los productos con stock > 0 -->
+        <!-- Productos con stock > 0 se mostrarán aquí -->
       </div>
     </div>
     
     <!-- Sección de Agotados -->
-    <div id="outOfStockSection" class="mb-8">
+    <div id="outOfStockSection" class="mb-8 hidden">
       <h2 class="text-xl font-bold mb-4 flex items-center">
         <i class="fas fa-exclamation-triangle mr-2"></i> Agotados
       </h2>
       <div id="outOfStockList" class="flex flex-col gap-4">
-        <!-- Se mostrarán los productos con stock 0 -->
+        <!-- Productos con stock 0 se mostrarán aquí -->
       </div>
     </div>
+    
+    <!-- Sección de Historial de Ventas -->
+    <div id="salesHistorySection" class="mb-8 hidden">
+      <h2 class="text-xl font-bold mb-4 flex items-center">
+        <i class="fas fa-history mr-2"></i> Historial de Ventas
+      </h2>
+      <ul id="salesHistoryList" class="list-disc pl-6">
+        <!-- Se mostrará el historial de ventas -->
+      </ul>
+    </div>
   </div>
-  
+
+  <!-- Modal para Venta a Crédito -->
+  <div id="creditModal" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center hidden">
+    <div class="bg-white p-6 rounded-lg w-11/12 sm:w-1/3">
+      <h2 class="text-xl font-bold mb-4">Venta a Crédito</h2>
+      <label for="customerName" class="block mb-1">Nombre del Cliente:</label>
+      <input type="text" id="customerName" class="w-full border border-[#0D0D0D] p-2 mb-4 rounded">
+      
+      <label for="weeksCount" class="block mb-1">Número de Semanas:</label>
+      <input type="number" id="weeksCount" class="w-full border border-[#0D0D0D] p-2 mb-4 rounded">
+      
+      <button id="confirmCreditSale" class="bg-[#0D0D0D] text-[#F2F2F2] py-2 px-4 rounded w-full">
+        Confirmar Venta
+      </button>
+      <button id="closeModal" class="bg-red-500 text-white py-2 px-4 rounded w-full mt-4">
+        Cancelar
+      </button>
+    </div>
+  </div>
+
   <script>
+    // Claves de localStorage
     const INVENTORY_KEY = 'inventory';
     const EARNINGS_KEY = 'earnings';
+    const CREDIT_EARNINGS_KEY = 'creditEarnings';
+    const SALES_HISTORY_KEY = 'salesHistory';
 
-    // Funciones para manejar localStorage
+    // Funciones de localStorage
     function loadInventory() {
       const data = localStorage.getItem(INVENTORY_KEY);
       return data ? JSON.parse(data) : [];
@@ -82,19 +135,50 @@
     function saveEarnings(earnings) {
       localStorage.setItem(EARNINGS_KEY, earnings.toFixed(2));
     }
+    function loadCreditEarnings() {
+      const data = localStorage.getItem(CREDIT_EARNINGS_KEY);
+      return data ? parseFloat(data) : 0;
+    }
+    function saveCreditEarnings(earnings) {
+      localStorage.setItem(CREDIT_EARNINGS_KEY, earnings.toFixed(2));
+    }
+    function loadSalesHistory() {
+      const data = localStorage.getItem(SALES_HISTORY_KEY);
+      return data ? JSON.parse(data) : [];
+    }
+    function saveSalesHistory(sales) {
+      localStorage.setItem(SALES_HISTORY_KEY, JSON.stringify(sales));
+    }
     
     function updateEarningsDisplay() {
       const earnings = loadEarnings();
-      document.getElementById('earningsDisplay').textContent = "$" + earnings.toFixed(2);
+      document.getElementById('earningsDisplay').textContent = "S/. " + earnings.toFixed(2);
+    }
+    function updateCreditEarningsDisplay() {
+      const creditEarnings = loadCreditEarnings();
+      document.getElementById('creditEarningsDisplay').textContent = "S/. " + creditEarnings.toFixed(2);
     }
     
-    // Función para renderizar inventario y agotados según búsqueda
+    function renderSalesHistory() {
+      const salesHistory = loadSalesHistory();
+      const salesHistoryList = document.getElementById('salesHistoryList');
+      salesHistoryList.innerHTML = "";
+      salesHistory.forEach(sale => {
+        const li = document.createElement('li');
+        if (sale.tipo === "Contado") {
+          li.textContent = `Contado: ${sale.nombre} (Cant: ${sale.cantidad}) - ${sale.fecha}`;
+        } else if (sale.tipo === "Crédito") {
+          li.textContent = `Crédito: ${sale.nombre} - Cliente: ${sale.cliente} - ${sale.fecha}`;
+        }
+        salesHistoryList.appendChild(li);
+      });
+    }
+    
     function renderInventory() {
       const inventory = loadInventory();
       const searchQuery = document.getElementById('searchInput').value.toLowerCase();
       const inventoryList = document.getElementById('inventoryList');
       const outOfStockList = document.getElementById('outOfStockList');
-      
       inventoryList.innerHTML = "";
       outOfStockList.innerHTML = "";
       
@@ -106,11 +190,14 @@
             <div>
               <p class="font-bold">${item.nombre}</p>
               <p>Stock: <span class="stock">${item.cantidad}</span></p>
-              <p>Precio: $${item.precio.toFixed(2)}</p>
+              <p>Precio: S/. ${item.precio.toFixed(2)}</p>
             </div>
             <div class="flex gap-2">
               <button class="sell-btn bg-[#0D0D0D] text-[#F2F2F2] px-2 py-1 rounded" title="Vender">
                 <i class="fas fa-shopping-cart"></i>
+              </button>
+              <button class="credit-btn bg-[#0D0D0D] text-[#F2F2F2] px-2 py-1 rounded" title="Vender a Crédito">
+                <i class="fas fa-credit-card"></i>
               </button>
               <button class="restock-btn bg-[#0D0D0D] text-[#F2F2F2] px-2 py-1 rounded" title="Agregar Stock">
                 <i class="fas fa-plus"></i>
@@ -118,27 +205,36 @@
             </div>
           `;
           
-          // Botón para vender: disminuye stock y suma ganancias
+          // Venta al contado: disminuye stock y suma ganancias
           card.querySelector('.sell-btn').addEventListener('click', () => {
             if(item.cantidad > 0) {
               item.cantidad -= 1;
               let earnings = loadEarnings();
               earnings += item.precio;
               saveEarnings(earnings);
+              const history = loadSalesHistory();
+              history.push({ nombre: item.nombre, cantidad: 1, tipo: 'Contado', fecha: new Date().toLocaleString() });
+              saveSalesHistory(history);
               updateEarningsDisplay();
-              saveInventory(inventory);
+              saveInventory(loadInventory().map((p, i) => i === index ? item : p));
               renderInventory();
+              renderSalesHistory();
             }
           });
           
-          // Botón para agregar stock
+          // Venta a crédito: muestra modal
+          card.querySelector('.credit-btn').addEventListener('click', () => {
+            showCreditModal(item, index);
+          });
+          
+          // Agregar stock
           card.querySelector('.restock-btn').addEventListener('click', () => {
             item.cantidad += 1;
-            saveInventory(inventory);
+            saveInventory(loadInventory().map((p, i) => i === index ? item : p));
             renderInventory();
           });
           
-          // Mostrar en Inventario o Agotados según stock
+          // Ubicar producto según stock
           if(item.cantidad > 0) {
             inventoryList.appendChild(card);
           } else {
@@ -148,29 +244,82 @@
       });
     }
     
-    document.getElementById('searchInput').addEventListener('input', renderInventory);
+    // Modal para Venta a Crédito
+    function showCreditModal(item, index) {
+      document.getElementById('creditModal').classList.remove('hidden');
+      // Al confirmar, se procesa la venta a crédito
+      document.getElementById('confirmCreditSale').onclick = () => {
+        const customerName = document.getElementById('customerName').value.trim();
+        const weeksCount = parseInt(document.getElementById('weeksCount').value);
+        if(customerName && weeksCount && item.cantidad > 0) {
+          item.cantidad -= 1;
+          const debt = item.precio;
+          const weeklyPayment = debt / weeksCount;
+          let creditEarnings = loadCreditEarnings();
+          creditEarnings += weeklyPayment;
+          saveCreditEarnings(creditEarnings);
+          const history = loadSalesHistory();
+          history.push({ nombre: item.nombre, cantidad: 1, tipo: 'Crédito', cliente: customerName, fecha: new Date().toLocaleString() });
+          saveSalesHistory(history);
+          let inv = loadInventory();
+          inv[index] = item;
+          saveInventory(inv);
+          updateCreditEarningsDisplay();
+          renderInventory();
+          renderSalesHistory();
+          closeModal();
+        }
+      };
+      document.getElementById('closeModal').onclick = closeModal;
+    }
+    function closeModal() {
+      document.getElementById('creditModal').classList.add('hidden');
+      document.getElementById('customerName').value = "";
+      document.getElementById('weeksCount').value = "";
+    }
     
-    // Inicialización: si no hay inventario en localStorage, cargar el inventario de inventario.json
+    // Menú: Toggle del dropdown y navegación
+    document.getElementById('menuButton').addEventListener('click', () => {
+      document.getElementById('menuDropdown').classList.toggle('hidden');
+    });
+    document.getElementById('menuInventario').addEventListener('click', () => {
+      document.getElementById('inventorySection').classList.remove('hidden');
+      document.getElementById('outOfStockSection').classList.add('hidden');
+      document.getElementById('salesHistorySection').classList.add('hidden');
+      document.getElementById('menuDropdown').classList.add('hidden');
+    });
+    document.getElementById('menuAgotados').addEventListener('click', () => {
+      document.getElementById('outOfStockSection').classList.remove('hidden');
+      document.getElementById('inventorySection').classList.add('hidden');
+      document.getElementById('salesHistorySection').classList.add('hidden');
+      document.getElementById('menuDropdown').classList.add('hidden');
+    });
+    document.getElementById('menuHistorial').addEventListener('click', () => {
+      document.getElementById('salesHistorySection').classList.remove('hidden');
+      document.getElementById('inventorySection').classList.add('hidden');
+      document.getElementById('outOfStockSection').classList.add('hidden');
+      document.getElementById('menuDropdown').classList.add('hidden');
+      renderSalesHistory();
+    });
+    
+    // Inicialización: si no existe inventario en localStorage, cargar inventario.json
     document.addEventListener('DOMContentLoaded', () => {
       if (!localStorage.getItem(INVENTORY_KEY)) {
         fetch('inventario.json')
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Error al cargar inventario.json');
-            }
-            return response.json();
-          })
+          .then(response => response.json())
           .then(data => {
             saveInventory(data);
             renderInventory();
           })
           .catch(error => {
-            console.error("Error fetching inventario.json:", error);
+            console.error("Error al cargar inventario.json:", error);
           });
       } else {
         renderInventory();
       }
       updateEarningsDisplay();
+      updateCreditEarningsDisplay();
+      renderSalesHistory();
     });
   </script>
 </body>
