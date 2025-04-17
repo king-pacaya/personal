@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="favicon.svg">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <title>Textos para Copywriting</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#F2F2F2',
+            text: '#0D0D0D',
+            card: '#FFFFFF',
+            border: '#E0E0E0',
+            primary: '#0D0D0D',
+            'primary-hover': '#333333',
+          },
+          fontFamily: {
+            montserrat: ['Montserrat', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Estilos adicionales para el toast y otros elementos específicos */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .toast.show {
+      opacity: 1;
+    }
+    
+    /* Mejorar el scroll en móviles */
+    .tabs-container::-webkit-scrollbar {
+      height: 4px;
+    }
+    
+    .tabs-container::-webkit-scrollbar-thumb {
+      background-color: rgba(13, 13, 13, 0.2);
+      border-radius: 2px;
+    }
+    
+    /* Estilo para los textos con saltos de línea */
+    .whitespace-pre-wrap {
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body class="bg-bg text-text font-montserrat p-5 min-h-screen">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-2xl md:text-3xl font-bold text-center mb-6 text-primary">Textos para Copywriting</h1>
+    
+    <div class="tabs-container flex justify-center gap-1 mb-6 flex-wrap overflow-x-auto pb-2" id="tabs-container"></div>
+    
+    <div class="content-area bg-card rounded-lg shadow-sm p-4 md:p-6" id="content-area">
+      <div class="text-center text-gray-500 py-5">
+        <i class="far fa-folder-open text-4xl mb-3 opacity-50"></i>
+        <p class="text-lg">Selecciona una categoría para ver los textos</p>
+      </div>
+    </div>
+    
+    <div class="toast bg-primary text-white px-4 py-2 rounded-md text-sm shadow-lg" id="toast">
+      <i class="fas fa-check-circle mr-2"></i>Texto copiado
+    </div>
+  </div>
+  
+  <script>
+    let categoriesData = [];
+    let currentCategory = null;
+    
+    async function loadCategories() {
+      try {
+        const response = await fetch('categorias.json');
+        categoriesData = await response.json();
+        renderTabs();
+        
+        if (categoriesData.length > 0) {
+          activateTab(categoriesData[0].name);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('content-area').innerHTML = `
+          <div class="text-center text-red-500 py-5">
+            <i class="fas fa-exclamation-triangle text-4xl mb-3"></i>
+            <p class="text-lg">Error al cargar las categorías</p>
+          </div>
+        `;
+      }
+    }
+    
+    function renderTabs() {
+      const tabsContainer = document.getElementById('tabs-container');
+      tabsContainer.innerHTML = '';
+      
+      categoriesData.forEach(category => {
+        const tab = document.createElement('button');
+        tab.className = 'tab px-4 py-2 cursor-pointer font-medium text-sm md:text-base transition-colors duration-200 border-b-2 border-transparent hover:text-primary focus:outline-none';
+        tab.textContent = category.name;
+        tab.dataset.category = category.name;
+        tab.addEventListener('click', () => activateTab(category.name));
+        tabsContainer.appendChild(tab);
+      });
+    }
+    
+    function activateTab(categoryName) {
+      document.querySelectorAll('.tab').forEach(tab => {
+        const isActive = tab.dataset.category === categoryName;
+        tab.classList.toggle('text-primary', isActive);
+        tab.classList.toggle('border-primary', isActive);
+        tab.classList.toggle('font-semibold', isActive);
+      });
+      
+      currentCategory = categoriesData.find(cat => cat.name === categoryName);
+      renderCategoryContent();
+    }
+    
+    function renderCategoryContent() {
+      const contentArea = document.getElementById('content-area');
+      
+      if (!currentCategory?.texts?.length) {
+        contentArea.innerHTML = `
+          <div class="text-center text-gray-500 py-5">
+            <i class="far fa-file-alt text-4xl mb-3 opacity-50"></i>
+            <p class="text-lg">No hay textos en esta categoría</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const groupedTexts = {};
+      currentCategory.texts.forEach(text => {
+        if (!groupedTexts[text.title]) {
+          groupedTexts[text.title] = [];
+        }
+        groupedTexts[text.title].push(text.text);
+      });
+      
+      let contentHTML = '';
+      
+      for (const [title, texts] of Object.entries(groupedTexts)) {
+        contentHTML += `
+          <div class="text-group mb-6">
+            <h2 class="group-title text-lg font-semibold mb-3 pb-2 border-b border-border">${title}</h2>
+        `;
+        
+        texts.forEach(text => {
+          // Reemplazar \n con saltos de línea reales
+          const formattedText = text.replace(/\\n/g, '\n');
+          contentHTML += `
+            <div class="text-item flex flex-col sm:flex-row items-start gap-3 mb-3 p-4 border border-border rounded-lg hover:bg-gray-50 transition-colors">
+              <div class="text-content whitespace-pre-wrap flex-1 text-sm md:text-base cursor-pointer" onclick="copyText('${escapeHtml(text.replace(/\\n/g, '\n'))}')">${formattedText}</div>
+              <button class="copy-btn bg-primary hover:bg-primary-hover text-white text-sm py-2 px-3 rounded flex items-center gap-2 transition-colors min-w-[100px] justify-center" onclick="copyText('${escapeHtml(text.replace(/\\n/g, '\n'))}')">
+                <i class="fas fa-copy"></i> Copiar
+              </button>
+            </div>
+          `;
+        });
+        
+        contentHTML += '</div>';
+      }
+      
+      contentArea.innerHTML = contentHTML;
+    }
+    
+    function copyText(text) {
+      // Asegurarse de que los saltos de línea se mantengan
+      const textToCopy = text.replace(/\\n/g, '\n');
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+      });
+    }
+    
+    function escapeHtml(unsafe) {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+    
+    document.addEventListener('DOMContentLoaded', loadCategories);
+    window.copyText = copyText;
+  </script>
+</body>
+</html>
