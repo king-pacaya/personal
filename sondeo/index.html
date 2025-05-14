@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!---Meta--->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!---Page Icon---> 
+    <link rel="shortcut icon" href="favicon.svg">
+  <!--CSS Documents-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <!--Fonts-->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <!---Scripts--->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/2/2.2.1/iconify.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+  <style>
+    * {
+      font-family: 'Montserrat', sans-serif;
+    }
+    .estatus-contactado {
+      background-color: #D1FAE5;
+      color: #065F46;
+    }
+    .estatus-respondido {
+      background-color: #DBEAFE;
+      color: #1E40AF;
+    }
+    .estatus-espera {
+      background-color: #FEF3C7;
+      color: #92400E;
+    }
+    @media (max-width: 768px) {
+      .hidden-mobile {
+        display: none;
+      }
+      .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+  </style>
+  <title>Estudio de Mercado Lima</title>
+</head>
+<body class="bg-gray-50">
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-8">Estudio de Mercado Lima</h1>
+    
+    <div class="mb-6 flex justify-center">
+      <button id="exportExcel" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+        <i class="fas fa-file-excel mr-2"></i>Exportar Excel
+      </button>
+    </div>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="table-responsive">
+        <table id="empresasTable" class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contacto</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden-mobile">Página web</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden-mobile">Ubicación</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden-mobile">Servicios</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden-mobile">Redes</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden-mobile">Correo</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estatus</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <!-- Empresa 1 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-4">Constructora Lima S.A.</td>
+              <td class="px-4 py-4">+51 987 654 321</td>
+              <td class="px-4 py-4 hidden-mobile"><a href="http://www.constructoralima.pe" target="_blank" class="text-blue-600 hover:underline">constructoralima.pe</a></td>
+              <td class="px-4 py-4 hidden-mobile">Lima Centro</td>
+              <td class="px-4 py-4 hidden-mobile">Construcción, Remodelación</td>
+              <td class="px-4 py-4 hidden-mobile">fb.com/constructoralima</td>
+              <td class="px-4 py-4 hidden-mobile">contacto@constructoralima.pe</td>
+              <td class="px-4 py-4">
+                <span class="px-2 py-1 rounded-full text-xs font-medium estatus-contactado">Contactado</span>
+              </td>
+            </tr>
+            
+            <!-- Empresa 2 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-4">Edifica Perú</td>
+              <td class="px-4 py-4">+51 912 345 678</td>
+              <td class="px-4 py-4 hidden-mobile"><a href="http://www.edificaperu.com" target="_blank" class="text-blue-600 hover:underline">edificaperu.com</a></td>
+              <td class="px-4 py-4 hidden-mobile">San Isidro</td>
+              <td class="px-4 py-4 hidden-mobile">Construcción, Arquitectura</td>
+              <td class="px-4 py-4 hidden-mobile">@edificaperu (Instagram)</td>
+              <td class="px-4 py-4 hidden-mobile">info@edificaperu.com</td>
+              <td class="px-4 py-4">
+                <span class="px-2 py-1 rounded-full text-xs font-medium estatus-respondido">Respondido</span>
+              </td>
+            </tr>
+            
+            <!-- Empresa 3 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-4">Obras y Proyectos SAC</td>
+              <td class="px-4 py-4">+51 945 678 123</td>
+              <td class="px-4 py-4 hidden-mobile"><a href="http://www.obrasyproyectos.com" target="_blank" class="text-blue-600 hover:underline">obrasyproyectos.com</a></td>
+              <td class="px-4 py-4 hidden-mobile">Miraflores</td>
+              <td class="px-4 py-4 hidden-mobile">Construcción, Supervisión</td>
+              <td class="px-4 py-4 hidden-mobile">linkedin.com/company/obrasproy</td>
+              <td class="px-4 py-4 hidden-mobile">ventas@obrasyproyectos.com</td>
+              <td class="px-4 py-4">
+                <span class="px-2 py-1 rounded-full text-xs font-medium estatus-espera">En espera</span>
+              </td>
+            </tr>
+            
+            <!-- Empresa 4 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-4">ElectroSoluciones S.R.L.</td>
+              <td class="px-4 py-4">+51 999 888 777</td>
+              <td class="px-4 py-4 hidden-mobile"><a href="http://www.electrosoluciones.pe" target="_blank" class="text-blue-600 hover:underline">electrosoluciones.pe</a></td>
+              <td class="px-4 py-4 hidden-mobile">San Borja</td>
+              <td class="px-4 py-4 hidden-mobile">Electricidad, Mantenimiento</td>
+              <td class="px-4 py-4 hidden-mobile">fb.com/electrosoluciones</td>
+              <td class="px-4 py-4 hidden-mobile">contacto@electrosoluciones.pe</td>
+              <td class="px-4 py-4">
+                <span class="px-2 py-1 rounded-full text-xs font-medium estatus-respondido">Respondido</span>
+              </td>
+            </tr>
+            
+            <!-- Empresa 5 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-4">Luz y Fuerza SAC</td>
+              <td class="px-4 py-4">+51 914 567 890</td>
+              <td class="px-4 py-4 hidden-mobile"><a href="http://www.luzyfuerza.pe" target="_blank" class="text-blue-600 hover:underline">luzyfuerza.pe</a></td>
+              <td class="px-4 py-4 hidden-mobile">La Molina</td>
+              <td class="px-4 py-4 hidden-mobile">Instalaciones eléctricas</td>
+              <td class="px-4 py-4 hidden-mobile">@luzyfuerza (Facebook)</td>
+              <td class="px-4 py-4 hidden-mobile">info@luzyfuerza.pe</td>
+              <td class="px-4 py-4">
+                <span class="px-2 py-1 rounded-full text-xs font-medium estatus-contactado">Contactado</span>
+              </td>
+            </tr>
+            
+            <!-- Empresa 6 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-4">ElectriRed</td>
+              <td class="px-4 py-4">+51 930 123 456</td>
+              <td class="px-4 py-4 hidden-mobile"><a href="http://www.electrired.com" target="_blank" class="text-blue-600 hover:underline">electrired.com</a></td>
+              <td class="px-4 py-4 hidden-mobile">Surco</td>
+              <td class="px-4 py-4 hidden-mobile">Electricidad, Redes eléctricas</td>
+              <td class="px-4 py-4 hidden-mobile">fb.com/electrired</td>
+              <td class="px-4 py-4 hidden-mobile">soporte@electrired.com</td>
+              <td class="px-4 py-4">
+                <span class="px-2 py-1 rounded-full text-xs font-medium estatus-espera">En espera</span>
+              </td>
+            </tr>
+            
+            <!-- Empresa 7 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-4">Pinturas del Perú</td>
+              <td class="px-4 py-4">+51 987 123 456</td>
+              <td class="px-4 py-4 hidden-mobile"><a href="http://www.pinturasdelperu.pe" target="_blank" class="text-blue-600 hover:underline">pinturasdelperu.pe</a></td>
+              <td class="px-4 py-4 hidden-mobile">Cercado de Lima</td>
+              <td class="px-4 py-4 hidden-mobile">Pintura residencial y comercial</td>
+              <td class="px-4 py-4 hidden-mobile">instagram.com/pinturasperu</td>
+              <td class="px-4 py-4 hidden-mobile">contacto@pinturasdelperu.pe</td>
+              <td class="px-4 py-4">
+                <span class="px-2 py-1 rounded-full text-xs font-medium estatus-contactado">Contactado</span>
+              </td>
+            </tr>
+            
+            <!-- Empresa 8 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-4">ColorArte SAC</td>
+              <td class="px-4 py-4">+51 912 345 789</td>
+              <td class="px-4 py-4 hidden-mobile"><a href="http://www.colorarte.com" target="_blank" class="text-blue-600 hover:underline">colorarte.com</a></td>
+              <td class="px-4 py-4 hidden-mobile">San Miguel</td>
+              <td class="px-4 py-4 hidden-mobile">Pintura decorativa y técnica</td>
+              <td class="px-4 py-4 hidden-mobile">fb.com/colorartesac</td>
+              <td class="px-4 py-4 hidden-mobile">ventas@colorarte.com</td>
+              <td class="px-4 py-4">
+                <span class="px-2 py-1 rounded-full text-xs font-medium estatus-respondido">Respondido</span>
+              </td>
+            </tr>
+            
+            <!-- Empresa 9 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-4">Pinturas Selectas</td>
+              <td class="px-4 py-4">+51 945 789 123</td>
+              <td class="px-4 py-4 hidden-mobile"><a href="http://www.pinturaselectas.pe" target="_blank" class="text-blue-600 hover:underline">pinturaselectas.pe</a></td>
+              <td class="px-4 py-4 hidden-mobile">Magdalena</td>
+              <td class="px-4 py-4 hidden-mobile">Pintura, Acabados especiales</td>
+              <td class="px-4 py-4 hidden-mobile">@pinturaselectas (Instagram)</td>
+              <td class="px-4 py-4 hidden-mobile">info@pinturaselectas.pe</td>
+              <td class="px-4 py-4">
+                <span class="px-2 py-1 rounded-full text-xs font-medium estatus-espera">En espera</span>
+              </td>
+            </tr>
+            
+            <!-- Empresa 10 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-4">Servicios Generales ABC</td>
+              <td class="px-4 py-4">+51 999 654 321</td>
+              <td class="px-4 py-4 hidden-mobile"><a href="http://www.serviciosabc.pe" target="_blank" class="text-blue-600 hover:underline">serviciosabc.pe</a></td>
+              <td class="px-4 py-4 hidden-mobile">San Juan de Lurigancho</td>
+              <td class="px-4 py-4 hidden-mobile">Limpieza, Mantenimiento</td>
+              <td class="px-4 py-4 hidden-mobile">fb.com/serviciosabc</td>
+              <td class="px-4 py-4 hidden-mobile">contacto@serviciosabc.pe</td>
+              <td class="px-4 py-4">
+                <span class="px-2 py-1 rounded-full text-xs font-medium estatus-contactado">Contactado</span>
+              </td>
+            </tr>
+            
+            <!-- Empresa 11 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-4">MultiServicios Perú</td>
+              <td class="px-4 py-4">+51 914 321 987</td>
+              <td class="px-4 py-4 hidden-mobile"><a href="http://www.multiserviciosperu.com" target="_blank" class="text-blue-600 hover:underline">multiserviciosperu.com</a></td>
+              <td class="px-4 py-4 hidden-mobile">Comas</td>
+              <td class="px-4 py-4 hidden-mobile">Servicios generales integrales</td>
+              <td class="px-4 py-4 hidden-mobile">linkedin.com/company/multiservicios</td>
+              <td class="px-4 py-4 hidden-mobile">info@multiserviciosperu.com</td>
+              <td class="px-4 py-4">
+                <span class="px-2 py-1 rounded-full text-xs font-medium estatus-respondido">Respondido</span>
+              </td>
+            </tr>
+            
+            <!-- Empresa 12 -->
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-4">Soluciones Integrales</td>
+              <td class="px-4 py-4">+51 930 456 789</td>
+              <td class="px-4 py-4 hidden-mobile"><a href="http://www.solucionesintegrales.pe" target="_blank" class="text-blue-600 hover:underline">solucionesintegrales.pe</a></td>
+              <td class="px-4 py-4 hidden-mobile">Villa El Salvador</td>
+              <td class="px-4 py-4 hidden-mobile">Servicios generales y técnicos</td>
+              <td class="px-4 py-4 hidden-mobile">fb.com/solucionesintegrales</td>
+              <td class="px-4 py-4 hidden-mobile">contacto@solucionesintegrales.pe</td>
+              <td class="px-4 py-4">
+                <span class="px-2 py-1 rounded-full text-xs font-medium estatus-espera">En espera</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Función para hacer responsive la tabla
+      function adjustTable() {
+        const screenWidth = window.innerWidth;
+        const hiddenElements = document.querySelectorAll('.hidden-mobile');
+        
+        if (screenWidth < 768) {
+          hiddenElements.forEach(el => {
+            el.style.display = 'none';
+          });
+        } else {
+          hiddenElements.forEach(el => {
+            el.style.display = '';
+          });
+        }
+      }
+      
+      // Ajustar al cargar y al cambiar tamaño
+      adjustTable();
+      window.addEventListener('resize', adjustTable);
+      
+      // Función para exportar a Excel
+      document.getElementById('exportExcel').addEventListener('click', function() {
+        // Obtener la tabla
+        const table = document.getElementById('empresasTable');
+        
+        // Convertir la tabla a un libro de trabajo de Excel
+        const wb = XLSX.utils.table_to_book(table);
+        
+        // Exportar el archivo Excel
+        XLSX.writeFile(wb, 'Estudio_Mercado_Lima.xlsx');
+      });
+    });
+  </script>
+</body>
+</html>
