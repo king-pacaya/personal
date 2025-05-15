@@ -1,14 +1,23 @@
-# README - Base de Datos Cronograma
+# Instrucciones para crear la base de datos y tablas
 
-Este documento explica cómo crear y configurar la base de datos para el proyecto, incluyendo las tablas necesarias.
+La base de datos debe llamarse **cronograma** y las tablas deben seguir esta estructura para evitar problemas.
 
-## Nombre de la tabla principal
+```sql
+CREATE DATABASE IF NOT EXISTS cronograma;
+USE cronograma;
 
-La tabla principal en la base de datos se llama **cronograma**. Por este motivo, es recomendable que al crear tu tabla también la nombres como **cronograma** para mantener consistencia y evitar confusiones.
+CREATE TABLE IF NOT EXISTS dias_cronograma (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    fecha DATE NOT NULL,
+    dia_semana VARCHAR(10) NOT NULL,
+    estado ENUM('pendiente', 'pagado', 'no_aplica') DEFAULT 'pendiente',
+    comentario VARCHAR(255),
+    UNIQUE KEY (fecha)
+);
 
----
-
-## Creación de la Base de Datos y Tablas
-
-El script SQL para crear la base de datos y las tablas necesarias está en el archivo:
-
+CREATE TABLE IF NOT EXISTS configuracion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    fecha_inicio DATE NOT NULL,
+    total_dias INT NOT NULL,
+    excluir_domingo BOOLEAN DEFAULT TRUE
+);
