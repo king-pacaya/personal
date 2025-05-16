@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!---Meta--->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!---Page Icon--->
+  <link rel="shortcut icon" href="favicon.svg">
+  <!--CSS Documents-->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+  <!---Scripts--->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Aplicar Montserrat a todos los elementos */
+    * {
+      font-family: 'Montserrat', sans-serif;
+      outline: none;
+    }
+    body {
+      background-color: #F2F2F2;
+      color: #0D0D0D;
+    }
+    .container {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    .input-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #0D0D0D;
+    }
+    /* Forzar que los inputs y selects tengan borde #0D0D0D */
+    input, select {
+      border-color: #0D0D0D;
+      color: #0D0D0D;
+    }
+    /* Evitar que el canvas se salga de la pantalla */
+    .canvas-container {
+      overflow-x: auto;
+    }
+    canvas {
+      max-width: 100%;
+      height: auto;
+      /* Sin borde para que no se genere un contorno extra en la imagen final */
+    }
+  </style>
+  <title>Square Generator</title>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-2xl font-bold mb-4 text-center uppercase">Generador de Rectángulos</h1>
+    <form id="rectangleForm">
+      <div class="input-group">
+        <label for="width" class="font-bold">Ancho:</label>
+        <input type="number" id="width" placeholder="Ej. 10" class="border p-2 w-full" />
+      </div>
+      <div class="input-group">
+        <label for="height" class="font-bold">Alto:</label>
+        <input type="number" id="height" placeholder="Ej. 5" class="border p-2 w-full" />
+      </div>
+      <div class="input-group">
+        <label for="unit" class="font-bold">Unidad:</label>
+        <select id="unit" class="border p-2 w-full">
+          <option value="px">px</option>
+          <option value="cm">cm</option>
+        </select>
+      </div>
+      <button type="submit" id="generateBtn" class="bg-[#0D0D0D] hover:bg-[#0D0D0D] text-[#F2F2F2] font-bold py-2 px-4 rounded block mx-auto">
+        Generar y Descargar
+      </button>
+    </form>
+    <div class="canvas-container mt-6 text-center">
+      <canvas id="rectangleCanvas"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const rectangleForm = document.getElementById('rectangleForm');
+    const canvas = document.getElementById('rectangleCanvas');
+    const ctx = canvas.getContext('2d');
+
+    rectangleForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      // Obtener valores de los inputs
+      let widthValue = parseFloat(document.getElementById('width').value);
+      let heightValue = parseFloat(document.getElementById('height').value);
+      const unit = document.getElementById('unit').value;
+      
+      if(isNaN(widthValue) || isNaN(heightValue)) {
+        alert('Por favor, ingresa valores numéricos para ancho y alto.');
+        return;
+      }
+      
+      // Conversión si se selecciona cm (1 cm ≈ 37.8 px)
+      const conversionFactor = 37.8;
+      let widthPx = (unit === 'cm') ? widthValue * conversionFactor : widthValue;
+      let heightPx = (unit === 'cm') ? heightValue * conversionFactor : heightValue;
+      
+      // Establecer dimensiones exactas del canvas
+      canvas.width = widthPx;
+      canvas.height = heightPx;
+      
+      // Rellenar todo el canvas de blanco (será el único rectángulo)
+      ctx.fillStyle = "#0D0D0D";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Iniciar descarga automática
+      const link = document.createElement('a');
+      link.download = 'rectangulo.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!---Meta--->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!---Page Icon---> 
+    <link rel="shortcut icon" href="favicon.svg">
+  <!--CSS Documents-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <!--Fonts-->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <!---Scripts--->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://code.iconify.design/2/2.2.1/iconify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    * {
+      font-family: 'Montserrat', sans-serif;
+    }
+    .sidebar {
+      transition: all 0.3s;
+    }
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+    }
+    .signature-space {
+      height: 60px;
+      border-top: 1px solid black;
+      margin-top: 20px;
+    }
+  </style>
+  <title>Dashboard de Préstamos</title>
+</head>
+<body class="bg-gray-100">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="sidebar bg-blue-800 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out" id="sidebar">
+      <div class="text-white flex items-center space-x-2 px-4">
+        <i class="fas fa-hand-holding-usd text-2xl"></i>
+        <span class="text-xl font-bold">PréstamosIQ</span>
+      </div>
+      <nav>
+        <button onclick="showSection('create-loan')" class="w-full flex items-center space-x-2 py-3 px-4 rounded transition duration-200 hover:bg-blue-700">
+          <i class="fas fa-file-contract"></i>
+          <span>Nuevo Préstamo</span>
+        </button>
+        <button onclick="showSection('loan-history')" class="w-full flex items-center space-x-2 py-3 px-4 rounded transition duration-200 hover:bg-blue-700">
+          <i class="fas fa-history"></i>
+          <span>Historial</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- Top Navigation -->
+      <header class="bg-white shadow-sm">
+        <div class="flex justify-between items-center py-4 px-6">
+          <button id="menu-toggle" class="md:hidden text-gray-500 focus:outline-none">
+            <i class="fas fa-bars text-2xl"></i>
+          </button>
+          <div class="flex items-center space-x-4">
+            <span class="font-semibold text-lg">Dashboard</span>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span id="current-date" class="text-sm text-gray-600"></span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Area -->
+      <main class="flex-1 overflow-y-auto p-6">
+        <!-- Create Loan Section -->
+        <section id="create-loan" class="section-content">
+          <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-bold mb-6">Crear Nuevo Préstamo</h2>
+            
+            <form id="loan-form" class="space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Monto del préstamo (S/.)</label>
+                  <input type="number" id="loan-amount" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Tasa de interés (%)</label>
+                  <input type="number" id="interest-rate" value="20" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Modalidad de pago</label>
+                  <select id="payment-type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <option value="monthly" selected>Mensual</option>
+                    <option value="daily">Diario</option>
+                  </select>
+                </div>
+                
+                <div id="period-container">
+                  <label id="period-label" class="block text-sm font-medium text-gray-700 mb-1">Duración (meses)</label>
+                  <input type="number" id="period" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de inicio</label>
+                  <input type="date" id="start-date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Prestamista</label>
+                  <select id="lender" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <option value="King Isaac Pacaya Astulla" data-dni="72485953" selected>King Isaac Pacaya Astulla</option>
+                    <option value="Carmen Rosa Astulla Fernández" data-dni="00110596">Carmen Rosa Astulla Fernández</option>
+                    <option value="Jordy Daniel Pacaya Astulla" data-dni="72485951">Jordy Daniel Pacaya Astulla</option>
+                  </select>
+                </div>
+              </div>
+              
+              <!-- Borrowers Section -->
+              <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-medium mb-4">Prestatarios</h3>
+                <div id="borrowers-container">
+                  <div class="borrower-form bg-gray-50 p-4 rounded-lg mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
+                        <input type="text" class="borrower-name w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">DNI</label>
+                        <input type="text" class="borrower-dni w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                      </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
+                        <select class="borrower-gender w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                          <option value="">Seleccionar</option>
+                          <option value="masculino">Masculino</option>
+                          <option value="femenino">Femenino</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                        <input type="text" class="borrower-address w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" onclick="addBorrower()" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md flex items-center">
+                  <i class="fas fa-plus mr-2"></i> Agregar Prestatario
+                </button>
+              </div>
+              
+              <!-- Guarantors Section -->
+              <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-lg font-medium mb-4">Garantes (Opcional)</h3>
+                <div id="guarantors-container">
+                  <!-- Guarantors will be added here -->
+                </div>
+                <button type="button" onclick="addGuarantor()" class="mt-2 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-md flex items-center">
+                  <i class="fas fa-plus mr-2"></i> Agregar Garante
+                </button>
+              </div>
+              
+              <div class="border-t border-gray-200 pt-6">
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-md font-medium">
+                  Generar Contrato
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Loan History Section -->
+        <section id="loan-history" class="section-content hidden">
+          <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-bold mb-6">Historial de Préstamos</h2>
+            
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prestatario(s)</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modalidad</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="loan-history-body" class="bg-white divide-y divide-gray-200">
+                  <!-- Loans will be listed here -->
+                </tbody>
+              </table>
+            </div>
+            
+            <div id="no-loans-message" class="text-center py-8 text-gray-500">
+              <i class="fas fa-file-alt text-4xl mb-2"></i>
+              <p>No hay préstamos registrados</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Contract Preview Modal -->
+  <div id="contract-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold">Vista previa del contrato</h3>
+          <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div id="contract-content" class="p-4 border border-gray-200 rounded">
+          <!-- Contract content will be generated here -->
+        </div>
+        <div class="mt-6 flex justify-end space-x-3">
+          <button onclick="closeModal()" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-md">
+            Cancelar
+          </button>
+          <button onclick="generatePDF()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md flex items-center">
+            <i class="fas fa-file-pdf mr-2"></i> Descargar PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Loan Modal -->
+  <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold">Editar Préstamo</h3>
+          <button onclick="closeEditModal()" class="text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div id="edit-form-container" class="p-4">
+          <!-- Edit form will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize variables
+    let loans = JSON.parse(localStorage.getItem('loans')) || [];
+    let currentLoanId = null;
+    
+    // DOM elements
+    const paymentTypeSelect = document.getElementById('payment-type');
+    const periodLabel = document.getElementById('period-label');
+    const periodInput = document.getElementById('period');
+    const startDateInput = document.getElementById('start-date');
+    const currentDateElement = document.getElementById('current-date');
+    
+    // Set current date
+    const today = new Date();
+    startDateInput.valueAsDate = today;
+    currentDateElement.textContent = today.toLocaleDateString('es-ES', { 
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+    });
+    
+    // Event listeners
+    paymentTypeSelect.addEventListener('change', updatePeriodLabel);
+    document.getElementById('menu-toggle').addEventListener('click', toggleSidebar);
+    document.getElementById('loan-form').addEventListener('submit', handleFormSubmit);
+    
+    // Initialize the page
+    updatePeriodLabel();
+    showSection('create-loan');
+    loadLoanHistory();
+    
+    // Functions
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('-translate-x-full');
+    }
+    
+    function showSection(sectionId) {
+      document.querySelectorAll('.section-content').forEach(section => {
+        section.classList.add('hidden');
+      });
+      document.getElementById(sectionId).classList.remove('hidden');
+    }
+    
+    function updatePeriodLabel() {
+      const paymentType = paymentTypeSelect.value;
+      if (paymentType === 'daily') {
+        periodLabel.textContent = 'Duración (días)';
+      } else if (paymentType === 'monthly') {
+        periodLabel.textContent = 'Duración (meses)';
+      }
+    }
+    
+    function addBorrower() {
+      const container = document.getElementById('borrowers-container');
+      const newBorrower = document.createElement('div');
+      newBorrower.className = 'borrower-form bg-gray-50 p-4 rounded-lg mb-4';
+      newBorrower.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <h4 class="font-medium">Prestatario adicional</h4>
+          <button onclick="removeForm(this, 'borrower')" class="text-red-500 hover:text-red-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
+            <input type="text" class="borrower-name w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">DNI</label>
+            <input type="text" class="borrower-dni w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
+            <select class="borrower-gender w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+              <option value="">Seleccionar</option>
+              <option value="masculino">Masculino</option>
+              <option value="femenino">Femenino</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+            <input type="text" class="borrower-address w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          </div>
+        </div>
+      `;
+      container.appendChild(newBorrower);
+    }
+    
+    function addGuarantor() {
+      const container = document.getElementById('guarantors-container');
+      const newGuarantor = document.createElement('div');
+      newGuarantor.className = 'guarantor-form bg-gray-50 p-4 rounded-lg mb-4';
+      newGuarantor.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <h4 class="font-medium">Garante</h4>
+          <button onclick="removeForm(this, 'guarantor')" class="text-red-500 hover:text-red-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
+            <input type="text" class="guarantor-name w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">DNI</label>
+            <input type="text" class="guarantor-dni w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
+            <select class="guarantor-gender w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">Seleccionar</option>
+              <option value="masculino">Masculino</option>
+              <option value="femenino">Femenino</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+            <input type="text" class="guarantor-address w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+      `;
+      container.appendChild(newGuarantor);
+    }
+    
+    function removeForm(button, type) {
+      const form = button.closest(`.${type}-form`);
+      form.remove();
+    }
+    
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      // Get form data
+      const amount = parseFloat(document.getElementById('loan-amount').value);
+      const interestRate = parseFloat(document.getElementById('interest-rate').value);
+      const paymentType = document.getElementById('payment-type').value;
+      const period = parseInt(document.getElementById('period').value);
+      const startDate = document.getElementById('start-date').value;
+      const lenderSelect = document.getElementById('lender');
+      const lenderName = lenderSelect.value;
+      const lenderDni = lenderSelect.options[lenderSelect.selectedIndex].getAttribute('data-dni');
+      
+      // Calculate end date
+      const endDate = calculateEndDate(startDate, period, paymentType);
+      
+      // Calculate payment details
+      const interestAmount = amount * (interestRate / 100);
+      const totalAmount = amount + interestAmount;
+      let paymentDetails;
+      
+      if (paymentType === 'daily') {
+        const dailyPayment = totalAmount / period;
+        paymentDetails = {
+          type: 'Diario',
+          dailyPayment: dailyPayment.toFixed(2),
+          totalDays: period,
+          totalAmount: totalAmount.toFixed(2)
+        };
+      } else {
+        const monthlyInterest = interestAmount / period;
+        paymentDetails = {
+          type: 'Mensual',
+          monthlyInterest: monthlyInterest.toFixed(2),
+          totalMonths: period,
+          totalAmount: totalAmount.toFixed(2),
+          finalPayment: totalAmount.toFixed(2)
+        };
+      }
+      
+      // Get borrowers
+      const borrowers = [];
+      document.querySelectorAll('.borrower-form').forEach(form => {
+        borrowers.push({
+          name: form.querySelector('.borrower-name').value,
+          dni: form.querySelector('.borrower-dni').value,
+          gender: form.querySelector('.borrower-gender').value,
+          address: form.querySelector('.borrower-address').value
+        });
+      });
+      
+      // Get guarantors (if any)
+      const guarantors = [];
+      document.querySelectorAll('.guarantor-form').forEach(form => {
+        const name = form.querySelector('.guarantor-name').value;
+        if (name) { // Only add if name is provided (optional field)
+          guarantors.push({
+            name: name,
+            dni: form.querySelector('.guarantor-dni').value,
+            gender: form.querySelector('.guarantor-gender').value,
+            address: form.querySelector('.guarantor-address').value
+          });
+        }
+      });
+      
+      // Create loan object
+      const loan = {
+        id: currentLoanId || Date.now().toString(),
+        date: today.toISOString().split('T')[0],
+        amount: amount,
+        interestRate: interestRate,
+        paymentType: paymentType,
+        period: period,
+        startDate: startDate,
+        endDate: endDate,
+        lender: {
+          name: lenderName,
+          dni: lenderDni
+        },
+        borrowers: borrowers,
+        guarantors: guarantors,
+        paymentDetails: paymentDetails
+      };
+      
+      // Add or update loan
+      if (currentLoanId) {
+        // Update existing loan
+        const index = loans.findIndex(l => l.id === currentLoanId);
+        if (index !== -1) {
+          loans[index] = loan;
+        }
+        currentLoanId = null;
+      } else {
+        // Add new loan
+        loans.push(loan);
+      }
+      
+      // Save to localStorage
+      localStorage.setItem('loans', JSON.stringify(loans));
+      
+      // Show contract preview
+      showContractPreview(loan);
+      
+      // Reset form
+      document.getElementById('loan-form').reset();
+      document.getElementById('borrowers-container').innerHTML = '';
+      document.getElementById('guarantors-container').innerHTML = '';
+      addBorrower(); // Add default borrower form
+    }
+    
+    function calculateEndDate(startDate, period, paymentType) {
+      const date = new Date(startDate);
+      
+      if (paymentType === 'daily') {
+        date.setDate(date.getDate() + period);
+      } else {
+        date.setMonth(date.getMonth() + period);
+      }
+      
+      return date.toISOString().split('T')[0];
+    }
+    
+    function showContractPreview(loan) {
+      const modal = document.getElementById('contract-modal');
+      const content = document.getElementById('contract-content');
+      
+      // Generate gender-specific terms
+      const borrowerTerm = loan.borrowers[0].gender === 'femenino' ? 'PRESTATARIA' : 'PRESTATARIO';
+      const borrowerTermPlural = loan.borrowers[0].gender === 'femenino' ? 'PRESTATARIAS' : 'PRESTATARIOS';
+      const guarantorTerm = loan.guarantors.length > 0 ? 
+        (loan.guarantors[0].gender === 'femenino' ? 'GARANTE' : 'GARANTE') : '';
+      const guarantorTermPlural = loan.guarantors.length > 0 ? 
+        (loan.guarantors[0].gender === 'femenino' ? 'GARANTES' : 'GARANTES') : '';
+      
+      // Generate contract content
+      let contractHTML = `
+        <h1 class="text-2xl font-bold text-center mb-6">CONTRATO DE PRÉSTAMO</h1>
+        
+        <p class="text-right mb-6">Lima, ${formatDate(loan.date)}</p>
+        
+        <div class="mb-6">
+          <p>CONSTE POR EL PRESENTE DOCUMENTO EL CONTRATO DE PRÉSTAMO QUE CELEBRAN POR UNA PARTE ${loan.lender.name}, identificado con DNI N° ${loan.lender.dni}, en adelante denominado EL PRESTAMISTA; DE OTRA PARTE ${loan.borrowers.map(b => `${b.name}, identificad${b.gender === 'femenino' ? 'a' : 'o'} con DNI N° ${b.dni}`).join('; ')} en adelante denominad${loan.borrowers.length > 1 ? 'os' : 'o'} ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}; ${loan.guarantors.length > 0 ? `Y DE OTRA PARTE ${loan.guarantors.map(g => `${g.name}, identificad${g.gender === 'femenino' ? 'a' : 'o'} con DNI N° ${g.dni}`).join('; ')} en adelante denominad${loan.guarantors.length > 1 ? 'os' : 'o'} ${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}` : ''}.</p>
+        </div>
+        
+        <div class="mb-6">
+          <p>EL PRESTAMISTA otorga a ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} un préstamo por la suma de S/. ${loan.amount.toFixed(2)} (${numberToWords(loan.amount)} SOLES), el cual será devuelto junto con los intereses conforme a lo establecido en el presente contrato. ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} pagará a EL PRESTAMISTA un interés del ${loan.interestRate}% sobre el monto del préstamo, lo que equivale a S/. ${(loan.amount * (loan.interestRate / 100)).toFixed(2)} (${numberToWords(loan.amount * (loan.interestRate / 100))} SOLES).</p>
+        </div>
+        
+        <div class="mb-6">
+          <p>${loan.paymentType === 'daily' ? 
+            `${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} se obliga a pagar la suma total de S/. ${loan.paymentDetails.totalAmount} (${numberToWords(parseFloat(loan.paymentDetails.totalAmount))} SOLES), en ${loan.period} días, mediante pagos diarios de S/. ${loan.paymentDetails.dailyPayment} (${numberToWords(parseFloat(loan.paymentDetails.dailyPayment))} SOLES).` : 
+            `${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} se obliga a pagar intereses mensuales de S/. ${loan.paymentDetails.monthlyInterest} (${numberToWords(parseFloat(loan.paymentDetails.monthlyInterest))} SOLES), durante ${loan.period} meses, y al final del plazo pagará el monto total del préstamo más el último interés, es decir S/. ${loan.paymentDetails.finalPayment} (${numberToWords(parseFloat(loan.paymentDetails.finalPayment))} SOLES).`}
+          El primer pago se realizará el ${formatDate(loan.startDate)} y el último pago el ${formatDate(loan.endDate)}.</p>
+        </div>
+        
+        ${loan.guarantors.length > 0 ? `
+        <div class="mb-6">
+          <p>${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm} se obliga${loan.guarantors.length > 1 ? 'n' : ''} solidariamente a cumplir con las obligaciones de ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} en caso de incumplimiento de este${loan.borrowers.length > 1 ? 's' : ''} último${loan.borrowers.length > 1 ? 's' : ''}.</p>
+        </div>
+        ` : ''}
+        
+        <div class="mb-6">
+          <h2 class="text-lg font-bold mb-2">FIRMAS</h2>
+          <div class="grid grid-cols-1 md:grid-cols-${1 + loan.borrowers.length + (loan.guarantors.length > 0 ? loan.guarantors.length : 0)} gap-4 mt-6">
+            <div class="text-center">
+              <div class="signature-space"></div>
+              <p class="font-bold">EL PRESTAMISTA</p>
+              <p>${loan.lender.name}</p>
+              <p>DNI ${loan.lender.dni}</p>
+            </div>
+            
+            ${loan.borrowers.map(borrower => `
+              <div class="text-center">
+                <div class="signature-space"></div>
+                <p class="font-bold">${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}</p>
+                <p>${borrower.name}</p>
+                <p>DNI ${borrower.dni}</p>
+              </div>
+            `).join('')}
+            
+            ${loan.guarantors.map(guarantor => `
+              <div class="text-center">
+                <div class="signature-space"></div>
+                <p class="font-bold">${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}</p>
+                <p>${guarantor.name}</p>
+                <p>DNI ${guarantor.dni}</p>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      
+      content.innerHTML = contractHTML;
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeModal() {
+      document.getElementById('contract-modal').classList.add('hidden');
+      document.body.style.overflow = 'auto';
+      loadLoanHistory();
+      showSection('loan-history');
+    }
+    
+    function closeEditModal() {
+      document.getElementById('edit-modal').classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+    
+    function generatePDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      // Get contract content
+      const content = document.getElementById('contract-content');
+      
+      // Generate filename
+      const firstBorrower = loans[loans.length - 1].borrowers[0].name.replace(/\s+/g, '-');
+      const date = loans[loans.length - 1].date.split('-').reverse().join('-');
+      const filename = `${firstBorrower}-${date}.pdf`;
+      
+      // Create a temporary div to hold the content for PDF generation
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = content.innerHTML;
+      document.body.appendChild(tempDiv);
+      
+      // Add content to PDF
+      doc.html(tempDiv, {
+        callback: function(doc) {
+          doc.save(filename);
+          document.body.removeChild(tempDiv);
+        },
+        margin: [10, 10, 10, 10],
+        autoPaging: 'text',
+        width: 180,
+        windowWidth: tempDiv.scrollWidth
+      });
+    }
+    
+    function loadLoanHistory() {
+      const tbody = document.getElementById('loan-history-body');
+      const noLoansMessage = document.getElementById('no-loans-message');
+      
+      tbody.innerHTML = '';
+      
+      if (loans.length === 0) {
+        noLoansMessage.classList.remove('hidden');
+        return;
+      }
+      
+      noLoansMessage.classList.add('hidden');
+      
+      loans.forEach(loan => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-50';
+        
+        const borrowersList = loan.borrowers.map(b => b.name).join(', ');
+        
+        row.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(loan.date)}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${borrowersList}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">S/. ${loan.amount.toFixed(2)}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${loan.paymentDetails.type}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            <button onclick="viewContract('${loan.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button onclick="downloadContract('${loan.id}')" class="text-green-600 hover:text-green-900 mr-3">
+              <i class="fas fa-file-pdf"></i>
+            </button>
+            <button onclick="editContract('${loan.id}')" class="text-yellow-600 hover:text-yellow-900 mr-3">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button onclick="deleteContract('${loan.id}')" class="text-red-600 hover:text-red-900">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        `;
+        
+        tbody.appendChild(row);
+      });
+    }
+    
+    function viewContract(loanId) {
+      const loan = loans.find(l => l.id === loanId);
+      if (loan) {
+        showContractPreview(loan);
+      }
+    }
+    
+    function editContract(loanId) {
+      const loan = loans.find(l => l.id === loanId);
+      if (loan) {
+        currentLoanId = loanId;
+        const editFormContainer = document.getElementById('edit-form-container');
+        
+        // Create edit form
+        let editFormHTML = `
+          <form id="edit-loan-form" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Monto del préstamo (S/.)</label>
+                <input type="number" id="edit-loan-amount" value="${loan.amount}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tasa de interés (%)</label>
+                <input type="number" id="edit-interest-rate" value="${loan.interestRate}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Modalidad de pago</label>
+                <select id="edit-payment-type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                  <option value="monthly" ${loan.paymentType === 'monthly' ? 'selected' : ''}>Mensual</option>
+                  <option value="daily" ${loan.paymentType === 'daily' ? 'selected' : ''}>Diario</option>
+                </select>
+              </div>
+              
+              <div id="edit-period-container">
+                <label id="edit-period-label" class="block text-sm font-medium text-gray-700 mb-1">Duración (${loan.paymentType === 'daily' ? 'días' : 'meses'})</label>
+                <input type="number" id="edit-period" value="${loan.period}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de inicio</label>
+                <input type="date" id="edit-start-date" value="${loan.startDate}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Prestamista</label>
+                <select id="edit-lender" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                  <option value="King Isaac Pacaya Astulla" data-dni="72485953" ${loan.lender.name === 'King Isaac Pacaya Astulla' ? 'selected' : ''}>King Isaac Pacaya Astulla</option>
+                  <option value="Carmen Rosa Astulla Fernández" data-dni="00110596" ${loan.lender.name === 'Carmen Rosa Astulla Fernández' ? 'selected' : ''}>Carmen Rosa Astulla Fernández</option>
+                  <option value="Jordy Daniel Pacaya Astulla" data-dni="72485951" ${loan.lender.name === 'Jordy Daniel Pacaya Astulla' ? 'selected' : ''}>Jordy Daniel Pacaya Astulla</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- Borrowers Section -->
+            <div class="border-t border-gray-200 pt-6">
+              <h3 class="text-lg font-medium mb-4">Prestatarios</h3>
+              <div id="edit-borrowers-container">
+                ${loan.borrowers.map((borrower, index) => `
+                  <div class="borrower-form bg-gray-50 p-4 rounded-lg mb-4">
+                    ${index > 0 ? `
+                    <div class="flex justify-between items-center mb-2">
+                      <h4 class="font-medium">Prestatario adicional</h4>
+                      <button onclick="removeForm(this, 'borrower')" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    ` : ''}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
+                        <input type="text" class="borrower-name w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="${borrower.name}" required>
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">DNI</label>
+                        <input type="text" class="borrower-dni w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="${borrower.dni}" required>
+                      </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
+                        <select class="borrower-gender w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                          <option value="masculino" ${borrower.gender === 'masculino' ? 'selected' : ''}>Masculino</option>
+                          <option value="femenino" ${borrower.gender === 'femenino' ? 'selected' : ''}>Femenino</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                        <input type="text" class="borrower-address w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="${borrower.address}" required>
+                      </div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+              <button type="button" onclick="addBorrowerToEditForm()" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md flex items-center">
+                <i class="fas fa-plus mr-2"></i> Agregar Prestatario
+              </button>
+            </div>
+            
+            <!-- Guarantors Section -->
+            <div class="border-t border-gray-200 pt-6">
+              <h3 class="text-lg font-medium mb-4">Garantes (Opcional)</h3>
+              <div id="edit-guarantors-container">
+                ${loan.guarantors.map((guarantor, index) => `
+                  <div class="guarantor-form bg-gray-50 p-4 rounded-lg mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                      <h4 class="font-medium">Garante</h4>
+                      <button onclick="removeForm(this, 'guarantor')" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
+                        <input type="text" class="guarantor-name w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="${guarantor.name}">
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">DNI</label>
+                        <input type="text" class="guarantor-dni w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="${guarantor.dni}">
+                      </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
+                        <select class="guarantor-gender w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                          <option value="masculino" ${guarantor.gender === 'masculino' ? 'selected' : ''}>Masculino</option>
+                          <option value="femenino" ${guarantor.gender === 'femenino' ? 'selected' : ''}>Femenino</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                        <input type="text" class="guarantor-address w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" value="${guarantor.address}">
+                      </div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+              <button type="button" onclick="addGuarantorToEditForm()" class="mt-2 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-md flex items-center">
+                <i class="fas fa-plus mr-2"></i> Agregar Garante
+              </button>
+            </div>
+            
+            <div class="border-t border-gray-200 pt-6">
+              <button type="submit" class="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-md font-medium">
+                Guardar Cambios
+              </button>
+            </div>
+          </form>
+        `;
+        
+        editFormContainer.innerHTML = editFormHTML;
+        
+        // Add event listeners
+        document.getElementById('edit-payment-type').addEventListener('change', function() {
+          const label = document.getElementById('edit-period-label');
+          label.textContent = this.value === 'daily' ? 'Duración (días)' : 'Duración (meses)';
+        });
+        
+        document.getElementById('edit-loan-form').addEventListener('submit', function(e) {
+          e.preventDefault();
+          handleFormSubmit(e);
+          closeEditModal();
+        });
+        
+        // Show modal
+        document.getElementById('edit-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+    
+    function addBorrowerToEditForm() {
+      const container = document.getElementById('edit-borrowers-container');
+      const newBorrower = document.createElement('div');
+      newBorrower.className = 'borrower-form bg-gray-50 p-4 rounded-lg mb-4';
+      newBorrower.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <h4 class="font-medium">Prestatario adicional</h4>
+          <button onclick="removeForm(this, 'borrower')" class="text-red-500 hover:text-red-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
+            <input type="text" class="borrower-name w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">DNI</label>
+            <input type="text" class="borrower-dni w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
+            <select class="borrower-gender w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+              <option value="">Seleccionar</option>
+              <option value="masculino">Masculino</option>
+              <option value="femenino">Femenino</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+            <input type="text" class="borrower-address w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+          </div>
+        </div>
+      `;
+      container.appendChild(newBorrower);
+    }
+    
+    function addGuarantorToEditForm() {
+      const container = document.getElementById('edit-guarantors-container');
+      const newGuarantor = document.createElement('div');
+      newGuarantor.className = 'guarantor-form bg-gray-50 p-4 rounded-lg mb-4';
+      newGuarantor.innerHTML = `
+        <div class="flex justify-between items-center mb-2">
+          <h4 class="font-medium">Garante</h4>
+          <button onclick="removeForm(this, 'guarantor')" class="text-red-500 hover:text-red-700">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
+            <input type="text" class="guarantor-name w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">DNI</label>
+            <input type="text" class="guarantor-dni w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Género</label>
+            <select class="guarantor-gender w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="">Seleccionar</option>
+              <option value="masculino">Masculino</option>
+              <option value="femenino">Femenino</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+            <input type="text" class="guarantor-address w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </div>
+        </div>
+      `;
+      container.appendChild(newGuarantor);
+    }
+    
+    function downloadContract(loanId) {
+      const loan = loans.find(l => l.id === loanId);
+      if (loan) {
+        // Create a temporary preview to generate the PDF
+        const tempContent = document.createElement('div');
+        tempContent.id = 'temp-contract-content';
+        document.body.appendChild(tempContent);
+        
+        // Generate gender-specific terms
+        const borrowerTerm = loan.borrowers[0].gender === 'femenino' ? 'PRESTATARIA' : 'PRESTATARIO';
+        const borrowerTermPlural = loan.borrowers[0].gender === 'femenino' ? 'PRESTATARIAS' : 'PRESTATARIOS';
+        const guarantorTerm = loan.guarantors.length > 0 ? 
+          (loan.guarantors[0].gender === 'femenino' ? 'GARANTE' : 'GARANTE') : '';
+        const guarantorTermPlural = loan.guarantors.length > 0 ? 
+          (loan.guarantors[0].gender === 'femenino' ? 'GARANTES' : 'GARANTES') : '';
+        
+        // Generate contract content
+        let contractHTML = `
+          <h1 class="text-2xl font-bold text-center mb-6">CONTRATO DE PRÉSTAMO</h1>
+          
+          <p class="text-right mb-6">Lima, ${formatDate(loan.date)}</p>
+          
+          <div class="mb-6">
+            <p>CONSTE POR EL PRESENTE DOCUMENTO EL CONTRATO DE PRÉSTAMO QUE CELEBRAN POR UNA PARTE ${loan.lender.name}, identificado con DNI N° ${loan.lender.dni}, en adelante denominado EL PRESTAMISTA; DE OTRA PARTE ${loan.borrowers.map(b => `${b.name}, identificad${b.gender === 'femenino' ? 'a' : 'o'} con DNI N° ${b.dni}`).join('; ')} en adelante denominad${loan.borrowers.length > 1 ? 'os' : 'o'} ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}; ${loan.guarantors.length > 0 ? `Y DE OTRA PARTE ${loan.guarantors.map(g => `${g.name}, identificad${g.gender === 'femenino' ? 'a' : 'o'} con DNI N° ${g.dni}`).join('; ')} en adelante denominad${loan.guarantors.length > 1 ? 'os' : 'o'} ${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}` : ''}.</p>
+          </div>
+          
+          <div class="mb-6">
+            <p>EL PRESTAMISTA otorga a ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} un préstamo por la suma de S/. ${loan.amount.toFixed(2)} (${numberToWords(loan.amount)} SOLES), el cual será devuelto junto con los intereses conforme a lo establecido en el presente contrato. ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} pagará a EL PRESTAMISTA un interés del ${loan.interestRate}% sobre el monto del préstamo, lo que equivale a S/. ${(loan.amount * (loan.interestRate / 100)).toFixed(2)} (${numberToWords(loan.amount * (loan.interestRate / 100))} SOLES).</p>
+          </div>
+          
+          <div class="mb-6">
+            <p>${loan.paymentType === 'daily' ? 
+              `${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} se obliga a pagar la suma total de S/. ${loan.paymentDetails.totalAmount} (${numberToWords(parseFloat(loan.paymentDetails.totalAmount))} SOLES), en ${loan.period} días, mediante pagos diarios de S/. ${loan.paymentDetails.dailyPayment} (${numberToWords(parseFloat(loan.paymentDetails.dailyPayment))} SOLES).` : 
+              `${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} se obliga a pagar intereses mensuales de S/. ${loan.paymentDetails.monthlyInterest} (${numberToWords(parseFloat(loan.paymentDetails.monthlyInterest))} SOLES), durante ${loan.period} meses, y al final del plazo pagará el monto total del préstamo más el último interés, es decir S/. ${loan.paymentDetails.finalPayment} (${numberToWords(parseFloat(loan.paymentDetails.finalPayment))} SOLES).`}
+            El primer pago se realizará el ${formatDate(loan.startDate)} y el último pago el ${formatDate(loan.endDate)}.</p>
+          </div>
+          
+          ${loan.guarantors.length > 0 ? `
+          <div class="mb-6">
+            <p>${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm} se obliga${loan.guarantors.length > 1 ? 'n' : ''} solidariamente a cumplir con las obligaciones de ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} en caso de incumplimiento de este${loan.borrowers.length > 1 ? 's' : ''} último${loan.borrowers.length > 1 ? 's' : ''}.</p>
+          </div>
+          ` : ''}
+          
+          <div class="mb-6">
+            <h2 class="text-lg font-bold mb-2">FIRMAS</h2>
+            <div class="grid grid-cols-1 md:grid-cols-${1 + loan.borrowers.length + (loan.guarantors.length > 0 ? loan.guarantors.length : 0)} gap-4 mt-6">
+              <div class="text-center">
+                <div class="signature-space"></div>
+                <p class="font-bold">EL PRESTAMISTA</p>
+                <p>${loan.lender.name}</p>
+                <p>DNI ${loan.lender.dni}</p>
+              </div>
+              
+              ${loan.borrowers.map(borrower => `
+                <div class="text-center">
+                  <div class="signature-space"></div>
+                  <p class="font-bold">${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}</p>
+                  <p>${borrower.name}</p>
+                  <p>DNI ${borrower.dni}</p>
+                </div>
+              `).join('')}
+              
+              ${loan.guarantors.map(guarantor => `
+                <div class="text-center">
+                  <div class="signature-space"></div>
+                  <p class="font-bold">${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}</p>
+                  <p>${guarantor.name}</p>
+                  <p>DNI ${guarantor.dni}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        
+        tempContent.innerHTML = contractHTML;
+        
+        // Generate PDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Generate filename
+        const firstBorrower = loan.borrowers[0].name.replace(/\s+/g, '-');
+        const date = loan.date.split('-').reverse().join('-');
+        const filename = `${firstBorrower}-${date}.pdf`;
+        
+        // Add content to PDF
+        doc.html(tempContent, {
+          callback: function(doc) {
+            doc.save(filename);
+            document.body.removeChild(tempContent);
+          },
+          margin: [10, 10, 10, 10],
+          autoPaging: 'text',
+          width: 180,
+          windowWidth: tempContent.scrollWidth
+        });
+      }
+    }
+    
+    function deleteContract(loanId) {
+      if (confirm('¿Estás seguro de que deseas eliminar este contrato?')) {
+        loans = loans.filter(loan => loan.id !== loanId);
+        localStorage.setItem('loans', JSON.stringify(loans));
+        loadLoanHistory();
+      }
+    }
+    
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+    }
+    
+    function numberToWords(num) {
+      // This is a simplified version for Spanish
+      // For a complete solution, you might want to use a library
+      const units = ['', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve'];
+      const teens = ['diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve'];
+      const tens = ['', 'diez', 'veinte', 'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta', 'ochenta', 'noventa'];
+      const hundreds = ['', 'ciento', 'doscientos', 'trescientos', 'cuatrocientos', 'quinientos', 'seiscientos', 'setecientos', 'ochocientos', 'novecientos'];
+      
+      num = Math.floor(num);
+      
+      if (num === 0) return 'cero';
+      if (num < 10) return units[num];
+      if (num < 20) return teens[num - 10];
+      if (num < 100) {
+        const ten = Math.floor(num / 10);
+        const unit = num % 10;
+        return tens[ten] + (unit !== 0 ? ' y ' + units[unit] : '');
+      }
+      if (num < 1000) {
+        const hundred = Math.floor(num / 100);
+        const remainder = num % 100;
+        return hundreds[hundred] + (remainder !== 0 ? ' ' + numberToWords(remainder) : '');
+      }
+      if (num === 1000) return 'mil';
+      
+      return num.toString(); // Fallback for numbers > 1000
+    }
+  </script>
+</body>
+</html>
