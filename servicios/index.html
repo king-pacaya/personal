@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!---Meta--->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!---Page Icon---> 
+  <link rel="shortcut icon" href="favicon.svg">
+  <!--CSS Documents-->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <!--Fonts-->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <!-- AOS Animation Library -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <!---Scripts--->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/2/2.2.1/iconify.min.js"></script>
+  <style>
+    * {
+      font-family: 'Montserrat', sans-serif;
+    }
+    
+    .hero-gradient {
+      background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+    }
+    
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      background: rgba(107, 115, 255, 0.1);
+    }
+    
+    .package-card {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .package-card:hover {
+      transform: scale(1.03);
+    }
+    
+    .highlight-badge {
+      position: absolute;
+      top: -12px;
+      right: 20px;
+      background: #FFD700;
+      color: #000;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+  <title>Soluciones Digitales para Técnicos</title>
+</head>
+<body class="bg-gray-50">
+  <!-- Hero Section -->
+  <section class="hero-gradient text-white py-20 px-4">
+    <div class="container mx-auto max-w-6xl">
+      <div class="flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2 mb-10 md:mb-0" data-aos="fade-right">
+          <h1 class="text-4xl md:text-5xl font-bold mb-6">Soluciones Digitales para Técnicos</h1>
+          <p class="text-xl mb-8 opacity-90">Potencia tu presencia en redes sociales con una imagen profesional y moderna</p>
+          <div class="space-y-4">
+            <div class="flex items-center">
+              <div class="feature-icon mr-4">
+                <i class="fas fa-check text-2xl text-blue-400"></i>
+              </div>
+              <span class="text-lg">Más confianza</span>
+            </div>
+            <div class="flex items-center">
+              <div class="feature-icon mr-4">
+                <i class="fas fa-eye text-2xl text-blue-400"></i>
+              </div>
+              <span class="text-lg">Más visibilidad</span>
+            </div>
+            <div class="flex items-center">
+              <div class="feature-icon mr-4">
+                <i class="fas fa-users text-2xl text-blue-400"></i>
+              </div>
+              <span class="text-lg">Más clientes preguntando por tus servicios</span>
+            </div>
+          </div>
+          <button class="mt-10 bg-white text-blue-600 font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition duration-300 transform hover:scale-105">
+            Empieza ahora
+          </button>
+        </div>
+        <div class="md:w-1/2" data-aos="fade-left">
+          <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Técnico trabajando" class="rounded-xl shadow-2xl border-4 border-white">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Success Cases Section -->
+  <section class="py-20 px-4 bg-white">
+    <div class="container mx-auto max-w-6xl">
+      <h2 class="text-3xl font-bold text-center mb-16" data-aos="fade-up">Casos Reales de Transformación</h2>
+      
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Case 1 -->
+        <div class="bg-gray-50 p-8 rounded-xl card-hover" data-aos="fade-up" data-aos-delay="100">
+          <div class="text-blue-500 text-4xl mb-4">01</div>
+          <h3 class="text-xl font-bold mb-4">Técnico sin página ni diseños</h3>
+          <p class="text-gray-600 mb-6">Publicaba desde su perfil. Le creamos identidad visual y publicaciones con diseño.</p>
+          <div class="bg-blue-50 text-blue-600 font-medium p-3 rounded-lg">
+            <i class="fas fa-check-circle mr-2"></i> Ahora recibe mensajes cada semana
+          </div>
+        </div>
+        
+        <!-- Case 2 -->
+        <div class="bg-gray-50 p-8 rounded-xl card-hover" data-aos="fade-up" data-aos-delay="200">
+          <div class="text-blue-500 text-4xl mb-4">02</div>
+          <h3 class="text-xl font-bold mb-4">Empresa informal</h3>
+          <p class="text-gray-600 mb-6">Le dimos nombre, logo y catálogo digital.</p>
+          <div class="bg-blue-50 text-blue-600 font-medium p-3 rounded-lg">
+            <i class="fas fa-check-circle mr-2"></i> Ahora ofrece sus servicios con más confianza y claridad
+          </div>
+        </div>
+        
+        <!-- Case 3 -->
+        <div class="bg-gray-50 p-8 rounded-xl card-hover" data-aos="fade-up" data-aos-delay="300">
+          <div class="text-blue-500 text-4xl mb-4">03</div>
+          <h3 class="text-xl font-bold mb-4">Experto sin estrategia</h3>
+          <p class="text-gray-600 mb-6">Organizamos su presencia digital y conectamos su perfil con nuestra web.</p>
+          <div class="bg-blue-50 text-blue-600 font-medium p-3 rounded-lg">
+            <i class="fas fa-check-circle mr-2"></i> ¡Resultados desde la primera semana!
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Packages Section -->
+  <section class="py-20 px-4 bg-gray-50">
+    <div class="container mx-auto max-w-6xl">
+      <h2 class="text-3xl font-bold text-center mb-4" data-aos="fade-up">Nuestros Paquetes Destacados</h2>
+      <p class="text-center text-gray-600 mb-16 max-w-2xl mx-auto" data-aos="fade-up">Elige el paquete que mejor se adapte a tus necesidades y lleva tu negocio al siguiente nivel</p>
+      
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Basic Package -->
+        <div class="bg-white p-8 rounded-xl shadow-md package-card relative" data-aos="fade-up" data-aos-delay="100">
+          <h3 class="text-2xl font-bold mb-4">Paquete Básico</h3>
+          <div class="text-4xl font-bold mb-6 text-blue-600">S/ 60</div>
+          <ul class="space-y-4 mb-8">
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+              <span>Diseño de foto de perfil y portada</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+              <span>1 publicación base profesional</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+              <span>Optimización de perfil o página</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+              <span>Asesoría rápida para mejorar tu presentación</span>
+            </li>
+          </ul>
+          <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300">
+            Seleccionar
+          </button>
+        </div>
+        
+        <!-- Pro Package -->
+        <div class="bg-white p-8 rounded-xl shadow-lg package-card relative border-2 border-blue-500" data-aos="fade-up" data-aos-delay="200">
+          <div class="highlight-badge">MÁS POPULAR</div>
+          <h3 class="text-2xl font-bold mb-4">Paquete Pro</h3>
+          <div class="text-4xl font-bold mb-6 text-blue-600">S/ 120</div>
+          <ul class="space-y-4 mb-8">
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+              <span>Todo lo del Básico</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+              <span>3 publicaciones profesionales adicionales</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+              <span>Catálogo digital en PDF y WhatsApp Business</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+              <span>Plantilla editable para redes sociales</span>
+            </li>
+            <li class="flex items-start bg-blue-50 p-2 rounded">
+              <i class="fas fa-gift text-blue-500 mt-1 mr-3"></i>
+              <span class="font-medium">Publicidad segmentada GRATIS por 3 días</span>
+            </li>
+          </ul>
+          <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105">
+            Seleccionar
+          </button>
+        </div>
+        
+        <!-- Full Package -->
+        <div class="bg-white p-8 rounded-xl shadow-md package-card relative" data-aos="fade-up" data-aos-delay="300">
+          <h3 class="text-2xl font-bold mb-4">Paquete Full</h3>
+          <div class="text-4xl font-bold mb-6 text-blue-600">S/ 180</div>
+          <ul class="space-y-4 mb-8">
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+              <span>Todo lo del Pro</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+              <span>Logo personalizado profesional</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+              <span>Mini video de presentación de tus servicios</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
+              <span>Guía de respuesta rápida para cerrar clientes</span>
+            </li>
+            <li class="flex items-start bg-blue-50 p-2 rounded">
+              <i class="fas fa-gift text-blue-500 mt-1 mr-3"></i>
+              <span class="font-medium">Publicidad segmentada GRATIS por 3 días</span>
+            </li>
+          </ul>
+          <button class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300">
+            Seleccionar
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Advertising Explanation -->
+  <section class="py-20 px-4 bg-white">
+    <div class="container mx-auto max-w-6xl">
+      <div class="flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2 mb-10 md:mb-0" data-aos="fade-right">
+          <h2 class="text-3xl font-bold mb-6">¿Qué es Publicidad Segmentada?</h2>
+          <p class="text-lg text-gray-600 mb-6">Es una forma de llegar directamente a personas interesadas en tus servicios, que viven en tu zona o tienen necesidades específicas (cámaras, vigilancia, electricidad, etc.).</p>
+          <p class="text-lg text-gray-600 font-medium">No es solo "publicar por publicar". Esto genera resultados reales.</p>
+        </div>
+        <div class="md:w-1/2" data-aos="fade-left">
+          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Publicidad segmentada" class="rounded-xl shadow-lg">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Web Connection Section -->
+  <section class="py-20 px-4 bg-gray-900 text-white">
+    <div class="container mx-auto max-w-6xl text-center" data-aos="zoom-in">
+      <h2 class="text-3xl font-bold mb-6">Conexión con nuestra Web Profesional</h2>
+      <p class="text-xl mb-8 max-w-3xl mx-auto">Al finalizar cualquier paquete, conectamos tu página en nuestra web especializada en cámaras de seguridad, aumentando tu visibilidad, confianza y posicionamiento digital.</p>
+      <div class="bg-yellow-400 text-black font-bold inline-block px-6 py-3 rounded-full mb-8">
+        LOS PAQUETES PRO Y FULL INCLUYEN PUBLICIDAD SEGMENTADA POR 3 DÍAS GRATIS
+      </div>
+      <button class="bg-white text-blue-600 font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition duration-300 transform hover:scale-105">
+        Contáctanos ahora
+      </button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-12 px-4">
+    <div class="container mx-auto max-w-6xl">
+      <div class="flex flex-col md:flex-row justify-between">
+        <div class="mb-8 md:mb-0">
+          <h3 class="text-xl font-bold mb-4">Mercado Digital</h3>
+          <p class="text-gray-400">Potenciamos tu presencia digital para que consigas más clientes.</p>
+        </div>
+        <div class="mb-8 md:mb-0">
+          <h4 class="text-lg font-bold mb-4">Contacto</h4>
+          <ul class="space-y-2">
+            <li><i class="fas fa-phone-alt mr-2 text-blue-400"></i> +51 966 002  733</li>
+            <li><i class="fas fa-envelope mr-2 text-blue-400"></i> mercadodigital@gmail.com</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-lg font-bold mb-4">Síguenos</h4>
+          <div class="flex space-x-4">
+            <a href="https://www.facebook.com/profile.php?id=61555397642226" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-blue-600 transition">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-pink-600 transition">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="#" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-blue-400 transition">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-gray-700 mt-12 pt-8 text-center text-gray-400">
+        <p>© 2023 Mercado Digital. Todos los derechos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- AOS Animation Script -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+  </script>
+</body>
+</html>
