@@ -33,6 +33,23 @@
       border-top: 1px solid black;
       margin-top: 20px;
     }
+    .contract-text {
+      font-size: 12pt;
+      line-height: 1.5;
+    }
+    .contract-content p {
+      font-size: 12pt;
+      margin-bottom: 1rem;
+    }
+    .contract-content h1, .contract-content h2, .contract-content h3 {
+      font-weight: bold;
+    }
+    .contract-content h1 {
+      font-size: 16pt;
+    }
+    .contract-content h2 {
+      font-size: 14pt;
+    }
   </style>
   <title>Dashboard de Préstamos</title>
 </head>
@@ -263,7 +280,7 @@
     const paymentTypeSelect = document.getElementById('payment-type');
     const periodLabel = document.getElementById('period-label');
     const periodInput = document.getElementById('period');
-    const startDateInput = document.getElementById('start-date');
+    const startDateInput = document.getElementById('start-date').value;
     const currentDateElement = document.getElementById('current-date');
     
     // Set current date
@@ -396,13 +413,19 @@
       const interestRate = parseFloat(document.getElementById('interest-rate').value);
       const paymentType = document.getElementById('payment-type').value;
       const period = parseInt(document.getElementById('period').value);
-      const startDate = document.getElementById('start-date').value;
+      
+      // Corregir la fecha de inicio (añadir un día)
+      const startDateInput = document.getElementById('start-date').value;
+      const startDate = new Date(startDateInput);
+      startDate.setDate(startDate.getDate() + 1);
+      const correctedStartDate = startDate.toISOString().split('T')[0];
+      
       const lenderSelect = document.getElementById('lender');
       const lenderName = lenderSelect.value;
       const lenderDni = lenderSelect.options[lenderSelect.selectedIndex].getAttribute('data-dni');
       
-      // Calculate end date
-      const endDate = calculateEndDate(startDate, period, paymentType);
+      // Calculate end date with corrected start date
+      const endDate = calculateEndDate(correctedStartDate, period, paymentType);
       
       // Calculate payment details
       const interestAmount = amount * (interestRate / 100);
@@ -443,7 +466,7 @@
       const guarantors = [];
       document.querySelectorAll('.guarantor-form').forEach(form => {
         const name = form.querySelector('.guarantor-name').value;
-        if (name) { // Only add if name is provided (optional field)
+        if (name) {
           guarantors.push({
             name: name,
             dni: form.querySelector('.guarantor-dni').value,
@@ -453,7 +476,7 @@
         }
       });
       
-      // Create loan object
+      // Create loan object with corrected date
       const loan = {
         id: currentLoanId || Date.now().toString(),
         date: today.toISOString().split('T')[0],
@@ -461,7 +484,7 @@
         interestRate: interestRate,
         paymentType: paymentType,
         period: period,
-        startDate: startDate,
+        startDate: correctedStartDate,
         endDate: endDate,
         lender: {
           name: lenderName,
@@ -497,7 +520,7 @@
       document.getElementById('guarantors-container').innerHTML = '';
       addBorrower(); // Add default borrower form
     }
-    
+
     function calculateEndDate(startDate, period, paymentType) {
       const date = new Date(startDate);
       
@@ -522,60 +545,62 @@
       const guarantorTermPlural = loan.guarantors.length > 0 ? 
         (loan.guarantors[0].gender === 'femenino' ? 'GARANTES' : 'GARANTES') : '';
       
-      // Generate contract content
+      // Generate contract content with bold text for important info and addresses
       let contractHTML = `
-        <h1 class="text-2xl font-bold text-center mb-6">CONTRATO DE PRÉSTAMO</h1>
-        
-        <p class="text-right mb-6">Lima, ${formatDate(loan.date)}</p>
-        
-        <div class="mb-6">
-          <p>CONSTE POR EL PRESENTE DOCUMENTO EL CONTRATO DE PRÉSTAMO QUE CELEBRAN POR UNA PARTE ${loan.lender.name}, identificado con DNI N° ${loan.lender.dni}, en adelante denominado EL PRESTAMISTA; DE OTRA PARTE ${loan.borrowers.map(b => `${b.name}, identificad${b.gender === 'femenino' ? 'a' : 'o'} con DNI N° ${b.dni}`).join('; ')} en adelante denominad${loan.borrowers.length > 1 ? 'os' : 'o'} ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}; ${loan.guarantors.length > 0 ? `Y DE OTRA PARTE ${loan.guarantors.map(g => `${g.name}, identificad${g.gender === 'femenino' ? 'a' : 'o'} con DNI N° ${g.dni}`).join('; ')} en adelante denominad${loan.guarantors.length > 1 ? 'os' : 'o'} ${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}` : ''}.</p>
-        </div>
-        
-        <div class="mb-6">
-          <p>EL PRESTAMISTA otorga a ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} un préstamo por la suma de S/. ${loan.amount.toFixed(2)} (${numberToWords(loan.amount)} SOLES), el cual será devuelto junto con los intereses conforme a lo establecido en el presente contrato. ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} pagará a EL PRESTAMISTA un interés del ${loan.interestRate}% sobre el monto del préstamo, lo que equivale a S/. ${(loan.amount * (loan.interestRate / 100)).toFixed(2)} (${numberToWords(loan.amount * (loan.interestRate / 100))} SOLES).</p>
-        </div>
-        
-        <div class="mb-6">
-          <p>${loan.paymentType === 'daily' ? 
-            `${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} se obliga a pagar la suma total de S/. ${loan.paymentDetails.totalAmount} (${numberToWords(parseFloat(loan.paymentDetails.totalAmount))} SOLES), en ${loan.period} días, mediante pagos diarios de S/. ${loan.paymentDetails.dailyPayment} (${numberToWords(parseFloat(loan.paymentDetails.dailyPayment))} SOLES).` : 
-            `${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} se obliga a pagar intereses mensuales de S/. ${loan.paymentDetails.monthlyInterest} (${numberToWords(parseFloat(loan.paymentDetails.monthlyInterest))} SOLES), durante ${loan.period} meses, y al final del plazo pagará el monto total del préstamo más el último interés, es decir S/. ${loan.paymentDetails.finalPayment} (${numberToWords(parseFloat(loan.paymentDetails.finalPayment))} SOLES).`}
-          El primer pago se realizará el ${formatDate(loan.startDate)} y el último pago el ${formatDate(loan.endDate)}.</p>
-        </div>
-        
-        ${loan.guarantors.length > 0 ? `
-        <div class="mb-6">
-          <p>${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm} se obliga${loan.guarantors.length > 1 ? 'n' : ''} solidariamente a cumplir con las obligaciones de ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} en caso de incumplimiento de este${loan.borrowers.length > 1 ? 's' : ''} último${loan.borrowers.length > 1 ? 's' : ''}.</p>
-        </div>
-        ` : ''}
-        
-        <div class="mb-6">
-          <h2 class="text-lg font-bold mb-2">FIRMAS</h2>
-          <div class="grid grid-cols-1 md:grid-cols-${1 + loan.borrowers.length + (loan.guarantors.length > 0 ? loan.guarantors.length : 0)} gap-4 mt-6">
-            <div class="text-center">
-              <div class="signature-space"></div>
-              <p class="font-bold">EL PRESTAMISTA</p>
-              <p>${loan.lender.name}</p>
-              <p>DNI ${loan.lender.dni}</p>
+        <div class="contract-content">
+          <h1 class="text-2xl font-bold text-center mb-6">CONTRATO DE PRÉSTAMO</h1>
+          
+          <p class="text-right mb-6">Lima, ${formatDate(loan.startDate)}</p>
+          
+          <div class="mb-6">
+            <p>CONSTE POR EL PRESENTE DOCUMENTO EL CONTRATO DE PRÉSTAMO QUE CELEBRAN POR UNA PARTE <strong>${loan.lender.name}</strong>, identificado con <strong>DNI N° ${loan.lender.dni}</strong>, con domicilio en <strong>Jr. Pachitea 266, Lima</strong>, en adelante denominado <strong>EL PRESTAMISTA</strong>; DE OTRA PARTE ${loan.borrowers.map(b => `<strong>${b.name}</strong>, identificad${b.gender === 'femenino' ? 'a' : 'o'} con <strong>DNI N° ${b.dni}</strong>, con domicilio en <strong>${b.address}</strong>`).join('; ')} en adelante denominad${loan.borrowers.length > 1 ? 'os' : 'o'} <strong>${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}</strong>; ${loan.guarantors.length > 0 ? `Y DE OTRA PARTE ${loan.guarantors.map(g => `<strong>${g.name}</strong>, identificad${g.gender === 'femenino' ? 'a' : 'o'} con <strong>DNI N° ${g.dni}</strong>, con domicilio en <strong>${g.address}</strong>`).join('; ')} en adelante denominad${loan.guarantors.length > 1 ? 'os' : 'o'} <strong>${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}</strong>` : ''}.</p>
+          </div>
+          
+          <div class="mb-6">
+            <p>EL PRESTAMISTA otorga a ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} un préstamo por la suma de <strong>S/. ${loan.amount.toFixed(2)} (${numberToWords(loan.amount)} SOLES)</strong>, el cual será devuelto junto con los intereses conforme a lo establecido en el presente contrato. ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} pagará a EL PRESTAMISTA un interés del <strong>${loan.interestRate}%</strong> sobre el monto del préstamo, lo que equivale a <strong>S/. ${(loan.amount * (loan.interestRate / 100)).toFixed(2)} (${numberToWords(loan.amount * (loan.interestRate / 100))} SOLES)</strong>.</p>
+          </div>
+          
+          <div class="mb-6">
+            <p>${loan.paymentType === 'daily' ? 
+              `${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} se obliga a pagar la suma total de <strong>S/. ${loan.paymentDetails.totalAmount} (${numberToWords(parseFloat(loan.paymentDetails.totalAmount))} SOLES)</strong>, en <strong>${loan.period} días</strong>, mediante pagos diarios de <strong>S/. ${loan.paymentDetails.dailyPayment} (${numberToWords(parseFloat(loan.paymentDetails.dailyPayment))} SOLES)</strong>.` : 
+              `${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} se obliga a pagar intereses mensuales de <strong>S/.${(loan.amount * (loan.interestRate / 100)).toFixed(2)} (${numberToWords(loan.amount * (loan.interestRate / 100))} SOLES)</strong>, durante <strong>${loan.period} meses</strong>, y al final del plazo pagará el monto total del préstamo más el último interés, es decir <strong>S/. ${loan.paymentDetails.finalPayment} (${numberToWords(parseFloat(loan.paymentDetails.finalPayment))} SOLES)</strong>.`}
+            El primer pago se realizará el <strong>${loan.paymentType === 'daily' ? formatDate(loan.startDate) : formatDate(getNextMonthDate(loan.startDate))}</strong> y el último pago el <strong>${formatDate(loan.endDate)}</strong>.</p>
+          </div>
+          
+          ${loan.guarantors.length > 0 ? `
+          <div class="mb-6">
+            <p>${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm} se obliga${loan.guarantors.length > 1 ? 'n' : ''} solidariamente a cumplir con las obligaciones de ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} en caso de incumplimiento de este${loan.borrowers.length > 1 ? 's' : ''} último${loan.borrowers.length > 1 ? 's' : ''}.</p>
+          </div>
+          ` : ''}
+          
+          <div class="mb-6">
+            <h2 class="text-lg font-bold mb-2">FIRMAS</h2>
+            <div class="grid grid-cols-1 md:grid-cols-${1 + loan.borrowers.length + (loan.guarantors.length > 0 ? loan.guarantors.length : 0)} gap-4 mt-6">
+              <div class="text-center">
+                <div class="signature-space"></div>
+                <p class="font-bold">EL PRESTAMISTA</p>
+                <p><strong>${loan.lender.name}</strong></p>
+                <p><strong>DNI ${loan.lender.dni}</strong></p>
+              </div>
+              
+              ${loan.borrowers.map(borrower => `
+                <div class="text-center">
+                  <div class="signature-space"></div>
+                  <p class="font-bold">${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}</p>
+                  <p><strong>${borrower.name}</strong></p>
+                  <p><strong>DNI ${borrower.dni}</strong></p>
+                </div>
+              `).join('')}
+              
+              ${loan.guarantors.map(guarantor => `
+                <div class="text-center">
+                  <div class="signature-space"></div>
+                  <p class="font-bold">${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}</p>
+                  <p><strong>${guarantor.name}</strong></p>
+                  <p><strong>DNI ${guarantor.dni}</strong></p>
+                </div>
+              `).join('')}
             </div>
-            
-            ${loan.borrowers.map(borrower => `
-              <div class="text-center">
-                <div class="signature-space"></div>
-                <p class="font-bold">${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}</p>
-                <p>${borrower.name}</p>
-                <p>DNI ${borrower.dni}</p>
-              </div>
-            `).join('')}
-            
-            ${loan.guarantors.map(guarantor => `
-              <div class="text-center">
-                <div class="signature-space"></div>
-                <p class="font-bold">${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}</p>
-                <p>${guarantor.name}</p>
-                <p>DNI ${guarantor.dni}</p>
-              </div>
-            `).join('')}
           </div>
         </div>
       `;
@@ -585,21 +610,17 @@
       document.body.style.overflow = 'hidden';
     }
     
-    function closeModal() {
-      document.getElementById('contract-modal').classList.add('hidden');
-      document.body.style.overflow = 'auto';
-      loadLoanHistory();
-      showSection('loan-history');
-    }
-    
-    function closeEditModal() {
-      document.getElementById('edit-modal').classList.add('hidden');
-      document.body.style.overflow = 'auto';
-    }
-    
     function generatePDF() {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      // Configurar tamaño de fuente
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
       
       // Get contract content
       const content = document.getElementById('contract-content');
@@ -611,22 +632,170 @@
       
       // Create a temporary div to hold the content for PDF generation
       const tempDiv = document.createElement('div');
+      tempDiv.className = 'contract-content';
+      tempDiv.style.width = '210mm';
+      tempDiv.style.padding = '20px';
       tempDiv.innerHTML = content.innerHTML;
       document.body.appendChild(tempDiv);
       
-      // Add content to PDF
-      doc.html(tempDiv, {
-        callback: function(doc) {
-          doc.save(filename);
-          document.body.removeChild(tempDiv);
+      // Add content to PDF with improved settings
+      const options = {
+        margin: [15, 15, 15, 15],
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+          scale: 2,
+          letterRendering: true,
+          useCORS: true
         },
-        margin: [10, 10, 10, 10],
-        autoPaging: 'text',
-        width: 180,
-        windowWidth: tempDiv.scrollWidth
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      
+      // Use html2canvas to ensure proper rendering
+      html2canvas(tempDiv, {
+        scale: 2,
+        letterRendering: true,
+        useCORS: true
+      }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 210; // A4 width in mm
+        const pageHeight = 295; // A4 height in mm
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        
+        doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        doc.save(filename);
+        document.body.removeChild(tempDiv);
       });
     }
     
+    function downloadContract(loanId) {
+      const loan = loans.find(l => l.id === loanId);
+      if (loan) {
+        // Create a temporary preview to generate the PDF
+        const tempContent = document.createElement('div');
+        tempContent.id = 'temp-contract-content';
+        tempContent.className = 'contract-content';
+        tempContent.style.width = '210mm';
+        tempContent.style.padding = '20px';
+        document.body.appendChild(tempContent);
+        
+        // Generate gender-specific terms
+        const borrowerTerm = loan.borrowers[0].gender === 'femenino' ? 'PRESTATARIA' : 'PRESTATARIO';
+        const borrowerTermPlural = loan.borrowers[0].gender === 'femenino' ? 'PRESTATARIAS' : 'PRESTATARIOS';
+        const guarantorTerm = loan.guarantors.length > 0 ? 
+          (loan.guarantors[0].gender === 'femenino' ? 'GARANTE' : 'GARANTE') : '';
+        const guarantorTermPlural = loan.guarantors.length > 0 ? 
+          (loan.guarantors[0].gender === 'femenino' ? 'GARANTES' : 'GARANTES') : '';
+        
+        // Generate contract content with bold text for important info and addresses
+        let contractHTML = `
+          <div class="contract-content">
+            <h1 class="text-2xl font-bold text-center mb-6">CONTRATO DE PRÉSTAMO</h1>
+            
+            <p class="text-right mb-6">Lima, ${formatDate(loan.startDate)}</p>
+            
+            <div class="mb-6">
+              <p>CONSTE POR EL PRESENTE DOCUMENTO EL CONTRATO DE PRÉSTAMO QUE CELEBRAN POR UNA PARTE <strong>${loan.lender.name}</strong>, identificado con <strong>DNI N° ${loan.lender.dni}</strong>, con domicilio en <strong>Jr. Pachitea 266, Lima</strong>, en adelante denominado <strong>EL PRESTAMISTA</strong>; DE OTRA PARTE ${loan.borrowers.map(b => `<strong>${b.name}</strong>, identificad${b.gender === 'femenino' ? 'a' : 'o'} con <strong>DNI N° ${b.dni}</strong>, con domicilio en <strong>${b.address}</strong>`).join('; ')} en adelante denominad${loan.borrowers.length > 1 ? 'os' : 'o'} <strong>${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}</strong>; ${loan.guarantors.length > 0 ? `Y DE OTRA PARTE ${loan.guarantors.map(g => `<strong>${g.name}</strong>, identificad${g.gender === 'femenino' ? 'a' : 'o'} con <strong>DNI N° ${g.dni}</strong>, con domicilio en <strong>${g.address}</strong>`).join('; ')} en adelante denominad${loan.guarantors.length > 1 ? 'os' : 'o'} <strong>${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}</strong>` : ''}.</p>
+            </div>
+          
+            <div class="mb-6">
+              <p>EL PRESTAMISTA otorga a ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} un préstamo por la suma de <strong>S/. ${loan.amount.toFixed(2)} (${numberToWords(loan.amount)} SOLES)</strong>, el cual será devuelto junto con los intereses conforme a lo establecido en el presente contrato. ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} pagará a EL PRESTAMISTA un interés del <strong>${loan.interestRate}%</strong> sobre el monto del préstamo, lo que equivale a <strong>S/. ${(loan.amount * (loan.interestRate / 100)).toFixed(2)} (${numberToWords(loan.amount * (loan.interestRate / 100))} SOLES)</strong>.</p>
+            </div>
+            
+            <div class="mb-6">
+              <p>${loan.paymentType === 'daily' ? 
+                `${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} se obliga a pagar la suma total de <strong>S/. ${loan.paymentDetails.totalAmount} (${numberToWords(parseFloat(loan.paymentDetails.totalAmount))} SOLES)</strong>, en <strong>${loan.period} días</strong>, mediante pagos diarios de <strong>S/. ${loan.paymentDetails.dailyPayment} (${numberToWords(parseFloat(loan.paymentDetails.dailyPayment))} SOLES)</strong>.` : 
+                `${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} se obliga a pagar intereses mensuales de <strong>S/.${(loan.amount * (loan.interestRate / 100)).toFixed(2)} (${numberToWords(loan.amount * (loan.interestRate / 100))} SOLES)</strong>, durante <strong>${loan.period} meses</strong>, y al final del plazo pagará el monto total del préstamo más el último interés, es decir <strong>S/. ${loan.paymentDetails.finalPayment} (${numberToWords(parseFloat(loan.paymentDetails.finalPayment))} SOLES)</strong>.`}
+              El primer pago se realizará el <strong>${loan.paymentType === 'daily' ? formatDate(loan.startDate) : formatDate(getNextMonthDate(loan.startDate))}</strong> y el último pago el <strong>${formatDate(loan.endDate)}</strong>.</p>
+            </div>
+            
+            ${loan.guarantors.length > 0 ? `
+            <div class="mb-6">
+              <p>${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm} se obliga${loan.guarantors.length > 1 ? 'n' : ''} solidariamente a cumplir con las obligaciones de ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} en caso de incumplimiento de este${loan.borrowers.length > 1 ? 's' : ''} último${loan.borrowers.length > 1 ? 's' : ''}.</p>
+            </div>
+            ` : ''}
+            
+            <div class="mb-6">
+              <h2 class="text-lg font-bold mb-2">FIRMAS</h2>
+              <div class="grid grid-cols-1 md:grid-cols-${1 + loan.borrowers.length + (loan.guarantors.length > 0 ? loan.guarantors.length : 0)} gap-4 mt-6">
+                <div class="text-center">
+                  <div class="signature-space"></div>
+                  <p class="font-bold">EL PRESTAMISTA</p>
+                  <p><strong>${loan.lender.name}</strong></p>
+                  <p><strong>DNI ${loan.lender.dni}</strong></p>
+                </div>
+                
+                ${loan.borrowers.map(borrower => `
+                  <div class="text-center">
+                    <div class="signature-space"></div>
+                    <p class="font-bold">${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}</p>
+                    <p><strong>${borrower.name}</strong></p>
+                    <p><strong>DNI ${borrower.dni}</strong></p>
+                  </div>
+                `).join('')}
+                
+                ${loan.guarantors.map(guarantor => `
+                  <div class="text-center">
+                    <div class="signature-space"></div>
+                    <p class="font-bold">${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}</p>
+                    <p><strong>${guarantor.name}</strong></p>
+                    <p><strong>DNI ${guarantor.dni}</strong></p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+        
+        tempContent.innerHTML = contractHTML;
+        
+        // Generate PDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+        
+        // Configurar tamaño de fuente
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        
+        // Generate filename
+        const firstBorrower = loan.borrowers[0].name.replace(/\s+/g, '-');
+        const date = loan.date.split('-').reverse().join('-');
+        const filename = `${firstBorrower}-${date}.pdf`;
+        
+        // Use html2canvas for better rendering
+        html2canvas(tempContent, {
+          scale: 2,
+          letterRendering: true,
+          useCORS: true
+        }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const imgWidth = 210; // A4 width in mm
+          const pageHeight = 295; // A4 height in mm
+          const imgHeight = canvas.height * imgWidth / canvas.width;
+          
+          doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+          doc.save(filename);
+          document.body.removeChild(tempContent);
+        });
+      }
+    }
+    
+    function closeModal() {
+      document.getElementById('contract-modal').classList.add('hidden');
+      document.body.style.overflow = 'auto';
+      loadLoanHistory();
+      showSection('loan-history');
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-modal').classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+
     function loadLoanHistory() {
       const tbody = document.getElementById('loan-history-body');
       const noLoansMessage = document.getElementById('no-loans-message');
@@ -670,14 +839,14 @@
         tbody.appendChild(row);
       });
     }
-    
+
     function viewContract(loanId) {
       const loan = loans.find(l => l.id === loanId);
       if (loan) {
         showContractPreview(loan);
       }
     }
-    
+
     function editContract(loanId) {
       const loan = loans.find(l => l.id === loanId);
       if (loan) {
@@ -834,10 +1003,109 @@
           label.textContent = this.value === 'daily' ? 'Duración (días)' : 'Duración (meses)';
         });
         
+        // Modified event listener for the edit form
         document.getElementById('edit-loan-form').addEventListener('submit', function(e) {
           e.preventDefault();
-          handleFormSubmit(e);
-          closeEditModal();
+          
+          // Get form data
+          const amount = parseFloat(document.getElementById('edit-loan-amount').value);
+          const interestRate = parseFloat(document.getElementById('edit-interest-rate').value);
+          const paymentType = document.getElementById('edit-payment-type').value;
+          const period = parseInt(document.getElementById('edit-period').value);
+          const startDateInput = document.getElementById('edit-start-date').value;
+          
+          // Corregir la fecha de inicio (añadir un día)
+          const startDate = new Date(startDateInput);
+          startDate.setDate(startDate.getDate() + 1);
+          const correctedStartDate = startDate.toISOString().split('T')[0];
+          
+          const lenderSelect = document.getElementById('edit-lender');
+          const lenderName = lenderSelect.value;
+          const lenderDni = lenderSelect.options[lenderSelect.selectedIndex].getAttribute('data-dni');
+          
+          // Calculate end date with corrected start date
+          const endDate = calculateEndDate(correctedStartDate, period, paymentType);
+          
+          // Calculate payment details
+          const interestAmount = amount * (interestRate / 100);
+          const totalAmount = amount + interestAmount;
+          let paymentDetails;
+          
+          if (paymentType === 'daily') {
+            const dailyPayment = totalAmount / period;
+            paymentDetails = {
+              type: 'Diario',
+              dailyPayment: dailyPayment.toFixed(2),
+              totalDays: period,
+              totalAmount: totalAmount.toFixed(2)
+            };
+          } else {
+            const monthlyInterest = interestAmount / period;
+            paymentDetails = {
+              type: 'Mensual',
+              monthlyInterest: monthlyInterest.toFixed(2),
+              totalMonths: period,
+              totalAmount: totalAmount.toFixed(2),
+              finalPayment: totalAmount.toFixed(2)
+            };
+          }
+          
+          // Get borrowers
+          const borrowers = [];
+          document.querySelectorAll('#edit-borrowers-container .borrower-form').forEach(form => {
+            borrowers.push({
+              name: form.querySelector('.borrower-name').value,
+              dni: form.querySelector('.borrower-dni').value,
+              gender: form.querySelector('.borrower-gender').value,
+              address: form.querySelector('.borrower-address').value
+            });
+          });
+          
+          // Get guarantors (if any)
+          const guarantors = [];
+          document.querySelectorAll('#edit-guarantors-container .guarantor-form').forEach(form => {
+            const name = form.querySelector('.guarantor-name').value;
+            if (name) {
+              guarantors.push({
+                name: name,
+                dni: form.querySelector('.guarantor-dni').value,
+                gender: form.querySelector('.guarantor-gender').value,
+                address: form.querySelector('.guarantor-address').value
+              });
+            }
+          });
+          
+          // Update the loan
+          const index = loans.findIndex(l => l.id === loanId);
+          if (index !== -1) {
+            loans[index] = {
+              id: loanId,
+              date: loans[index].date, // Keep original creation date
+              amount: amount,
+              interestRate: interestRate,
+              paymentType: paymentType,
+              period: period,
+              startDate: correctedStartDate, // Usar la fecha corregida
+              endDate: endDate,
+              lender: {
+                name: lenderName,
+                dni: lenderDni
+              },
+              borrowers: borrowers,
+              guarantors: guarantors,
+              paymentDetails: paymentDetails
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('loans', JSON.stringify(loans));
+            
+            // Close modal and refresh view
+            closeEditModal();
+            loadLoanHistory();
+            
+            // Show success message
+            alert('Los cambios se han guardado correctamente');
+          }
         });
         
         // Show modal
@@ -845,7 +1113,7 @@
         document.body.style.overflow = 'hidden';
       }
     }
-    
+
     function addBorrowerToEditForm() {
       const container = document.getElementById('edit-borrowers-container');
       const newBorrower = document.createElement('div');
@@ -884,7 +1152,7 @@
       `;
       container.appendChild(newBorrower);
     }
-    
+
     function addGuarantorToEditForm() {
       const container = document.getElementById('edit-guarantors-container');
       const newGuarantor = document.createElement('div');
@@ -923,106 +1191,7 @@
       `;
       container.appendChild(newGuarantor);
     }
-    
-    function downloadContract(loanId) {
-      const loan = loans.find(l => l.id === loanId);
-      if (loan) {
-        // Create a temporary preview to generate the PDF
-        const tempContent = document.createElement('div');
-        tempContent.id = 'temp-contract-content';
-        document.body.appendChild(tempContent);
-        
-        // Generate gender-specific terms
-        const borrowerTerm = loan.borrowers[0].gender === 'femenino' ? 'PRESTATARIA' : 'PRESTATARIO';
-        const borrowerTermPlural = loan.borrowers[0].gender === 'femenino' ? 'PRESTATARIAS' : 'PRESTATARIOS';
-        const guarantorTerm = loan.guarantors.length > 0 ? 
-          (loan.guarantors[0].gender === 'femenino' ? 'GARANTE' : 'GARANTE') : '';
-        const guarantorTermPlural = loan.guarantors.length > 0 ? 
-          (loan.guarantors[0].gender === 'femenino' ? 'GARANTES' : 'GARANTES') : '';
-        
-        // Generate contract content
-        let contractHTML = `
-          <h1 class="text-2xl font-bold text-center mb-6">CONTRATO DE PRÉSTAMO</h1>
-          
-          <p class="text-right mb-6">Lima, ${formatDate(loan.date)}</p>
-          
-          <div class="mb-6">
-            <p>CONSTE POR EL PRESENTE DOCUMENTO EL CONTRATO DE PRÉSTAMO QUE CELEBRAN POR UNA PARTE ${loan.lender.name}, identificado con DNI N° ${loan.lender.dni}, en adelante denominado EL PRESTAMISTA; DE OTRA PARTE ${loan.borrowers.map(b => `${b.name}, identificad${b.gender === 'femenino' ? 'a' : 'o'} con DNI N° ${b.dni}`).join('; ')} en adelante denominad${loan.borrowers.length > 1 ? 'os' : 'o'} ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}; ${loan.guarantors.length > 0 ? `Y DE OTRA PARTE ${loan.guarantors.map(g => `${g.name}, identificad${g.gender === 'femenino' ? 'a' : 'o'} con DNI N° ${g.dni}`).join('; ')} en adelante denominad${loan.guarantors.length > 1 ? 'os' : 'o'} ${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}` : ''}.</p>
-          </div>
-          
-          <div class="mb-6">
-            <p>EL PRESTAMISTA otorga a ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} un préstamo por la suma de S/. ${loan.amount.toFixed(2)} (${numberToWords(loan.amount)} SOLES), el cual será devuelto junto con los intereses conforme a lo establecido en el presente contrato. ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} pagará a EL PRESTAMISTA un interés del ${loan.interestRate}% sobre el monto del préstamo, lo que equivale a S/. ${(loan.amount * (loan.interestRate / 100)).toFixed(2)} (${numberToWords(loan.amount * (loan.interestRate / 100))} SOLES).</p>
-          </div>
-          
-          <div class="mb-6">
-            <p>${loan.paymentType === 'daily' ? 
-              `${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} se obliga a pagar la suma total de S/. ${loan.paymentDetails.totalAmount} (${numberToWords(parseFloat(loan.paymentDetails.totalAmount))} SOLES), en ${loan.period} días, mediante pagos diarios de S/. ${loan.paymentDetails.dailyPayment} (${numberToWords(parseFloat(loan.paymentDetails.dailyPayment))} SOLES).` : 
-              `${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} se obliga a pagar intereses mensuales de S/. ${loan.paymentDetails.monthlyInterest} (${numberToWords(parseFloat(loan.paymentDetails.monthlyInterest))} SOLES), durante ${loan.period} meses, y al final del plazo pagará el monto total del préstamo más el último interés, es decir S/. ${loan.paymentDetails.finalPayment} (${numberToWords(parseFloat(loan.paymentDetails.finalPayment))} SOLES).`}
-            El primer pago se realizará el ${formatDate(loan.startDate)} y el último pago el ${formatDate(loan.endDate)}.</p>
-          </div>
-          
-          ${loan.guarantors.length > 0 ? `
-          <div class="mb-6">
-            <p>${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm} se obliga${loan.guarantors.length > 1 ? 'n' : ''} solidariamente a cumplir con las obligaciones de ${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} en caso de incumplimiento de este${loan.borrowers.length > 1 ? 's' : ''} último${loan.borrowers.length > 1 ? 's' : ''}.</p>
-          </div>
-          ` : ''}
-          
-          <div class="mb-6">
-            <h2 class="text-lg font-bold mb-2">FIRMAS</h2>
-            <div class="grid grid-cols-1 md:grid-cols-${1 + loan.borrowers.length + (loan.guarantors.length > 0 ? loan.guarantors.length : 0)} gap-4 mt-6">
-              <div class="text-center">
-                <div class="signature-space"></div>
-                <p class="font-bold">EL PRESTAMISTA</p>
-                <p>${loan.lender.name}</p>
-                <p>DNI ${loan.lender.dni}</p>
-              </div>
-              
-              ${loan.borrowers.map(borrower => `
-                <div class="text-center">
-                  <div class="signature-space"></div>
-                  <p class="font-bold">${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}</p>
-                  <p>${borrower.name}</p>
-                  <p>DNI ${borrower.dni}</p>
-                </div>
-              `).join('')}
-              
-              ${loan.guarantors.map(guarantor => `
-                <div class="text-center">
-                  <div class="signature-space"></div>
-                  <p class="font-bold">${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}</p>
-                  <p>${guarantor.name}</p>
-                  <p>DNI ${guarantor.dni}</p>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-        
-        tempContent.innerHTML = contractHTML;
-        
-        // Generate PDF
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        
-        // Generate filename
-        const firstBorrower = loan.borrowers[0].name.replace(/\s+/g, '-');
-        const date = loan.date.split('-').reverse().join('-');
-        const filename = `${firstBorrower}-${date}.pdf`;
-        
-        // Add content to PDF
-        doc.html(tempContent, {
-          callback: function(doc) {
-            doc.save(filename);
-            document.body.removeChild(tempContent);
-          },
-          margin: [10, 10, 10, 10],
-          autoPaging: 'text',
-          width: 180,
-          windowWidth: tempContent.scrollWidth
-        });
-      }
-    }
-    
+
     function deleteContract(loanId) {
       if (confirm('¿Estás seguro de que deseas eliminar este contrato?')) {
         loans = loans.filter(loan => loan.id !== loanId);
@@ -1030,12 +1199,12 @@
         loadLoanHistory();
       }
     }
-    
+
     function formatDate(dateString) {
       const date = new Date(dateString);
       return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
     }
-    
+
     function numberToWords(num) {
       // This is a simplified version for Spanish
       // For a complete solution, you might want to use a library
@@ -1062,6 +1231,12 @@
       if (num === 1000) return 'mil';
       
       return num.toString(); // Fallback for numbers > 1000
+    }
+    
+    function getNextMonthDate(dateString) {
+        const date = new Date(dateString);
+        date.setMonth(date.getMonth() + 1);
+        return date.toISOString().split('T')[0];
     }
   </script>
 </body>
