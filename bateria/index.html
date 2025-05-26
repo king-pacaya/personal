@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="shortcut icon" href="favicon.svg">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/2/2.2.1/iconify.min.js"></script>
+    <style>
+        * {
+            font-family: 'Montserrat', sans-serif;
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            transition: background-color 0.3s; /* Para suavizar el cambio de fondo */
+        }
+        body.slider-view-active {
+            background-color: #000; /* Fondo negro cuando el slider está activo */
+        }
+
+        /* Estilos para la cara del To-Do List */
+        #todo-face {
+            min-height: 100vh;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        #todo-face.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none; /* Evita interacción cuando está oculta */
+        }
+
+        /* Estilos para la cara del Slider Rotado */
+        #slider-face {
+            display: none; /* Oculto por defecto */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 100vh; /* Ancho es la altura del viewport */
+            height: 100vw; /* Alto es el ancho del viewport */
+            background-color: #111; /* Fondo oscuro para el slider */
+            overflow: hidden;
+            transform: translate(-50%, -50%) rotate(90deg);
+            transform-origin: center center;
+            color: white;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            opacity: 0; /* Inicialmente transparente para la transición */
+        }
+
+        #slider-face.active {
+            display: block;
+            opacity: 1;
+        }
+
+        #image-slider {
+            width: 100%; /* Será 100vh de la pantalla original */
+            height: 100%; /* Será 100vw de la pantalla original */
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .slide.active {
+            display: flex;
+        }
+        .slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* Mantiene el aspect ratio 16:9 */
+        }
+
+        #to-todo-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 50;
+            transform: rotate(180deg);
+            padding: 8px 12px;
+            border-radius: 0.375rem; /* rounded-md */
+            background-color: #3b82f6; /* bg-blue-500 */
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: background-color 0.2s;
+        }
+        #to-todo-button:hover {
+            background-color: #2563eb; /* hover:bg-blue-600 */
+        }
+        #to-todo-button .iconify {
+            margin-right: 4px;
+            transform: rotate(180deg);
+        }
+
+        .slider-nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%) rotate(90deg); /* Rotar flechas para swipe vertical en pantalla */
+            z-index: 40;
+            background-color: rgba(0,0,0,0.4);
+            color: white;
+            border: none;
+            padding: 0.75rem; /* 12px */
+            cursor: pointer;
+            border-radius: 9999px; /* rounded-full */
+            font-size: 1.5rem; /* text-2xl */
+            line-height: 1;
+            transition: background-color 0.2s;
+        }
+        .slider-nav-button:hover {
+            background-color: rgba(0,0,0,0.7);
+        }
+        #prev-slide {
+            left: 20px;
+        }
+        #next-slide {
+            right: 20px;
+        }
+        /* Ocultar scrollbars en el body cuando el slider está activo */
+        body.slider-mode-active {
+            overflow: hidden !important;
+        }
+
+        /* Estilo para que el checkbox y label estén alineados y el label sea clickeable */
+        .task-item label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .task-item input[type="checkbox"] {
+            margin-right: 0.75rem; /* Ajusta el espacio */
+            min-width: 1.25rem; /* Asegura tamaño clickeable */
+            min-height: 1.25rem;
+        }
+        .task-item input[type="checkbox"]:checked + span {
+            text-decoration: line-through;
+            color: #6b7280; /* gray-500 */
+        }
+    </style>
+    <title>Mis Metas</title>
+</head>
+<body class="bg-gray-100">
+
+    <div id="todo-face" class="p-4 md:p-6">
+        <button id="to-slider-button" class="fixed top-4 right-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg shadow-md transition-colors z-20">
+            <span class="iconify text-xl align-middle" data-icon="mdi:image-multiple-outline" data-inline="false"></span>
+            <span class="ml-1 align-middle hidden sm:inline">Ver Galería</span>
+        </button>
+
+        <header class="text-center mb-6 mt-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">Mis Metas Musicales</h1>
+            <p id="deadline" class="text-gray-600 mt-1 text-sm sm:text-base">Cargando deadline...</p>
+        </header>
+
+        <main class="max-w-lg mx-auto space-y-3 sm:space-y-4">
+            <div class="task-item bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+                <label for="task-compas" class="text-lg text-gray-700">
+                    <input type="checkbox" id="task-compas" class="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                    <span>Completar compas 4/4</span>
+                </label>
+            </div>
+            <div class="task-item bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+                <label for="task-alabare" class="text-lg text-gray-700">
+                    <input type="checkbox" id="task-alabare" class="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                    <span>Tocar "Te alabaré" sin error</span>
+                </label>
+            </div>
+            <div class="task-item bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+                <label for="task-redobles" class="text-lg text-gray-700">
+                    <input type="checkbox" id="task-redobles" class="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                    <span>Grupo de redobles</span>
+                </label>
+            </div>
+        </main>
+    </div>
+
+    <div id="slider-face">
+        <button id="to-todo-button" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold shadow-md transition-colors">
+            <span class="iconify text-lg" data-icon="mdi:image-multiple-outline" data-inline="false"></span>
+            <span class="ml-1 hidden sm:inline">Volver</span>
+        </button>
+
+        <div id="image-slider">
+            <div class="slide active">
+                <img src="1.png" alt="Imagen 1">
+            </div>
+            <div class="slide">
+                <img src="2.png" alt="Imagen 2">
+            </div>
+            <div class="slide">
+                <img src="3.png" alt="Imagen 3">
+            </div>
+
+            <button id="prev-slide" class="slider-nav-button" aria-label="Anterior">&#10094;</button>
+            <button id="next-slide" class="slider-nav-button" aria-label="Siguiente">&#10095;</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const todoFace = document.getElementById('todo-face');
+            const sliderFace = document.getElementById('slider-face');
+            const toSliderButton = document.getElementById('to-slider-button');
+            const toTodoButton = document.getElementById('to-todo-button');
+            const deadlineEl = document.getElementById('deadline');
+
+            // --- Lógica del To-Do List ---
+            const taskIds = ['task-compas', 'task-alabare', 'task-redobles'];
+            const todoCheckboxes = taskIds.map(id => document.getElementById(id)).filter(cb => cb !== null);
+
+            function getNextMondayFormatted() {
+                const today = new Date();
+                const dayOfWeek = today.getDay(); // 0 (Sun) - 6 (Sat)
+                let daysUntilMonday = (1 - dayOfWeek + 7) % 7;
+                if (daysUntilMonday === 0) { // If today is Monday, target next Monday
+                    daysUntilMonday = 7;
+                }
+                const nextMonday = new Date(today);
+                nextMonday.setDate(today.getDate() + daysUntilMonday);
+                return nextMonday.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+            }
+
+            if (deadlineEl) {
+                deadlineEl.textContent = `Deadline: ${getNextMondayFormatted()}`;
+            }
+
+            function loadTasksState() {
+                try {
+                    const tasksState = JSON.parse(localStorage.getItem('todoTasks')) || {};
+                    todoCheckboxes.forEach(checkbox => {
+                        checkbox.checked = tasksState[checkbox.id] || false;
+                        // Aplicar estilo si está marcado al cargar
+                        const labelSpan = checkbox.nextElementSibling;
+                         if(labelSpan){
+                            if (checkbox.checked) {
+                                labelSpan.classList.add('line-through', 'text-gray-500');
+                            } else {
+                                labelSpan.classList.remove('line-through', 'text-gray-500');
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.error("Error loading tasks from localStorage:", e);
+                }
+            }
+
+            function saveTasksState() {
+                const tasksState = {};
+                todoCheckboxes.forEach(checkbox => {
+                    tasksState[checkbox.id] = checkbox.checked;
+                });
+                try {
+                    localStorage.setItem('todoTasks', JSON.stringify(tasksState));
+                } catch (e) {
+                    console.error("Error saving tasks to localStorage:", e);
+                }
+            }
+
+            todoCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', (event) => {
+                    saveTasksState();
+                    const labelSpan = event.target.nextElementSibling;
+                    if(labelSpan){
+                        if (event.target.checked) {
+                            labelSpan.classList.add('line-through', 'text-gray-500');
+                        } else {
+                            labelSpan.classList.remove('line-through', 'text-gray-500');
+                        }
+                    }
+                });
+            });
+
+            loadTasksState(); // Cargar estado al iniciar
+
+            // --- Lógica del Slider ---
+            const slides = document.querySelectorAll('#image-slider .slide');
+            const prevButton = document.getElementById('prev-slide');
+            const nextButton = document.getElementById('next-slide');
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+            }
+
+            if (slides.length > 0) {
+                showSlide(currentSlide); // Mostrar la primera imagen
+
+                if (nextButton) {
+                    nextButton.addEventListener('click', () => {
+                        currentSlide = (currentSlide + 1) % slides.length;
+                        showSlide(currentSlide);
+                    });
+                }
+
+                if (prevButton) {
+                    prevButton.addEventListener('click', () => {
+                        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+                        showSlide(currentSlide);
+                    });
+                }
+            }
+
+
+            // --- Lógica de cambio de caras ---
+            if (toSliderButton) {
+                toSliderButton.addEventListener('click', () => {
+                    todoFace.classList.add('hidden');
+                    todoFace.style.pointerEvents = 'none';
+
+                    sliderFace.classList.add('active');
+                    document.body.classList.add('slider-mode-active'); // Para ocultar scrollbar del body
+                });
+            }
+
+            if (toTodoButton) {
+                toTodoButton.addEventListener('click', () => {
+                    sliderFace.classList.remove('active');
+                    document.body.classList.remove('slider-mode-active');
+
+                    // Pequeño delay para que la transición de salida del slider termine antes de mostrar el todo-list
+                    setTimeout(() => {
+                         todoFace.classList.remove('hidden');
+                         todoFace.style.pointerEvents = 'auto';
+                    }, 50); // Debe coincidir o ser menor que la transición de opacity/transform si se usa para #slider-face
+                });
+            }
+        });
+    </script>
+</body>
+</html>
