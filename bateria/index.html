@@ -70,6 +70,7 @@
             display: none;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
         .slide.active {
             display: flex;
@@ -106,7 +107,7 @@
         .slider-nav-button {
             position: absolute;
             top: 50%;
-            transform: translateY(-50%) rotate(90deg); /* Rotar flechas para swipe vertical en pantalla */
+            transform: translateY(-50%);
             z-index: 40;
             background-color: rgba(0,0,0,0.4);
             color: white;
@@ -127,6 +128,7 @@
         #next-slide {
             right: 20px;
         }
+        
         /* Ocultar scrollbars en el body cuando el slider está activo */
         body.slider-mode-active {
             overflow: hidden !important;
@@ -147,8 +149,41 @@
             text-decoration: line-through;
             color: #6b7280; /* gray-500 */
         }
+        
+        /* Estilo para el indicador de slide */
+        .slide-counter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+        
+        /* Estilo para el botón de pantalla completa */
+        #fullscreen-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+            padding: 8px 12px;
+            border-radius: 0.375rem;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: background-color 0.2s;
+        }
+        #fullscreen-button:hover {
+            background-color: #2563eb;
+        }
     </style>
-    <title>Mis Metas</title>
+    <title>Prácticas</title>
 </head>
 <body class="bg-gray-100">
 
@@ -159,7 +194,7 @@
         </button>
 
         <header class="text-center mb-6 mt-8">
-            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">Mis Metas Musicales</h1>
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">Prácticas</h1>
             <p id="deadline" class="text-gray-600 mt-1 text-sm sm:text-base">Cargando deadline...</p>
         </header>
 
@@ -190,15 +225,23 @@
             <span class="iconify text-lg" data-icon="mdi:image-multiple-outline" data-inline="false"></span>
             <span class="ml-1 hidden sm:inline">Volver</span>
         </button>
+        
+        <button id="fullscreen-button">
+            <span class="iconify" data-icon="mdi:fullscreen" data-inline="false"></span>
+            <span class="ml-1 hidden sm:inline">Pantalla completa</span>
+        </button>
 
         <div id="image-slider">
             <div class="slide active">
+                <div class="slide-counter">1 / 3</div>
                 <img src="1.png" alt="Imagen 1">
             </div>
             <div class="slide">
+                <div class="slide-counter">2 / 3</div>
                 <img src="2.png" alt="Imagen 2">
             </div>
             <div class="slide">
+                <div class="slide-counter">3 / 3</div>
                 <img src="3.png" alt="Imagen 3">
             </div>
 
@@ -214,6 +257,7 @@
             const toSliderButton = document.getElementById('to-slider-button');
             const toTodoButton = document.getElementById('to-todo-button');
             const deadlineEl = document.getElementById('deadline');
+            const fullscreenButton = document.getElementById('fullscreen-button');
 
             // --- Lógica del To-Do List ---
             const taskIds = ['task-compas', 'task-alabare', 'task-redobles'];
@@ -293,6 +337,10 @@
                 slides.forEach((slide, i) => {
                     slide.classList.toggle('active', i === index);
                 });
+                // Actualizar contador
+                document.querySelectorAll('.slide-counter').forEach((counter, i) => {
+                    counter.textContent = `${i + 1} / ${slides.length}`;
+                });
             }
 
             if (slides.length > 0) {
@@ -313,6 +361,20 @@
                 }
             }
 
+            // --- Lógica de pantalla completa ---
+            if (fullscreenButton) {
+                fullscreenButton.addEventListener('click', toggleFullscreen);
+            }
+
+            function toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    sliderFace.requestFullscreen().catch(err => {
+                        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                    });
+                } else {
+                    document.exitFullscreen();
+                }
+            }
 
             // --- Lógica de cambio de caras ---
             if (toSliderButton) {
