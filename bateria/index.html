@@ -6,64 +6,194 @@
     <link rel="shortcut icon" href="favicon.svg">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://code.iconify.design/2/2.2.1/iconify.min.js"></script>
+    <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
     <style>
+        :root {
+            --color-primary: #ffffff;  /* Blanco */
+            --color-secondary: #757575;  /* Plomo */
+            --color-accent: #ef4444;  /* Rojo */
+        }
+        
         * {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Inter', sans-serif;
             box-sizing: border-box;
         }
         body {
             margin: 0;
-            transition: background-color 0.3s; /* Para suavizar el cambio de fondo */
-        }
-        body.slider-view-active {
-            background-color: #000; /* Fondo negro cuando el slider está activo */
+            background-color: var(--color-primary);
         }
 
-        /* Estilos para la cara del To-Do List */
-        #todo-face {
-            min-height: 100vh;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-        }
-        #todo-face.hidden {
-            opacity: 0;
-            transform: scale(0.95);
-            pointer-events: none; /* Evita interacción cuando está oculta */
-        }
-
-        /* Estilos para la cara del Slider Rotado */
-        #slider-face {
-            display: none; /* Oculto por defecto */
+        /* Botón de cambio de modo */
+        .mode-switch-container {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            width: 100vh; /* Ancho es la altura del viewport */
-            height: 100vw; /* Alto es el ancho del viewport */
-            background-color: #111; /* Fondo oscuro para el slider */
-            overflow: hidden;
-            transform: translate(-50%, -50%) rotate(90deg);
-            transform-origin: center center;
-            color: white;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            opacity: 0; /* Inicialmente transparente para la transición */
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
         }
-
-        #slider-face.active {
-            display: block;
-            opacity: 1;
-        }
-
-        #image-slider {
-            width: 100%; /* Será 100vh de la pantalla original */
-            height: 100%; /* Será 100vw de la pantalla original */
-            position: relative;
+        .mode-switch-button {
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background-color: var(--color-primary);
+            color: var(--color-secondary);
+            border: 2px solid var(--color-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .mode-switch-button:hover {
+            background-color: var(--color-secondary);
+            color: var(--color-primary);
         }
 
+        /* Vista To-Do List */
+        #todo-face {
+            min-height: 100vh;
+            padding: 80px 20px 40px;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        #todo-face.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-secondary);
+            margin-bottom: 8px;
+        }
+
+        /* Lista de tareas - Nuevo diseño */
+        .task-list {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0;
+            list-style: none;
+        }
+        .task-item {
+            background-color: var(--color-primary);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e5e5e5;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .task-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
+        .task-item.overdue {
+            border-left: 3px solid var(--color-accent);
+        }
+        
+        .task-content {
+            display: flex;
+            align-items: center;
+        }
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            accent-color: var(--color-secondary);
+            cursor: pointer;
+        }
+        .task-text {
+            flex: 1;
+            font-size: 1rem;
+            color: var(--color-secondary);
+            font-weight: 500;
+        }
+        .task-checkbox:checked + .task-text {
+            text-decoration: line-through;
+            color: #bdbdbd;
+        }
+        
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: #bdbdbd;
+        }
+        .task-days-left {
+            font-weight: 600;
+        }
+        .task-days-left.urgent {
+            color: var(--color-accent);
+        }
+        
+        .task-actions {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            gap: 8px;
+        }
+        .task-action-btn {
+            background: none;
+            border: none;
+            color: var(--color-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .task-item:hover .task-action-btn {
+            opacity: 1;
+        }
+        .task-action-btn.delete {
+            color: var(--color-accent);
+        }
+
+        /* Vista Slider */
+        #slider-face {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--color-primary);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 900;
+        }
+        #slider-face.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* Rotación para móviles */
+        @media (max-width: 768px) {
+            #slider-face.rotated {
+                width: 100vh;
+                height: 100vw;
+                transform: translate(-50%, -50%) rotate(90deg);
+                transform-origin: center center;
+                top: 50%;
+                left: 50%;
+            }
+        }
+
+        .slider-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
         .slide {
             width: 100%;
             height: 100%;
@@ -76,51 +206,33 @@
             display: flex;
         }
         .slide img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain; /* Mantiene el aspect ratio 16:9 */
+            max-width: 90%;
+            max-height: 80vh;
+            object-fit: contain;
         }
 
-        #to-todo-button {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 50;
-            transform: rotate(180deg);
-            padding: 8px 12px;
-            border-radius: 0.375rem; /* rounded-md */
-            background-color: #3b82f6; /* bg-blue-500 */
-            color: white;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: background-color 0.2s;
-        }
-        #to-todo-button:hover {
-            background-color: #2563eb; /* hover:bg-blue-600 */
-        }
-        #to-todo-button .iconify {
-            margin-right: 4px;
-            transform: rotate(180deg);
-        }
-
+        /* Controles del slider */
         .slider-nav-button {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            z-index: 40;
-            background-color: rgba(0,0,0,0.4);
-            color: white;
-            border: none;
-            padding: 0.75rem; /* 12px */
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--color-secondary);
+            color: var(--color-secondary);
+            font-size: 1.5rem;
             cursor: pointer;
-            border-radius: 9999px; /* rounded-full */
-            font-size: 1.5rem; /* text-2xl */
-            line-height: 1;
-            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10;
         }
         .slider-nav-button:hover {
-            background-color: rgba(0,0,0,0.7);
+            background-color: var(--color-secondary);
+            color: var(--color-primary);
         }
         #prev-slide {
             left: 20px;
@@ -128,277 +240,316 @@
         #next-slide {
             right: 20px;
         }
-        
-        /* Ocultar scrollbars en el body cuando el slider está activo */
-        body.slider-mode-active {
-            overflow: hidden !important;
-        }
 
-        /* Estilo para que el checkbox y label estén alineados y el label sea clickeable */
-        .task-item label {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-        }
-        .task-item input[type="checkbox"] {
-            margin-right: 0.75rem; /* Ajusta el espacio */
-            min-width: 1.25rem; /* Asegura tamaño clickeable */
-            min-height: 1.25rem;
-        }
-        .task-item input[type="checkbox"]:checked + span {
-            text-decoration: line-through;
-            color: #6b7280; /* gray-500 */
-        }
-        
-        /* Estilo para el indicador de slide */
         .slide-counter {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: rgba(0,0,0,0.5);
-            color: white;
-            padding: 4px 12px;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: var(--color-secondary);
+            padding: 6px 16px;
             border-radius: 20px;
-            font-size: 0.9rem;
-            z-index: 10;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid var(--color-secondary);
         }
-        
-        /* Estilo para el botón de pantalla completa */
-        #fullscreen-button {
-            position: fixed;
+
+        .fullscreen-button {
+            position: absolute;
             bottom: 20px;
             right: 20px;
-            z-index: 50;
-            padding: 8px 12px;
-            border-radius: 0.375rem;
-            background-color: #3b82f6;
-            color: white;
-            border: none;
+            width: 44px;
+            height: 44px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--color-secondary);
+            color: var(--color-secondary);
+            border-radius: 50%;
             cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10;
         }
-        #fullscreen-button:hover {
-            background-color: #2563eb;
+        .fullscreen-button:hover {
+            background-color: var(--color-secondary);
+            color: var(--color-primary);
         }
     </style>
-    <title>Prácticas</title>
+    <title>Prácticas Musicales</title>
 </head>
-<body class="bg-gray-100">
-
-    <div id="todo-face" class="p-4 md:p-6">
-        <button id="to-slider-button" class="fixed top-4 right-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg shadow-md transition-colors z-20">
-            <span class="iconify text-xl align-middle" data-icon="mdi:image-multiple-outline" data-inline="false"></span>
-            <span class="ml-1 align-middle hidden sm:inline">Ver Galería</span>
+<body>
+    <!-- Botón de cambio de modo fijo -->
+    <div class="mode-switch-container">
+        <button id="mode-switch-button" class="mode-switch-button">
+            <span class="iconify" data-icon="mdi:image-multiple-outline"></span>
         </button>
-
-        <header class="text-center mb-6 mt-8">
-            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">Prácticas</h1>
-            <p id="deadline" class="text-gray-600 mt-1 text-sm sm:text-base">Cargando deadline...</p>
-        </header>
-
-        <main class="max-w-lg mx-auto space-y-3 sm:space-y-4">
-            <div class="task-item bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                <label for="task-compas" class="text-lg text-gray-700">
-                    <input type="checkbox" id="task-compas" class="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                    <span>Completar compas 4/4</span>
-                </label>
-            </div>
-            <div class="task-item bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                <label for="task-alabare" class="text-lg text-gray-700">
-                    <input type="checkbox" id="task-alabare" class="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                    <span>Tocar "Te alabaré" sin error</span>
-                </label>
-            </div>
-            <div class="task-item bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
-                <label for="task-redobles" class="text-lg text-gray-700">
-                    <input type="checkbox" id="task-redobles" class="form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
-                    <span>Grupo de redobles</span>
-                </label>
-            </div>
-        </main>
     </div>
 
-    <div id="slider-face">
-        <button id="to-todo-button" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold shadow-md transition-colors">
-            <span class="iconify text-lg" data-icon="mdi:image-multiple-outline" data-inline="false"></span>
-            <span class="ml-1 hidden sm:inline">Volver</span>
-        </button>
-        
-        <button id="fullscreen-button">
-            <span class="iconify" data-icon="mdi:fullscreen" data-inline="false"></span>
-            <span class="ml-1 hidden sm:inline">Pantalla completa</span>
-        </button>
+    <!-- Vista To-Do List -->
+    <div id="todo-face">
+        <div class="header">
+            <h1 class="title">Prácticas Musicales</h1>
+        </div>
 
-        <div id="image-slider">
+        <ul id="task-list" class="task-list">
+            <!-- Las tareas se cargarán dinámicamente -->
+        </ul>
+    </div>
+
+    <!-- Vista Slider -->
+    <div id="slider-face">
+        <div class="slider-container">
             <div class="slide active">
-                <div class="slide-counter">1 / 3</div>
                 <img src="1.png" alt="Imagen 1">
+                <div class="slide-counter">1 / 3</div>
             </div>
             <div class="slide">
-                <div class="slide-counter">2 / 3</div>
                 <img src="2.png" alt="Imagen 2">
+                <div class="slide-counter">2 / 3</div>
             </div>
             <div class="slide">
-                <div class="slide-counter">3 / 3</div>
                 <img src="3.png" alt="Imagen 3">
+                <div class="slide-counter">3 / 3</div>
             </div>
 
             <button id="prev-slide" class="slider-nav-button" aria-label="Anterior">&#10094;</button>
             <button id="next-slide" class="slider-nav-button" aria-label="Siguiente">&#10095;</button>
+
+            <button id="fullscreen-button" class="fullscreen-button">
+                <span class="iconify" data-icon="mdi:fullscreen"></span>
+            </button>
         </div>
     </div>
 
     <script>
+        // Datos iniciales de las tareas
+        const initialTasks = [
+            {
+                id: "task-compas",
+                title: "Completar compas 4/4",
+                created: new Date("2024-05-26").toISOString(),
+                due: new Date("2024-06-02").toISOString(),
+                completed: false
+            },
+            {
+                id: "task-alabare",
+                title: "Tocar 'Te alabaré' sin error",
+                created: new Date("2024-05-26").toISOString(),
+                due: new Date("2024-06-02").toISOString(),
+                completed: false
+            },
+            {
+                id: "task-redobles",
+                title: "Grupo de redobles",
+                created: new Date("2024-05-26").toISOString(),
+                due: new Date("2024-06-02").toISOString(),
+                completed: false
+            }
+        ];
+
         document.addEventListener('DOMContentLoaded', () => {
-            const todoFace = document.getElementById('todo-face');
-            const sliderFace = document.getElementById('slider-face');
-            const toSliderButton = document.getElementById('to-slider-button');
-            const toTodoButton = document.getElementById('to-todo-button');
-            const deadlineEl = document.getElementById('deadline');
-            const fullscreenButton = document.getElementById('fullscreen-button');
+            // Elementos del DOM
+            const elements = {
+                todoFace: document.getElementById('todo-face'),
+                sliderFace: document.getElementById('slider-face'),
+                modeSwitchButton: document.getElementById('mode-switch-button'),
+                taskList: document.getElementById('task-list'),
+                prevSlideButton: document.getElementById('prev-slide'),
+                nextSlideButton: document.getElementById('next-slide'),
+                fullscreenButton: document.getElementById('fullscreen-button')
+            };
 
-            // --- Lógica del To-Do List ---
-            const taskIds = ['task-compas', 'task-alabare', 'task-redobles'];
-            const todoCheckboxes = taskIds.map(id => document.getElementById(id)).filter(cb => cb !== null);
+            // Estado de la aplicación
+            const state = {
+                currentSlide: 0,
+                isSliderMode: false,
+                isMobile: window.matchMedia("(max-width: 768px)").matches,
+                tasks: JSON.parse(localStorage.getItem('tasks')) || initialTasks
+            };
 
-            function getNextMondayFormatted() {
-                const today = new Date();
-                const dayOfWeek = today.getDay(); // 0 (Sun) - 6 (Sat)
-                let daysUntilMonday = (1 - dayOfWeek + 7) % 7;
-                if (daysUntilMonday === 0) { // If today is Monday, target next Monday
-                    daysUntilMonday = 7;
-                }
-                const nextMonday = new Date(today);
-                nextMonday.setDate(today.getDate() + daysUntilMonday);
-                return nextMonday.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-            }
-
-            if (deadlineEl) {
-                deadlineEl.textContent = `Deadline: ${getNextMondayFormatted()}`;
-            }
-
-            function loadTasksState() {
-                try {
-                    const tasksState = JSON.parse(localStorage.getItem('todoTasks')) || {};
-                    todoCheckboxes.forEach(checkbox => {
-                        checkbox.checked = tasksState[checkbox.id] || false;
-                        // Aplicar estilo si está marcado al cargar
-                        const labelSpan = checkbox.nextElementSibling;
-                         if(labelSpan){
-                            if (checkbox.checked) {
-                                labelSpan.classList.add('line-through', 'text-gray-500');
-                            } else {
-                                labelSpan.classList.remove('line-through', 'text-gray-500');
-                            }
-                        }
+            // Funciones de utilidad
+            const utils = {
+                formatDate: (dateString) => {
+                    const date = new Date(dateString);
+                    return date.toLocaleDateString('es-ES', { 
+                        day: 'numeric', 
+                        month: 'short' 
                     });
-                } catch (e) {
-                    console.error("Error loading tasks from localStorage:", e);
+                },
+                
+                daysBetween: (date1, date2) => {
+                    const diff = new Date(date1) - new Date(date2);
+                    return Math.floor(diff / (1000 * 60 * 60 * 24));
+                },
+                
+                isOverdue: (dueDate) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const due = new Date(dueDate);
+                    due.setHours(0, 0, 0, 0);
+                    return due < today;
+                },
+                
+                getDaysLeft: (dueDate) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const due = new Date(dueDate);
+                    due.setHours(0, 0, 0, 0);
+                    return utils.daysBetween(due, today);
                 }
+            };
+
+            // Renderizar tareas
+            function renderTasks() {
+                elements.taskList.innerHTML = '';
+                
+                state.tasks.forEach(task => {
+                    const isOverdue = utils.isOverdue(task.due);
+                    const daysLeft = utils.getDaysLeft(task.due);
+                    
+                    const taskItem = document.createElement('li');
+                    taskItem.className = `task-item ${isOverdue ? 'overdue' : ''}`;
+                    
+                    taskItem.innerHTML = `
+                        <div class="task-content">
+                            <input type="checkbox" id="${task.id}" class="task-checkbox" ${task.completed ? 'checked' : ''}>
+                            <span class="task-text">${task.title}</span>
+                            
+                            <div class="task-actions">
+                                <button class="task-action-btn delete" data-id="${task.id}">
+                                    <span class="iconify" data-icon="mdi:trash-can-outline"></span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="task-meta">
+                            <span>Creada: ${utils.formatDate(task.created)}</span>
+                            <span class="task-days-left ${daysLeft <= 3 ? 'urgent' : ''}">
+                                ${isOverdue ? 'Vencida' : `${daysLeft} días restantes`}
+                            </span>
+                        </div>
+                    `;
+                    
+                    elements.taskList.appendChild(taskItem);
+                    
+                    // Evento para el checkbox
+                    const checkbox = taskItem.querySelector('.task-checkbox');
+                    checkbox.addEventListener('change', () => {
+                        task.completed = checkbox.checked;
+                        saveTasks();
+                    });
+                    
+                    // Evento para eliminar tarea
+                    const deleteBtn = taskItem.querySelector('.delete');
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteTask(task.id);
+                    });
+                });
             }
 
-            function saveTasksState() {
-                const tasksState = {};
-                todoCheckboxes.forEach(checkbox => {
-                    tasksState[checkbox.id] = checkbox.checked;
-                });
-                try {
-                    localStorage.setItem('todoTasks', JSON.stringify(tasksState));
-                } catch (e) {
-                    console.error("Error saving tasks to localStorage:", e);
-                }
+            // Guardar tareas
+            function saveTasks() {
+                localStorage.setItem('tasks', JSON.stringify(state.tasks));
             }
 
-            todoCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', (event) => {
-                    saveTasksState();
-                    const labelSpan = event.target.nextElementSibling;
-                    if(labelSpan){
-                        if (event.target.checked) {
-                            labelSpan.classList.add('line-through', 'text-gray-500');
-                        } else {
-                            labelSpan.classList.remove('line-through', 'text-gray-500');
-                        }
-                    }
-                });
-            });
+            // Eliminar tarea
+            function deleteTask(taskId) {
+                state.tasks = state.tasks.filter(task => task.id !== taskId);
+                saveTasks();
+                renderTasks();
+            }
 
-            loadTasksState(); // Cargar estado al iniciar
+            // Eliminar tareas vencidas
+            function deleteOverdueTasks() {
+                state.tasks = state.tasks.filter(task => !utils.isOverdue(task.due));
+                saveTasks();
+                renderTasks();
+            }
 
-            // --- Lógica del Slider ---
-            const slides = document.querySelectorAll('#image-slider .slide');
-            const prevButton = document.getElementById('prev-slide');
-            const nextButton = document.getElementById('next-slide');
-            let currentSlide = 0;
-
+            // Slider functions
             function showSlide(index) {
-                slides.forEach((slide, i) => {
+                document.querySelectorAll('.slide').forEach((slide, i) => {
                     slide.classList.toggle('active', i === index);
                 });
+                
                 // Actualizar contador
-                document.querySelectorAll('.slide-counter').forEach((counter, i) => {
-                    counter.textContent = `${i + 1} / ${slides.length}`;
+                document.querySelectorAll('.slide-counter').forEach(counter => {
+                    counter.textContent = `${index + 1} / 3`;
                 });
             }
 
-            if (slides.length > 0) {
-                showSlide(currentSlide); // Mostrar la primera imagen
-
-                if (nextButton) {
-                    nextButton.addEventListener('click', () => {
-                        currentSlide = (currentSlide + 1) % slides.length;
-                        showSlide(currentSlide);
-                    });
-                }
-
-                if (prevButton) {
-                    prevButton.addEventListener('click', () => {
-                        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-                        showSlide(currentSlide);
-                    });
-                }
+            function nextSlide() {
+                state.currentSlide = (state.currentSlide + 1) % 3;
+                showSlide(state.currentSlide);
             }
 
-            // --- Lógica de pantalla completa ---
-            if (fullscreenButton) {
-                fullscreenButton.addEventListener('click', toggleFullscreen);
+            function prevSlide() {
+                state.currentSlide = (state.currentSlide - 1 + 3) % 3;
+                showSlide(state.currentSlide);
             }
 
+            // Pantalla completa
             function toggleFullscreen() {
                 if (!document.fullscreenElement) {
-                    sliderFace.requestFullscreen().catch(err => {
-                        console.error(`Error attempting to enable fullscreen: ${err.message}`);
-                    });
+                    elements.sliderFace.requestFullscreen().catch(console.error);
                 } else {
                     document.exitFullscreen();
                 }
             }
 
-            // --- Lógica de cambio de caras ---
-            if (toSliderButton) {
-                toSliderButton.addEventListener('click', () => {
-                    todoFace.classList.add('hidden');
-                    todoFace.style.pointerEvents = 'none';
-
-                    sliderFace.classList.add('active');
-                    document.body.classList.add('slider-mode-active'); // Para ocultar scrollbar del body
-                });
-            }
-
-            if (toTodoButton) {
-                toTodoButton.addEventListener('click', () => {
-                    sliderFace.classList.remove('active');
-                    document.body.classList.remove('slider-mode-active');
-
-                    // Pequeño delay para que la transición de salida del slider termine antes de mostrar el todo-list
+            // Cambiar entre modos
+            function toggleViewMode() {
+                state.isSliderMode = !state.isSliderMode;
+                
+                if (state.isSliderMode) {
+                    elements.todoFace.classList.add('hidden');
+                    elements.sliderFace.classList.add('active');
+                    elements.modeSwitchButton.innerHTML = '<span class="iconify" data-icon="mdi:format-list-checkbox"></span>';
+                    
+                    if (state.isMobile) {
+                        elements.sliderFace.classList.add('rotated');
+                    }
+                } else {
+                    elements.sliderFace.classList.remove('active', 'rotated');
                     setTimeout(() => {
-                         todoFace.classList.remove('hidden');
-                         todoFace.style.pointerEvents = 'auto';
-                    }, 50); // Debe coincidir o ser menor que la transición de opacity/transform si se usa para #slider-face
-                });
+                        elements.todoFace.classList.remove('hidden');
+                    }, 300);
+                    elements.modeSwitchButton.innerHTML = '<span class="iconify" data-icon="mdi:image-multiple-outline"></span>';
+                }
             }
+
+            // Detectar cambios de tamaño
+            function handleResize() {
+                state.isMobile = window.matchMedia("(max-width: 768px)").matches;
+                
+                if (state.isSliderMode && state.isMobile) {
+                    elements.sliderFace.classList.add('rotated');
+                } else {
+                    elements.sliderFace.classList.remove('rotated');
+                }
+            }
+
+            // Event listeners
+            elements.modeSwitchButton.addEventListener('click', toggleViewMode);
+            elements.prevSlideButton.addEventListener('click', prevSlide);
+            elements.nextSlideButton.addEventListener('click', nextSlide);
+            elements.fullscreenButton.addEventListener('click', toggleFullscreen);
+            window.addEventListener('resize', handleResize);
+            
+            // Navegación por teclado
+            document.addEventListener('keydown', (e) => {
+                if (state.isSliderMode) {
+                    if (e.key === 'ArrowRight') nextSlide();
+                    if (e.key === 'ArrowLeft') prevSlide();
+                }
+            });
+
+            // Inicialización
+            renderTasks();
+            showSlide(0);
         });
     </script>
 </body>
