@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!---Meta--->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!---Page Icon---> 
+    <link rel="shortcut icon" href="favicon.svg">
+  <!--CSS Documents-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <!--Fonts-->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <!---Scripts--->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      font-family: 'Montserrat', sans-serif;
+    }
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    .energy-bar {
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #3b82f6, #10b981);
+    }
+  </style>
+  <title>Energía Cinética - Dashboard</title>
+</head>
+<body class="bg-gray-50">
+  <div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <header class="mb-10">
+      <h1 class="text-3xl font-bold text-gray-800">Dashboard de Energía Cinética</h1>
+      <p class="text-gray-600">Monitorea la energía generada por tus máquinas</p>
+    </header>
+
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10" id="statsOverview">
+      <!-- Los datos se cargarán dinámicamente con JavaScript -->
+    </div>
+
+    <!-- Machines Section -->
+    <section class="mb-10">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold text-gray-800">Máquinas Generadoras</h2>
+        <button onclick="openAddMachineModal()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center">
+          <i class="fas fa-plus mr-2"></i> Añadir Máquina
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="machinesContainer">
+        <!-- Las máquinas se cargarán dinámicamente con JavaScript -->
+      </div>
+    </section>
+
+    <!-- Recent Activity and Energy Chart -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Recent Users -->
+      <div class="bg-white p-6 rounded-xl shadow-sm lg:col-span-1">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Usuarios Recientes</h2>
+        <div class="space-y-4" id="recentUsers">
+          <!-- Los usuarios recientes se cargarán dinámicamente -->
+        </div>
+      </div>
+      
+      <!-- Energy Chart -->
+      <div class="bg-white p-6 rounded-xl shadow-sm lg:col-span-2">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-800">Generación de Energía</h2>
+          <select id="timeRangeSelect" class="bg-gray-100 border-0 rounded-lg px-3 py-1 text-sm" onchange="updateChart()">
+            <option value="today">Hoy</option>
+            <option value="week">Esta semana</option>
+            <option value="month">Este mes</option>
+          </select>
+        </div>
+        
+        <canvas id="energyChart" height="250"></canvas>
+        
+        <div class="grid grid-cols-3 gap-4 mt-6" id="machineStats">
+          <!-- Las estadísticas por máquina se cargarán dinámicamente -->
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Edit Machine Modal -->
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden" id="editModal">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Editar Máquina</h3>
+        <button onclick="closeModal('editModal')" class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <form id="editMachineForm">
+        <input type="hidden" id="editMachineId">
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2">Nombre</label>
+          <input type="text" id="editMachineName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2">Tipo</label>
+          <select id="editMachineType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="bike">Bicicleta</option>
+            <option value="arm">Brazo</option>
+            <option value="leg">Piernas</option>
+          </select>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2">mAh generados</label>
+          <input type="number" id="editMachineEnergy" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2">Usuarios</label>
+          <input type="number" id="editMachineUsers" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2">Tiempo activo (horas)</label>
+          <input type="number" step="0.1" id="editMachineActiveTime" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2">Estado</label>
+          <select id="editMachineStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="active">Activa</option>
+            <option value="inactive">Inactiva</option>
+            <option value="maintenance">Mantenimiento</option>
+          </select>
+        </div>
+        
+        <div class="flex justify-end space-x-3">
+          <button type="button" onclick="closeModal('editModal')" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+            Cancelar
+          </button>
+          <button type="button" onclick="saveMachineChanges()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+            Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Machine Modal -->
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden" id="addMachineModal">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">Añadir Máquina</h3>
+        <button onclick="closeModal('addMachineModal')" class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <form id="addMachineForm">
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2">Nombre</label>
+          <input type="text" id="addMachineName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2">Tipo</label>
+          <select id="addMachineType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            <option value="bike">Bicicleta</option>
+            <option value="arm">Brazo</option>
+            <option value="leg">Piernas</option>
+          </select>
+        </div>
+        
+        <div class="flex justify-end space-x-3">
+          <button type="button" onclick="closeModal('addMachineModal')" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+            Cancelar
+          </button>
+          <button type="button" onclick="addNewMachine()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+            Añadir Máquina
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Datos iniciales si no existen en localStorage
+    const initialData = {
+      machines: [
+        {
+          id: '1',
+          name: 'Bicicleta Gen-3',
+          type: 'bike',
+          energy: 320,
+          users: 15,
+          activeTime: 4.2,
+          status: 'active'
+        },
+        {
+          id: '2',
+          name: 'Brazo Power-X',
+          type: 'arm',
+          energy: 180,
+          users: 8,
+          activeTime: 2.5,
+          status: 'active'
+        },
+        {
+          id: '3',
+          name: 'Piernas Turbo',
+          type: 'leg',
+          energy: 420,
+          users: 19,
+          activeTime: 6.8,
+          status: 'maintenance'
+        }
+      ],
+      recentUsers: [
+        { name: 'María González', machineType: 'bike', energy: 45, time: '12:45 PM' },
+        { name: 'Carlos Mendoza', machineType: 'leg', energy: 68, time: '11:30 AM' },
+        { name: 'Ana Rodríguez', machineType: 'arm', energy: 32, time: '10:15 AM' },
+        { name: 'Luis Pérez', machineType: 'bike', energy: 56, time: '9:20 AM' }
+      ],
+      energyData: {
+        today: {
+          bike: [15, 25, 30, 45, 50, 60, 75, 80, 90, 100, 120, 150, 180, 200, 220, 240, 260, 280, 300, 310, 320, 320, 320, 320],
+          arm: [5, 10, 15, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 175, 180, 180, 180, 180],
+          leg: [20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 410, 420, 420, 420]
+        },
+        week: {
+          bike: [120, 180, 210, 250, 280, 300, 320],
+          arm: [80, 100, 120, 140, 160, 170, 180],
+          leg: [200, 250, 300, 350, 380, 400, 420]
+        },
+        month: {
+          bike: [800, 950, 1100, 1250, 1400, 1550, 1700, 1850, 2000, 2150, 2300, 2450, 2600, 2750, 2900, 3050, 3200, 3350, 3500, 3650, 3800, 3950, 4100, 4250, 4400, 4550, 4700, 4850, 5000, 5120],
+          arm: [500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1650, 1700, 1750, 1800, 1800, 1800, 1800, 1800, 1800, 1800, 1800, 1800, 1800, 1800, 1800, 1800, 1800, 1800],
+          leg: [1000, 1200, 1400, 1600, 1800, 2000, 2200, 2400, 2600, 2800, 3000, 3200, 3400, 3600, 3800, 4000, 4200, 4400, 4600, 4800, 5000, 5200, 5400, 5600, 5800, 6000, 6200, 6400, 6600, 6800]
+        }
+      }
+    };
+
+    // Inicializar datos si no existen
+    if (!localStorage.getItem('fitnessDashboardData')) {
+      localStorage.setItem('fitnessDashboardData', JSON.stringify(initialData));
+    }
+
+    // Obtener datos del localStorage
+    function getDashboardData() {
+      return JSON.parse(localStorage.getItem('fitnessDashboardData'));
+    }
+
+    // Guardar datos en localStorage
+    function saveDashboardData(data) {
+      localStorage.setItem('fitnessDashboardData', JSON.stringify(data));
+    }
+
+    // Cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+      loadDashboard();
+      initChart();
+    });
+
+    // Cargar el dashboard
+    function loadDashboard() {
+      const data = getDashboardData();
+      
+      // Cargar estadísticas generales
+      loadStats(data);
+      
+      // Cargar máquinas
+      loadMachines(data.machines);
+      
+      // Cargar usuarios recientes
+      loadRecentUsers(data.recentUsers);
+      
+      // Cargar estadísticas por máquina
+      loadMachineStats(data.machines);
+    }
+
+    // Cargar estadísticas generales
+    function loadStats(data) {
+      const totalEnergy = data.machines.reduce((sum, machine) => sum + machine.energy, 0);
+      const totalUsers = data.machines.reduce((sum, machine) => sum + machine.users, 0);
+      const activeMachines = data.machines.filter(machine => machine.status === 'active').length;
+      const efficiency = Math.round((totalEnergy / (data.machines.length * 500)) * 100); // 500 es el máximo teórico por máquina
+      
+      document.getElementById('statsOverview').innerHTML = `
+        <div class="bg-white p-6 rounded-xl shadow-sm flex items-center">
+          <div class="bg-blue-100 p-3 rounded-full mr-4">
+            <i class="fas fa-bolt text-blue-500 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm">Energía Total</p>
+            <h3 class="text-2xl font-bold text-gray-800">${totalEnergy} <span class="text-sm">mAh</span></h3>
+          </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-xl shadow-sm flex items-center">
+          <div class="bg-green-100 p-3 rounded-full mr-4">
+            <i class="fas fa-users text-green-500 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm">Usuarios Totales</p>
+            <h3 class="text-2xl font-bold text-gray-800">${totalUsers}</h3>
+          </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-xl shadow-sm flex items-center">
+          <div class="bg-purple-100 p-3 rounded-full mr-4">
+            <i class="fas fa-cogs text-purple-500 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm">Máquinas Activas</p>
+            <h3 class="text-2xl font-bold text-gray-800">${activeMachines}/${data.machines.length}</h3>
+          </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-xl shadow-sm flex items-center">
+          <div class="bg-yellow-100 p-3 rounded-full mr-4">
+            <i class="fas fa-chart-line text-yellow-500 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-gray-500 text-sm">Eficiencia</p>
+            <h3 class="text-2xl font-bold text-gray-800">${efficiency}%</h3>
+          </div>
+        </div>
+      `;
+    }
+
+    // Cargar máquinas
+    function loadMachines(machines) {
+      const container = document.getElementById('machinesContainer');
+      container.innerHTML = '';
+      
+      machines.forEach(machine => {
+        const icon = getMachineIcon(machine.type);
+        const status = getStatusInfo(machine.status);
+        const energyPercentage = Math.min(Math.round((machine.energy / 500) * 100), 100);
+        
+        const machineCard = document.createElement('div');
+        machineCard.className = 'bg-white p-6 rounded-xl shadow-sm card-hover';
+        machineCard.innerHTML = `
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <span class="iconify text-4xl ${status.color} mr-2" data-icon="${icon}"></span>
+              <h3 class="text-lg font-semibold text-gray-800 mt-2">${machine.name}</h3>
+              <p class="text-gray-500 text-sm">ID: ${machine.type.toUpperCase()}-${machine.id}</p>
+            </div>
+            <span class="${status.bgColor} ${status.textColor} text-xs px-2 py-1 rounded-full">${status.text}</span>
+          </div>
+          
+          <div class="mb-4">
+            <div class="flex justify-between text-sm mb-1">
+              <span class="text-gray-500">Energía generada</span>
+              <span class="font-medium">${machine.energy} mAh</span>
+            </div>
+            <div class="energy-bar" style="width: ${energyPercentage}%"></div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <p class="text-gray-500 text-sm">Usuarios</p>
+              <p class="font-medium">${machine.users}</p>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm">Tiempo activo</p>
+              <p class="font-medium">${machine.activeTime} hrs</p>
+            </div>
+          </div>
+          
+          <button onclick="openEditModal('${machine.id}')" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded-lg flex items-center justify-center">
+            <i class="fas fa-edit mr-2"></i> Editar
+          </button>
+        `;
+        
+        container.appendChild(machineCard);
+      });
+    }
+
+    // Cargar usuarios recientes
+    function loadRecentUsers(users) {
+      const container = document.getElementById('recentUsers');
+      container.innerHTML = '';
+      
+      users.forEach(user => {
+        const colors = {
+          bike: { bg: 'bg-blue-100', text: 'text-blue-800' },
+          arm: { bg: 'bg-purple-100', text: 'text-purple-800' },
+          leg: { bg: 'bg-orange-100', text: 'text-orange-800' }
+        };
+        
+        const machineType = colors[user.machineType] || colors.bike;
+        
+        const userElement = document.createElement('div');
+        userElement.className = 'flex items-center';
+        userElement.innerHTML = `
+          <div class="${machineType.bg} ${machineType.text} w-10 h-10 rounded-full flex items-center justify-center mr-3">
+            <i class="fas fa-user"></i>
+          </div>
+          <div>
+            <p class="font-medium">${user.name}</p>
+            <p class="text-gray-500 text-sm">${getMachineName(user.machineType)} • ${user.energy} mAh</p>
+          </div>
+          <div class="ml-auto text-sm text-gray-500">${user.time}</div>
+        `;
+        
+        container.appendChild(userElement);
+      });
+    }
+
+    // Cargar estadísticas por máquina
+    function loadMachineStats(machines) {
+      const container = document.getElementById('machineStats');
+      container.innerHTML = '';
+      
+      const stats = {
+        bike: { total: 0, color: 'text-blue-500' },
+        arm: { total: 0, color: 'text-purple-500' },
+        leg: { total: 0, color: 'text-orange-500' }
+      };
+      
+      machines.forEach(machine => {
+        stats[machine.type].total += machine.energy;
+      });
+      
+      for (const type in stats) {
+        const statElement = document.createElement('div');
+        statElement.className = 'text-center';
+        statElement.innerHTML = `
+          <p class="text-gray-500 text-sm">${getMachineName(type)}</p>
+          <p class="font-medium ${stats[type].color}">${stats[type].total} mAh</p>
+        `;
+        container.appendChild(statElement);
+      }
+    }
+
+    // Funciones auxiliares
+    function getMachineIcon(type) {
+      const icons = {
+        bike: 'mdi:bike',
+        arm: 'mdi:arm-flex',
+        leg: 'mdi:leg'
+      };
+      return icons[type] || icons.bike;
+    }
+
+    function getMachineName(type) {
+      const names = {
+        bike: 'Bicicletas',
+        arm: 'Brazos',
+        leg: 'Piernas'
+      };
+      return names[type] || names.bike;
+    }
+
+    function getStatusInfo(status) {
+      const statuses = {
+        active: { text: 'Activa', bgColor: 'bg-green-100', textColor: 'text-green-800', color: 'text-green-500' },
+        inactive: { text: 'Inactiva', bgColor: 'bg-gray-100', textColor: 'text-gray-800', color: 'text-gray-500' },
+        maintenance: { text: 'Mantenimiento', bgColor: 'bg-yellow-100', textColor: 'text-yellow-800', color: 'text-yellow-500' }
+      };
+      return statuses[status] || statuses.active;
+    }
+
+    // Funciones para los modales
+    function openEditModal(machineId) {
+      const data = getDashboardData();
+      const machine = data.machines.find(m => m.id === machineId);
+      
+      if (machine) {
+        document.getElementById('editMachineId').value = machine.id;
+        document.getElementById('editMachineName').value = machine.name;
+        document.getElementById('editMachineType').value = machine.type;
+        document.getElementById('editMachineEnergy').value = machine.energy;
+        document.getElementById('editMachineUsers').value = machine.users;
+        document.getElementById('editMachineActiveTime').value = machine.activeTime;
+        document.getElementById('editMachineStatus').value = machine.status;
+        
+        document.getElementById('editModal').classList.remove('hidden');
+      }
+    }
+
+    function openAddMachineModal() {
+      document.getElementById('addMachineModal').classList.remove('hidden');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    function saveMachineChanges() {
+      const data = getDashboardData();
+      const machineId = document.getElementById('editMachineId').value;
+      const machineIndex = data.machines.findIndex(m => m.id === machineId);
+      
+      if (machineIndex !== -1) {
+        data.machines[machineIndex] = {
+          ...data.machines[machineIndex],
+          name: document.getElementById('editMachineName').value,
+          type: document.getElementById('editMachineType').value,
+          energy: parseInt(document.getElementById('editMachineEnergy').value),
+          users: parseInt(document.getElementById('editMachineUsers').value),
+          activeTime: parseFloat(document.getElementById('editMachineActiveTime').value),
+          status: document.getElementById('editMachineStatus').value
+        };
+        
+        saveDashboardData(data);
+        loadDashboard();
+        closeModal('editModal');
+      }
+    }
+
+    function addNewMachine() {
+      const name = document.getElementById('addMachineName').value;
+      const type = document.getElementById('addMachineType').value;
+      
+      if (name) {
+        const data = getDashboardData();
+        const newId = (Math.max(...data.machines.map(m => parseInt(m.id))) + 1).toString();
+        
+        data.machines.push({
+          id: newId,
+          name: name,
+          type: type,
+          energy: 0,
+          users: 0,
+          activeTime: 0,
+          status: 'active'
+        });
+        
+        saveDashboardData(data);
+        loadDashboard();
+        closeModal('addMachineModal');
+        document.getElementById('addMachineForm').reset();
+      }
+    }
+
+    // Gráfico de energía
+    let energyChart;
+
+    function initChart() {
+      const ctx = document.getElementById('energyChart').getContext('2d');
+      const data = getDashboardData();
+      
+      energyChart = new Chart(ctx, {
+        type: 'line',
+        data: getChartData('today'),
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'mAh generados'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Horas del día'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateChart() {
+      const timeRange = document.getElementById('timeRangeSelect').value;
+      energyChart.data = getChartData(timeRange);
+      
+      // Actualizar las opciones del eje X según el rango de tiempo
+      if (timeRange === 'today') {
+        energyChart.options.scales.x.title.text = 'Horas del día';
+      } else if (timeRange === 'week') {
+        energyChart.options.scales.x.title.text = 'Días de la semana';
+      } else {
+        energyChart.options.scales.x.title.text = 'Días del mes';
+      }
+      
+      energyChart.update();
+    }
+
+    function getChartData(timeRange) {
+      const data = getDashboardData();
+      const energyData = data.energyData[timeRange];
+      
+      let labels;
+      if (timeRange === 'today') {
+        labels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
+      } else if (timeRange === 'week') {
+        labels = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+      } else {
+        labels = Array.from({ length: 30 }, (_, i) => `Día ${i + 1}`);
+      }
+      
+      return {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Bicicletas',
+            data: energyData.bike,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4,
+            fill: true
+          },
+          {
+            label: 'Brazos',
+            data: energyData.arm,
+            borderColor: '#8b5cf6',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            tension: 0.4,
+            fill: true
+          },
+          {
+            label: 'Piernas',
+            data: energyData.leg,
+            borderColor: '#f97316',
+            backgroundColor: 'rgba(249, 115, 22, 0.1)',
+            tension: 0.4,
+            fill: true
+          }
+        ]
+      };
+    }
+  </script>
+</body>
+</html>
