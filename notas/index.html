@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="https://www.google.com/s2/favicons?domain=bible.com">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <style>
+        /* Tu fuente 'Moderat' se puede cargar si el path es correcto. Usaré Montserrat como fallback. */
+        * {
+            font-family: 'Montserrat', 'Moderat', sans-serif;
+            font-weight: 500;
+            font-style: normal;
+        }
+        :root {
+            --green: #83DC5A;
+            --dark-blue: #203855;
+            --blue: #1D54C0;
+            --light-blue: #A0C3EA;
+            --extra-light-blue: #EDF5FF;
+        }
+        
+        /* Estilos personalizados */
+        body {
+            background-color: #f5f5f5;
+            background-image: linear-gradient(#eee 0.1em, transparent 0.1em);
+            background-size: 100% 1.6em;
+            line-height: 1.6;
+        }
+        
+        .container {
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 0;
+            position: relative;
+            padding-bottom: 120px; /* Espacio para botones flotantes */
+            z-index: 0;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 40px;
+            width: 2px;
+            height: 100%;
+            background-color: var(--extra-light-blue); /* Línea de cuaderno */
+            z-index: -1;
+        }
+        
+        .suggestions {
+            display: none;
+            position: absolute;
+            background: white;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 0 0 4px 4px;
+            z-index: 10;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .suggestions.show {
+            display: block;
+        }
+        
+        .suggestion-item {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        
+        .suggestion-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        #modal {
+            display: none; /* Se cambia a flex por JS */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 90%;
+            width: 500px;
+            max-height: 80%;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .teaching-item {
+            display: flex;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        
+        .teaching-input {
+            flex-grow: 1;
+            margin-left: 8px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px dashed var(--light-blue);
+            padding: 4px 0;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--dark-blue);
+        }
+        
+        .teaching-input:focus {
+            outline: none;
+            border-bottom: 1px solid var(--blue);
+        }
+        
+        .verse-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            margin-bottom: 4px;
+            border-bottom: 1px dashed var(--extra-light-blue);
+        }
+
+        .verse-item:hover {
+            background-color: var(--extra-light-blue);
+        }
+        
+        .verse-text {
+            color: var(--dark-blue);
+        }
+
+        .verse-text-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--blue);
+            padding: 4px 0;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--dark-blue);
+        }
+
+        .verse-text-input:focus {
+            outline: none;
+        }
+
+        .verse-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-valid { background-color: var(--green); }
+        .status-invalid { background-color: #f44336; }
+        .status-pending { background-color: #ff9800; }
+        
+        .title-input {
+            font-size: 1.5rem;
+            font-weight: bold;
+            width: 100%;
+            border: none;
+            border-bottom: 2px solid var(--dark-blue);
+            padding: 8px 0;
+            margin-bottom: 16px;
+            background: transparent;
+            line-height: 1.6;
+            color: var(--dark-blue);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .title-input:focus {
+            outline: none;
+            border-bottom: 2px solid var(--blue);
+        }
+        
+        .conclusion-input {
+            width: 100%;
+            border: none;
+            border-bottom: 1px dashed var(--light-blue);
+            padding: 8px 0;
+            background: transparent;
+            resize: none;
+            min-height: 80px;
+            line-height: 1.6;
+            color: var(--dark-blue);
+        }
+        
+        .conclusion-input:focus {
+            outline: none;
+            border-bottom: 1px solid var(--blue);
+        }
+        
+        .verse-input-container, .teaching-input-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .main-input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            border-bottom: 1px dashed var(--light-blue);
+            padding: 4px 0;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--dark-blue);
+        }
+        
+        .main-input:focus {
+            outline: none;
+            border-bottom: 1px solid var(--blue);
+        }
+        
+        .action-buttons {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            border: none;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .save-btn { background-color: var(--green); color: white; }
+        .share-btn { background-color: var(--blue); color: white; }
+        .clear-btn { background-color: #f44336; color: white; }
+        .add-btn { color: var(--blue); cursor: pointer; transition: color 0.2s; }
+        .add-btn:hover { color: var(--dark-blue); }
+        .edit-btn { color: var(--blue); cursor: pointer; transition: color 0.2s; margin-left: 8px; }
+        .edit-btn:hover { color: var(--dark-blue); }
+        .delete-btn { color: #f44336; cursor: pointer; transition: color 0.2s; margin-left: 8px; }
+        .delete-btn:hover { color: #831006; }
+        
+        h2 {
+            position: relative;
+            z-index: 1;
+        }
+        
+    </style>
+    <title>Apuntes de Culto</title>
+</head>
+<body>
+
+    <div id="main-content" class="container mx-auto p-6 max-w-2xl">
+        <input type="text" id="title" class="title-input" placeholder="Título">
+        
+        <h2 class="text-xl font-bold mb-2 mt-6 text-dark-blue">Versículos Clave</h2>
+        <div id="verses-container" class="mb-4 pl-6"></div>
+        
+        <div class="verse-input-container pl-6 relative">
+            <input type="text" id="verse-input" class="main-input" placeholder="Versículo">
+            <div id="verse-suggestions" class="suggestions"></div>
+            <iconify-icon icon="mdi:plus" id="add-verse-btn" class="add-btn text-2xl ml-2"></iconify-icon>
+        </div>
+        
+        <h2 class="text-xl font-bold mb-2 mt-8 text-dark-blue">Enseñanzas</h2>
+        <div id="teachings-container" class="mb-4 pl-6"></div>
+        <div class="pl-6 teaching-input-container">
+            <iconify-icon icon="mdi:plus" id="add-teaching-btn" class="add-btn text-2xl mr-2"></iconify-icon>
+            <input type="text" id="teaching-input" class="main-input" placeholder="Enseñanza">
+        </div>
+
+        <h2 class="text-xl font-bold mb-2 mt-8 text-dark-blue">Conclusión</h2>
+        <textarea id="conclusion" class="conclusion-input pl-6" placeholder="Conclusión"></textarea>
+    </div>
+    
+    <div class="action-buttons">
+        <button class="action-btn save-btn" id="save-btn" title="Guardar Manualmente">
+            <iconify-icon icon="mdi:content-save" width="24" height="24"></iconify-icon>
+        </button>
+        <button class="action-btn share-btn" id="share-btn" title="Compartir">
+            <iconify-icon icon="mdi:share-variant" width="24" height="24"></iconify-icon>
+        </button>
+        <button class="action-btn clear-btn" id="clear-btn" title="Limpiar Todo">
+            <iconify-icon icon="mdi:trash-can" width="24" height="24"></iconify-icon>
+        </button>
+    </div>
+    
+    <div id="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-title" class="text-xl font-bold text-dark-blue"></h3>
+                <iconify-icon icon="mdi:close" id="close-modal" class="cursor-pointer text-2xl text-gray-500 hover:text-black"></iconify-icon>
+            </div>
+            <div id="modal-text" class="text-gray-700 leading-relaxed"></div>
+        </div>
+    </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- ELEMENTOS DEL DOM ---
+        const mainContent = document.getElementById('main-content');
+        const titleInput = document.getElementById('title');
+        const conclusionInput = document.getElementById('conclusion');
+        const verseInput = document.getElementById('verse-input');
+        const verseSuggestions = document.getElementById('verse-suggestions');
+        const addVerseBtn = document.getElementById('add-verse-btn');
+        const versesContainer = document.getElementById('verses-container');
+        const teachingsContainer = document.getElementById('teachings-container');
+        const teachingInput = document.getElementById('teaching-input');
+        const addTeachingBtn = document.getElementById('add-teaching-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const shareBtn = document.getElementById('share-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const modal = document.getElementById('modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalText = document.getElementById('modal-text');
+
+        const BIBLE_BOOKS = [
+            'Génesis', 'Éxodo', 'Levítico', 'Números', 'Deuteronomio', 'Josué', 'Jueces', 'Rut',
+            '1 Samuel', '2 Samuel', '1 Reyes', '2 Reyes', '1 Crónicas', '2 Crónicas', 'Esdras',
+            'Nehemías', 'Ester', 'Job', 'Salmos', 'Proverbios', 'Eclesiastés', 'Cantares',
+            'Isaías', 'Jeremías', 'Lamentaciones', 'Ezequiel', 'Daniel', 'Oseas', 'Joel',
+            'Amós', 'Abdías', 'Jonás', 'Miqueas', 'Nahúm', 'Habacuc', 'Sofonías', 'Hageo',
+            'Zacarías', 'Malaquías', 'Mateo', 'Marcos', 'Lucas', 'Juan', 'Hechos', 'Romanos',
+            '1 Corintios', '2 Corintios', 'Gálatas', 'Efesios', 'Filipenses', 'Colosenses',
+            '1 Tesalonicenses', '2 Tesalonicenses', '1 Timoteo', '2 Timoteo', 'Tito', 'Filemón',
+            'Hebreos', 'Santiago', '1 Pedro', '2 Pedro', '1 Juan', '2 Juan', '3 Juan', 'Judas',
+            'Apocalipsis'
+        ];
+
+        // Mapeo de libros de `draft2.html` para la API
+        const books = [
+            { name: "Génesis", abrev: "GN" }, { name: "Éxodo", abrev: "EX" }, { name: "Levítico", abrev: "LV" },
+            { name: "Números", abrev: "NM" }, { name: "Deuteronomio", abrev: "DT" }, { name: "Josué", abrev: "JOS" },
+            { name: "Jueces", abrev: "JUE" }, { name: "Rut", abrev: "RT" }, { name: "1 Samuel", abrev: "1S" },
+            { name: "2 Samuel", abrev: "2S" }, { name: "1 Reyes", abrev: "1R" }, { name: "2 Reyes", abrev: "2R" },
+            { name: "1 Crónicas", abrev: "1CR" }, { name: "2 Crónicas", abrev: "2CR" }, { name: "Esdras", abrev: "ESD" },
+            { name: "Nehemías", abrev: "NEH" }, { name: "Ester", abrev: "EST" }, { name: "Job", abrev: "JOB" },
+            { name: "Salmos", abrev: "SAL" }, { name: "Proverbios", abrev: "PR" }, { name: "Eclesiastés", abrev: "EC" },
+            { name: "Cantares", abrev: "CNT" }, { name: "Isaías", abrev: "IS" }, { name: "Jeremías", abrev: "JER" },
+            { name: "Lamentaciones", abrev: "LM" }, { name: "Ezequiel", abrev: "EZ" }, { name: "Daniel", abrev: "DN" },
+            { name: "Oseas", abrev: "OS" }, { name: "Joel", abrev: "JL" }, { name: "Amós", abrev: "AM" },
+            { name: "Abdías", abrev: "ABD" }, { name: "Jonás", abrev: "JON" }, { name: "Miqueas", abrev: "MI" },
+            { name: "Nahúm", abrev: "NAH" }, { name: "Habacuc", abrev: "HAB" }, { name: "Sofonías", abrev: "SOF" },
+            { name: "Hageo", abrev: "HAG" }, { name: "Zacarías", abrev: "ZAC" }, { name: "Malaquías", abrev: "MAL" },
+            { name: "Mateo", abrev: "MT" }, { name: "Marcos", abrev: "MR" }, { name: "Lucas", abrev: "LC" },
+            { name: "Juan", abrev: "JN" }, { name: "Hechos", abrev: "HCH" }, { name: "Romanos", abrev: "RO" },
+            { name: "1 Corintios", abrev: "1CO" }, { name: "2 Corintios", abrev: "2CO" }, { name: "Gálatas", abrev: "GA" },
+            { name: "Efesios", abrev: "EF" }, { name: "Filipenses", abrev: "FIL" }, { name: "Colosenses", abrev: "COL" },
+            { name: "1 Tesalonicenses", abrev: "1TS" }, { name: "2 Tesalonicenses", abrev: "2TS" },
+            { name: "1 Timoteo", abrev: "1TI" }, { name: "2 Timoteo", abrev: "2TI" }, { name: "Tito", abrev: "TIT" },
+            { name: "Filemón", abrev: "FLM" }, { name: "Hebreos", abrev: "HE" }, { name: "Santiago", abrev: "STG" },
+            { name: "1 Pedro", abrev: "1P" }, { name: "2 Pedro", abrev: "2P" }, { name: "1 Juan", abrev: "1JN" },
+            { name: "2 Juan", abrev: "2JN" }, { name: "3 Juan", abrev: "3JN" }, { name: "Judas", abrev: "JUD" },
+            { name: "Apocalipsis", abrev: "AP" }
+        ];
+
+        // --- MANEJO DE DATOS ---
+
+        function saveData() {
+            const teachings = Array.from(teachingsContainer.querySelectorAll('.teaching-input')).map(input => input.value);
+            const verses = Array.from(versesContainer.querySelectorAll('.verse-text')).map(span => span.textContent);
+
+            const data = {
+                title: titleInput.value,
+                verses: verses,
+                teachings: teachings,
+                conclusion: conclusionInput.value
+            };
+            localStorage.setItem('cultoNotes', JSON.stringify(data));
+        }
+
+        async function loadData() {
+            const savedData = localStorage.getItem('cultoNotes');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                titleInput.value = data.title || '';
+                conclusionInput.value = data.conclusion || '';
+
+                if (data.verses) {
+                    const versePromises = data.verses.map(verse => renderVerse(verse));
+                    await Promise.all(versePromises);
+                }
+                if (data.teachings) {
+                    data.teachings.forEach(teaching => renderTeaching(teaching));
+                }
+            }
+        }
+        
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-md shadow-lg z-50';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // --- LÓGICA DE VERSIÓN DE DRAFT2.HTML ---
+        function findBookAbrev(bookName) {
+            const normalizedName = bookName.toLowerCase().replace(/\s/g, '').replace(/-/g, '');
+            for (const book of books) {
+                const normalizedBookName = book.name.toLowerCase().replace(/\s/g, '').replace(/-/g, '');
+                if (normalizedBookName.includes(normalizedName)) {
+                    return book.abrev;
+                }
+            }
+            return null;
+        }
+
+        function parseInput(input) {
+            const regex = /([a-záéíóú\d\s\W]+)\s*(\d+):(\d+)(?:-(\d+))?/i;
+            const match = input.match(regex);
+            if (match) {
+                const bookName = match[1].trim();
+                const chapter = match[2];
+                const verse = match[3];
+                const verseEnd = match[4];
+                return { book: bookName, chapter, verse, verseEnd };
+            }
+            return null;
+        }
+
+        async function checkVerse(verseRef) {
+            const parsed = parseInput(verseRef);
+            if (!parsed) return false;
+            const bookAbrev = findBookAbrev(parsed.book);
+            if (!bookAbrev) return false;
+
+            let verseRange = parsed.verse;
+            if (parsed.verseEnd) {
+                verseRange += `-${parsed.verseEnd}`;
+            }
+
+            try {
+                const url = `https://bible-api.deno.dev/api/read/rv1960/${bookAbrev}/${parsed.chapter}/${verseRange}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                return response.ok && data.length > 0;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        // --- RENDERIZADO Y LÓGICA DE UI ---
+
+        async function renderVerse(verseText) {
+            const verseDiv = document.createElement('div');
+            verseDiv.className = 'verse-item';
+            
+            const verseTextSpan = document.createElement('span');
+            verseTextSpan.className = 'verse-text cursor-pointer';
+            verseTextSpan.textContent = verseText;
+            verseTextSpan.onclick = () => showVerseModal(verseText);
+            
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'verse-actions';
+
+            const statusIndicator = document.createElement('div');
+            statusIndicator.className = 'status-indicator status-pending';
+            
+            const isValid = await checkVerse(verseText);
+            statusIndicator.className = `status-indicator ${isValid ? 'status-valid' : 'status-invalid'}`;
+
+            const editIcon = document.createElement('iconify-icon');
+            editIcon.setAttribute('icon', 'mdi:pencil');
+            editIcon.className = 'edit-btn text-xl';
+            editIcon.onclick = () => enableVerseEdit(verseDiv, verseTextSpan, verseText);
+
+            const deleteIcon = document.createElement('iconify-icon');
+            deleteIcon.setAttribute('icon', 'mdi:close-circle-outline');
+            deleteIcon.className = 'delete-btn text-xl';
+            deleteIcon.onclick = () => {
+                verseDiv.remove();
+                saveData();
+            };
+
+            actionsDiv.appendChild(statusIndicator);
+            actionsDiv.appendChild(editIcon);
+            actionsDiv.appendChild(deleteIcon);
+            
+            verseDiv.appendChild(verseTextSpan);
+            verseDiv.appendChild(actionsDiv);
+            versesContainer.appendChild(verseDiv);
+        }
+        
+        function enableVerseEdit(verseDiv, verseTextSpan, verseText) {
+            const originalText = verseTextSpan.textContent;
+            
+            const verseInput = document.createElement('input');
+            verseInput.type = 'text';
+            verseInput.className = 'verse-text-input';
+            verseInput.value = originalText;
+
+            verseDiv.replaceChild(verseInput, verseTextSpan);
+            verseInput.focus();
+
+            verseInput.addEventListener('keypress', async (e) => {
+                if (e.key === 'Enter') {
+                    const newText = verseInput.value.trim();
+                    if (newText) {
+                        verseTextSpan.textContent = newText;
+                        verseDiv.replaceChild(verseTextSpan, verseInput);
+                        saveData();
+                        // Actualizar el estado del versículo
+                        const statusIndicator = verseDiv.querySelector('.status-indicator');
+                        statusIndicator.className = 'status-indicator status-pending';
+                        const isValid = await checkVerse(newText);
+                        statusIndicator.className = `status-indicator ${isValid ? 'status-valid' : 'status-invalid'}`;
+                    } else {
+                        verseDiv.remove();
+                        saveData();
+                    }
+                }
+            });
+            verseInput.addEventListener('blur', () => {
+                verseDiv.replaceChild(verseTextSpan, verseInput);
+            });
+        }
+
+        async function showVerseModal(verseRef) {
+            modalTitle.textContent = verseRef;
+            modalText.innerHTML = 'Cargando...';
+            modal.style.display = 'flex';
+
+            const parsed = parseInput(verseRef);
+            if (!parsed) {
+                modalText.textContent = `Formato de referencia incorrecto: "${verseRef}". Por favor, verifica el formato (ej: Juan 3:16).`;
+                return;
+            }
+            const bookAbrev = findBookAbrev(parsed.book);
+            if (!bookAbrev) {
+                modalText.textContent = `No se encontró el libro "${parsed.book}".`;
+                return;
+            }
+
+            let verseRange = parsed.verse;
+            if (parsed.verseEnd) {
+                verseRange += `-${parsed.verseEnd}`;
+            }
+            
+            try {
+                const url = `https://bible-api.deno.dev/api/read/rv1960/${bookAbrev}/${parsed.chapter}/${verseRange}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    modalText.textContent = `Versículo no encontrado o referencia inválida: "${verseRef}". Por favor, verifica la referencia.`;
+                } else {
+                    const versesHtml = data.map(verseData => `
+                        <p class="mb-2">
+                            <span class="font-bold text-dark-blue">${verseData.number}.</span> ${verseData.verse}
+                        </p>
+                    `).join('');
+                    modalText.innerHTML = versesHtml;
+                }
+
+            } catch (error) {
+                console.error('Error al obtener el versículo:', error);
+                modalText.textContent = 'No se pudo cargar el versículo. Inténtalo de nuevo más tarde.';
+            }
+        }
+        
+        function renderTeaching(text) {
+            const teachingDiv = document.createElement('div');
+            teachingDiv.className = 'teaching-item';
+            
+            const teachingInput = document.createElement('input');
+            teachingInput.type = 'text';
+            teachingInput.className = 'teaching-input';
+            teachingInput.placeholder = 'Enseñanza';
+            teachingInput.value = text;
+            teachingInput.addEventListener('input', saveData);
+            
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'ml-auto';
+
+            const deleteIcon = document.createElement('iconify-icon');
+            deleteIcon.setAttribute('icon', 'mdi:close-circle-outline');
+            deleteIcon.className = 'delete-btn text-xl ml-2';
+            deleteIcon.onclick = () => {
+                teachingDiv.remove();
+                saveData();
+            };
+            
+            teachingDiv.appendChild(document.createTextNode('•'));
+            teachingDiv.appendChild(teachingInput);
+            teachingDiv.appendChild(deleteIcon);
+            teachingsContainer.appendChild(teachingDiv);
+        }
+
+        function handleAddTeaching() {
+            const teachingText = teachingInput.value.trim();
+            if (teachingText) {
+                renderTeaching(teachingText);
+                teachingInput.value = '';
+            }
+            teachingInput.focus();
+            saveData();
+        }
+
+        // --- EVENT LISTENERS ---
+
+        // Guardado automático en cualquier cambio
+        mainContent.addEventListener('input', saveData);
+        
+        // Versículos
+        verseInput.addEventListener('input', () => {
+            const input = verseInput.value.trim();
+            verseSuggestions.innerHTML = '';
+            if (input.length < 2) {
+                verseSuggestions.classList.remove('show');
+                return;
+            }
+            const suggestions = BIBLE_BOOKS.filter(book => book.toLowerCase().startsWith(input.toLowerCase()));
+            if (suggestions.length > 0) {
+                suggestions.forEach(book => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.textContent = book;
+                    div.onclick = () => {
+                        verseInput.value = book + ' ';
+                        verseInput.focus();
+                        verseSuggestions.classList.remove('show');
+                    };
+                    verseSuggestions.appendChild(div);
+                });
+                verseSuggestions.classList.add('show');
+            } else {
+                verseSuggestions.classList.remove('show');
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target !== verseInput) verseSuggestions.classList.remove('show');
+        });
+
+        const handleAddVerse = () => {
+            const verseText = verseInput.value.trim();
+            if (verseText) {
+                renderVerse(verseText);
+                verseInput.value = '';
+                saveData();
+            }
+        };
+        addVerseBtn.addEventListener('click', handleAddVerse);
+        verseInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleAddVerse(); });
+
+        // Enseñanzas
+        addTeachingBtn.addEventListener('click', handleAddTeaching);
+        teachingInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleAddTeaching();
+            }
+        });
+        
+        // Botones de acción flotantes
+        saveBtn.addEventListener('click', () => {
+            saveData();
+            showToast('Apuntes guardados correctamente');
+        });
+
+        clearBtn.addEventListener('click', () => {
+            if (confirm('¿Estás seguro? Se borrarán todos los apuntes permanentemente.')) {
+                localStorage.removeItem('cultoNotes');
+                titleInput.value = '';
+                conclusionInput.value = '';
+                versesContainer.innerHTML = '';
+                teachingsContainer.innerHTML = '';
+                teachingInput.value = '';
+                showToast('Apuntes limpiados');
+            }
+        });
+        
+        shareBtn.addEventListener('click', async () => {
+            const title = titleInput.value.trim() || 'Apuntes de Culto';
+            const verses = Array.from(versesContainer.querySelectorAll('.verse-text')).map(span => `- ${span.textContent}`);
+            const teachings = Array.from(teachingsContainer.querySelectorAll('.teaching-input')).map(input => `- ${input.value}`);
+            const conclusion = conclusionInput.value.trim();
+
+            let shareText = `*${title}*\n\n`;
+            if (verses.length > 0) shareText += `*Versículos:*\n${verses.join('\n')}\n\n`;
+            if (teachings.length > 0) shareText += `*Enseñanzas:*\n${teachings.join('\n')}\n\n`;
+            if (conclusion) shareText += `*Conclusión:*\n${conclusion}`;
+
+            if (navigator.share) {
+                await navigator.share({ title, text: shareText }).catch(err => console.error('Error al compartir:', err));
+            } else {
+                await navigator.clipboard.writeText(shareText);
+                showToast('¡Apuntes copiados al portapapeles!');
+            }
+        });
+
+        // Modal
+        closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+        // Carga inicial de datos
+        loadData();
+    });
+    </script>
+</body>
+</html>
