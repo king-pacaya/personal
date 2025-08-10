@@ -1,955 +1,747 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="https://www.google.com/s2/favicons?domain=bible.com">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-    <style>
-        /* Tu fuente 'Moderat' se puede cargar si el path es correcto. Usaré Montserrat como fallback. */
-        * {
-            font-family: 'Montserrat', 'Moderat', sans-serif;
-            font-weight: 500;
-            font-style: normal;
-        }
-        :root {
-            --green: #83DC5A;
-            --dark-blue: #203855;
-            --blue: #1D54C0;
-            --light-blue: #A0C3EA;
-            --extra-light-blue: #EDF5FF;
-        }
-        
-        /* Estilos personalizados */
-        body {
-            background-color: #f5f5f5;
-            background-image: linear-gradient(#eee 0.1em, transparent 0.1em);
-            background-size: 100% 1.6em;
-            line-height: 1.6;
-            overflow-x: hidden; /* Para manejar el menú lateral */
-        }
-
-        #app-container {
-            display: flex;
-            transition: transform 0.3s ease-in-out;
-        }
-        
-        #main-content {
-            flex-shrink: 0;
-            width: 100%;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            border-radius: 0;
-            position: relative;
-            padding-bottom: 2rem;
-            z-index: 1;
-        }
-        
-        #main-content::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 40px;
-            width: 2px;
-            height: 100%;
-            background-color: var(--extra-light-blue);
-            z-index: -1;
-        }
-
-        #history-panel {
-            flex-shrink: 0;
-            width: 80%; /* Ancho del panel */
-            max-width: 350px;
-            height: 100vh;
-            background-color: #f5f5f5;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.2);
-            position: fixed;
-            top: 0;
-            left: -80%; /* Oculto por defecto */
-            z-index: 20;
-            overflow-y: auto;
-            transition: left 0.3s ease-in-out;
-        }
-
-        #history-panel.show {
-            left: 0;
-        }
-
-        .history-item {
-            padding: 12px 16px;
-            cursor: pointer;
-            border-bottom: 1px solid #e0e0e0;
-            transition: background-color 0.2s;
-        }
-
-        .history-item:hover {
-            background-color: #e8e8e8;
-        }
-
-        .suggestions {
-            display: none;
-            position: absolute;
-            background: white;
-            width: 100%;
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 0 0 4px 4px;
-            z-index: 10;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        .suggestions.show {
-            display: block;
-        }
-        
-        .suggestion-item {
-            padding: 8px 12px;
-            cursor: pointer;
-        }
-        
-        .suggestion-item:hover {
-            background-color: #f0f0f0;
-        }
-        
-        #modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem;
-        }
-        
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 90%;
-            width: 500px;
-            max-height: 80%;
-            overflow-y: auto;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-        
-        .teaching-item {
-            display: flex;
-            margin-bottom: 8px;
-            align-items: center;
-        }
-        
-        .teaching-input-container {
-            display: flex;
-            align-items: center;
-            flex-grow: 1;
-        }
-        
-        .teaching-input {
-            flex-grow: 1;
-            margin-left: 8px;
-            background: transparent;
-            border: none;
-            border-bottom: 1px dashed var(--light-blue);
-            padding: 4px 0;
-            font-size: 1rem;
-            line-height: 1.6;
-            color: var(--dark-blue);
-        }
-        
-        .teaching-input:focus {
-            outline: none;
-            border-bottom: 1px solid var(--blue);
-        }
-        
-        .verse-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 0;
-            margin-bottom: 4px;
-            border-bottom: 1px dashed var(--extra-light-blue);
-        }
-
-        .verse-item:hover {
-            background-color: var(--extra-light-blue);
-        }
-        
-        .verse-text {
-            color: var(--dark-blue);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            flex-grow: 1;
-        }
-
-        .verse-text-input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid var(--blue);
-            padding: 4px 0;
-            font-size: 1rem;
-            line-height: 1.6;
-            color: var(--dark-blue);
-        }
-
-        .verse-text-input:focus {
-            outline: none;
-        }
-
-        .verse-actions, .teaching-actions {
-            display: flex;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .status-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-
-        .status-valid { background-color: var(--green); }
-        .status-invalid { background-color: #f44336; }
-        .status-pending { background-color: #ff9800; }
-        
-        .title-input {
-            font-size: 1.5rem;
-            font-weight: bold;
-            width: 100%;
-            border: none;
-            border-bottom: 2px solid var(--dark-blue);
-            padding: 8px 0;
-            margin-bottom: 16px;
-            background: transparent;
-            line-height: 1.6;
-            color: var(--dark-blue);
-            position: relative;
-            z-index: 1;
-        }
-        
-        .title-input:focus {
-            outline: none;
-            border-bottom: 2px solid var(--blue);
-        }
-        
-        .conclusion-input {
-            width: 100%;
-            border: none;
-            border-bottom: 1px dashed var(--light-blue);
-            padding: 8px 0;
-            background: transparent;
-            resize: none;
-            min-height: 80px;
-            line-height: 1.6;
-            color: var(--dark-blue);
-        }
-        
-        .conclusion-input:focus {
-            outline: none;
-            border-bottom: 1px solid var(--blue);
-        }
-        
-        .verse-input-container, .teaching-input-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        
-        .main-input {
-            flex-grow: 1;
-            background: transparent;
-            border: none;
-            border-bottom: 1px dashed var(--light-blue);
-            padding: 4px 0;
-            font-size: 1rem;
-            line-height: 1.6;
-            color: var(--dark-blue);
-        }
-        
-        .main-input:focus {
-            outline: none;
-            border-bottom: 1px solid var(--blue);
-        }
-        
-        .action-buttons {
-            display: flex;
-            width: 100%;
-            border-top: 1px solid #ddd;
-            margin-top: 40px;
-            padding-top: 16px;
-        }
-        
-        .action-btn {
-            flex-grow: 1;
-            width: 100%;
-            padding: 12px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            font-weight: bold;
-            text-align: center;
-        }
-        
-        .action-btn:hover {
-            opacity: 0.8;
-        }
-        
-        .whatsapp-btn { background-color: #25D366; color: white; }
-        .share-btn { background-color: var(--blue); color: white; }
-        .save-btn { background-color: var(--green); color: white; }
-        .new-btn { background-color: #f44336; color: white; }
-        .add-btn { color: var(--blue); cursor: pointer; transition: color 0.2s; }
-        .add-btn:hover { color: var(--dark-blue); }
-        .edit-btn { color: var(--blue); cursor: pointer; transition: color 0.2s; margin-left: 8px; }
-        .edit-btn:hover { color: var(--dark-blue); }
-        .view-btn { color: var(--blue); cursor: pointer; transition: color 0.2s; margin-left: 8px; }
-        .view-btn:hover { color: var(--dark-blue); }
-        .delete-btn { color: #f44336; cursor: pointer; transition: color 0.2s; margin-left: 8px; }
-        .delete-btn:hover { color: #831006; }
-        .save-edit-btn { color: var(--green); cursor: pointer; transition: color 0.2s; margin-left: 8px; }
-        .save-edit-btn:hover { color: #5aa139; }
-        
-        h2 {
-            position: relative;
-            z-index: 1;
-        }
-        
-    </style>
-    <title>Apuntes de Culto</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="favicon.svg">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+  <style>
+    * {
+      font-family: 'Montserrat', sans-serif;
+      box-sizing: border-box;
+      outline: none;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    textarea {
+      min-height: 100px;
+    }
+    .point-number {
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+    }
+    .slide-menu {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 80%;
+      max-width: 350px;
+      height: 100%;
+      background-color: white;
+      box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+      transition: right 0.3s ease-in-out;
+      z-index: 50;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+    .slide-menu.open {
+      right: 0;
+    }
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 40;
+      display: none;
+    }
+    .menu-overlay.open {
+      display: block;
+    }
+    .share-options-menu {
+      position: fixed;
+      bottom: 6rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 60;
+      padding: 1rem;
+      width: 90%;
+      max-width: 300px;
+      display: none;
+    }
+    .share-options-menu.open {
+      display: block;
+    }
+    .verse-text-display {
+      font-size: 0.9rem;
+      color: #475569; /* slate-600 */
+      margin-top: 0.25rem;
+      padding-left: 0.75rem;
+      border-left: 2px solid #c7d2fe; /* indigo-200 */
+    }
+  </style>
+  <title>Apuntes de Prédica</title>
 </head>
-<body>
-    <div id="app-container">
-        
-        <div id="history-panel" class="p-4">
-            <h3 class="text-xl font-bold mb-4 text-dark-blue">Cultos guardados</h3>
-            <div id="history-list">
-                </div>
-        </div>
+<body class="bg-gray-100 text-gray-800">
 
-        <div id="main-content" class="container mx-auto p-6 max-w-2xl">
-            <input type="text" id="title" class="title-input" placeholder="Título">
-            
-            <h2 class="text-xl font-bold mb-2 mt-6 text-dark-blue">Versículos Clave</h2>
-            <div id="verses-container" class="mb-4 pl-6"></div>
-            
-            <div class="verse-input-container pl-6 relative">
-                <input type="text" id="verse-input" class="main-input" placeholder="Versículo">
-                <div id="verse-suggestions" class="suggestions"></div>
-                <iconify-icon icon="mdi:plus" id="add-verse-btn" class="add-btn text-2xl ml-2"></iconify-icon>
-            </div>
-            
-            <h2 class="text-xl font-bold mb-2 mt-8 text-dark-blue">Enseñanzas</h2>
-            <div id="teachings-container" class="mb-4 pl-6"></div>
-            <div class="pl-6 teaching-input-row">
-                <div class="teaching-input-container flex-grow">
-                    <input type="text" id="teaching-input" class="main-input" placeholder="Enseñanza">
-                </div>
-                <iconify-icon icon="mdi:plus" id="add-teaching-btn" class="add-btn text-2xl ml-2"></iconify-icon>
-            </div>
-
-            <h2 class="text-xl font-bold mb-2 mt-8 text-dark-blue">Conclusión</h2>
-            <textarea id="conclusion" class="conclusion-input pl-6" placeholder="Conclusión"></textarea>
-
-            <div class="action-buttons">
-                <button class="action-btn whatsapp-btn" id="whatsapp-share-btn" title="Compartir a WhatsApp">
-                    <iconify-icon icon="mdi:whatsapp" width="24" height="24"></iconify-icon>
-                </button>
-                <button class="action-btn share-btn" id="share-btn" title="Copiar como texto plano">
-                    <iconify-icon icon="mdi:content-copy" width="24" height="24"></iconify-icon>
-                </button>
-                <button class="action-btn save-btn" id="save-btn" title="Guardar Manualmente">
-                    <iconify-icon icon="mdi:content-save" width="24" height="24"></iconify-icon>
-                </button>
-                <button class="action-btn new-btn" id="new-btn" title="Nuevo Culto">
-                    <iconify-icon icon="mdi:plus-circle-outline" width="24" height="24"></iconify-icon>
-                </button>
-            </div>
-        </div>
+  <div id="slide-menu" class="slide-menu">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-indigo-800">Prédicas Guardadas</h3>
+      <button id="close-menu-btn" class="text-gray-500 hover:text-gray-800">
+        <span class="iconify text-2xl" data-icon="clarity:close-line"></span>
+      </button>
     </div>
-    
-    <div id="modal">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="modal-title" class="text-xl font-bold text-dark-blue"></h3>
-                <iconify-icon icon="mdi:close" id="close-modal" class="cursor-pointer text-2xl text-gray-500 hover:text-black"></iconify-icon>
-            </div>
-            <div id="modal-text" class="text-gray-700 leading-relaxed"></div>
-        </div>
+    <ul id="prédicas-guardadas-lista" class="space-y-2"></ul>
+    <div class="text-center mt-6">
+      <button id="limpiar-todo-btn" class="text-red-500 hover:text-red-700 text-sm">Limpiar todas las prédicas</button>
     </div>
+  </div>
+  <div id="menu-overlay" class="menu-overlay"></div>
+
+  <div class="container mx-auto p-4 md:p-8" id="prédica-content">
     
-    <script>
+    <header class="bg-white rounded-xl shadow-lg p-6 mb-8 text-center relative">
+      <button id="open-menu-btn" class="absolute top-4 right-4 text-gray-500 hover:text-indigo-700">
+        <span class="iconify text-3xl" data-icon="mdi:bookmark-outline"></span>
+      </button>
+      <h1 class="text-3xl md:text-4xl font-bold text-indigo-800 mb-2">
+        <input type="text" id="prédica-título" placeholder="Título de la Prédica" class="w-full text-center bg-transparent p-2 rounded-md font-bold text-2xl md:text-3xl text-indigo-800 focus:bg-gray-100">
+      </h1>
+      <p class="text-lg text-gray-600">Por: <input type="text" id="predicador-nombre" placeholder="Nombre del Predicador" class="bg-transparent p-1 rounded-md text-gray-600 text-base md:text-lg text-center font-semibold focus:bg-gray-100"></p>
+      <div class="flex flex-col items-center text-gray-500 mt-3 text-sm space-y-1">
+        <div class="flex items-center">
+          <span class="iconify mr-2" data-icon="clarity:date-line"></span>
+          <span id="fecha-actual"></span>
+        </div>
+        <div class="flex items-center">
+          <span class="iconify mr-2" data-icon="ic:baseline-watch-line"></span>
+          <span id="hora-actual"></span>
+        </div>
+        <div class="flex items-center">
+          <span class="iconify mr-2" data-icon="ic:baseline-location-on"></span>
+          <span>Iglesia Bíblica Bautista La Verdad</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="grid md:grid-cols-2 gap-8 mb-8">
+      <div class="bg-white rounded-xl shadow-lg p-6 flex items-center justify-center">
+        <div class="text-center w-full">
+          <p class="text-gray-500 text-sm mb-2 uppercase tracking-wide font-semibold">Versículo Principal</p>
+          <input type="text" id="pasaje-principal" placeholder="Juan 3:16" class="w-full text-center bg-gray-100 p-2 rounded-md font-bold text-xl md:text-2xl text-gray-900 mb-2">
+          <textarea id="cita-pasaje" placeholder="El texto del versículo aparecerá aquí..." class="w-full bg-gray-100 p-2 rounded-md text-gray-700"></textarea>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        <h2 class="text-xl font-bold text-indigo-700 mb-4 flex items-center"><span class="iconify mr-2 text-2xl" data-icon="clarity:list-line"></span> Datos de la Prédica</h2>
+        <ul id="puntos-lista" class="space-y-4"></ul>
+        <div class="flex gap-4 mt-4">
+          <button id="añadir-punto" class="flex-grow bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">
+            Añadir Dato
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center"><span class="iconify mr-2" data-icon="clarity:link-line"></span> Versículos Citados</h2>
+      <ul id="versículos-citados-lista" class="space-y-4"></ul>
+      <button id="añadir-versiculo" class="mt-4 w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">
+        Añadir Versículo
+      </button>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center"><span class="iconify mr-2" data-icon="clarity:search-line"></span> Buscando la Profundidad</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-lg font-bold text-indigo-700 mb-2 flex items-center"><span class="iconify mr-2" data-icon="clarity:book-line"></span> Situación</h3>
+          <p class="text-gray-600 text-sm mb-4">Anota detalles del contexto del pasaje: ¿A quién se le escribió y por qué? ¿Qué estaba pasando en ese tiempo?</p>
+          <textarea id="situación-texto" placeholder="Ej: Este evangelio fue escrito para los judíos y griegos..." class="w-full bg-gray-100 p-2 rounded-md text-gray-700"></textarea>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-lg font-bold text-indigo-700 mb-2 flex items-center"><span class="iconify mr-2" data-icon="clarity:link-line"></span> Historias Relacionadas</h3>
+          <p class="text-gray-600 text-sm mb-4">Vincula este pasaje con otros versículos o historias de la Biblia que hablen de temas similares.</p>
+          <textarea id="historias-texto" placeholder="Ej: Conectar Juan 3:16 con Romanos 5:8..." class="w-full bg-gray-100 p-2 rounded-md text-gray-700"></textarea>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg p-6">
+          <h3 class="text-lg font-bold text-indigo-700 mb-2 flex items-center"><span class="iconify mr-2" data-icon="clarity:star-line"></span> La Cosecha de la Verdad</h3>
+          <p class="text-gray-600 text-sm mb-4">Reflexiona sobre cómo esta verdad bíblica se manifiesta en tu vida y en la vida de los creyentes.</p>
+          <textarea id="cosecha-texto" placeholder="Ej: La cosecha es la seguridad de la salvación eterna..." class="w-full bg-gray-100 p-2 rounded-md text-gray-700"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <h2 class="text-2xl font-bold text-gray-900 mb-4 flex items-center"><span class="iconify mr-2" data-icon="clarity:pencil-line"></span> Conclusión</h2>
+      <div class="space-y-6">
+        <div>
+          <p class="font-semibold text-gray-900 mb-1">¿Qué es lo más importante que Dios me está diciendo en esta prédica?</p>
+          <textarea id="pregunta1-texto" placeholder="Ej: El amor de Dios es incondicional..." class="w-full bg-gray-100 p-2 rounded-md text-gray-700"></textarea>
+        </div>
+        <div>
+          <p class="font-semibold text-gray-900 mb-1">¿Cómo debo aplicar esta verdad en mi vida esta semana?</p>
+          <textarea id="pregunta2-texto" placeholder="Ej: Orar por mis seres queridos..." class="w-full bg-gray-100 p-2 rounded-md text-gray-700"></textarea>
+        </div>
+        <div>
+          <p class="font-semibold text-gray-900 mb-1">¿Con quién puedo compartir esta enseñanza?</p>
+          <textarea id="pregunta3-texto" placeholder="Ej: Con mi amigo de la universidad..." class="w-full bg-gray-100 p-2 rounded-md text-gray-700"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="p-4 flex justify-between space-x-4 mb-16">
+      <button id="nueva-prédica-btn" class="flex-grow flex items-center justify-center space-x-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-300">
+        <span class="iconify text-2xl" data-icon="mdi:plus"></span>
+      </button>
+      <button id="btn-evangelizar" class="flex-grow flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition-colors duration-300">
+        <span class="iconify text-2xl" data-icon="mdi:share-variant-outline"></span>
+      </button>
+    </section>
+  </div>
+
+  <div id="share-options-menu" class="share-options-menu">
+    <div class="flex justify-between items-center mb-4">
+      <h4 class="text-lg font-bold text-gray-800">Selecciona el tipo de mensaje</h4>
+      <button id="close-share-menu-btn" class="text-gray-500 hover:text-gray-800">
+        <span class="iconify text-2xl" data-icon="clarity:close-line"></span>
+      </button>
+    </div>
+    <ul class="space-y-3">
+      <li>
+        <button id="share-evangelizacion" class="flex items-center w-full p-3 bg-gray-100 rounded-md hover:bg-indigo-100 transition-colors">
+          <span class="iconify text-xl text-indigo-600 mr-3" data-icon="ic:round-format-quote"></span>
+          <span class="font-semibold text-gray-800">Evangelización</span>
+        </button>
+      </li>
+      <li>
+        <button id="share-guia" class="flex items-center w-full p-3 bg-gray-100 rounded-md hover:bg-indigo-100 transition-colors">
+          <span class="iconify text-xl text-indigo-600 mr-3" data-icon="mdi:book-open-outline"></span>
+          <span class="font-semibold text-gray-800">Guía para prédicar</span>
+        </button>
+      </li>
+      <li>
+        <button id="share-estudio" class="flex items-center w-full p-3 bg-gray-100 rounded-md hover:bg-indigo-100 transition-colors">
+          <span class="iconify text-xl text-indigo-600 mr-3" data-icon="mdi:text-box-search-outline"></span>
+          <span class="font-semibold text-gray-800">Estudio de Prédica</span>
+        </button>
+      </li>
+    </ul>
+  </div>
+
+  <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- ELEMENTOS DEL DOM ---
-        const appContainer = document.getElementById('app-container');
-        const mainContent = document.getElementById('main-content');
-        const titleInput = document.getElementById('title');
-        const conclusionInput = document.getElementById('conclusion');
-        const verseInput = document.getElementById('verse-input');
-        const verseSuggestions = document.getElementById('verse-suggestions');
-        const addVerseBtn = document.getElementById('add-verse-btn');
-        const versesContainer = document.getElementById('verses-container');
-        const teachingsContainer = document.getElementById('teachings-container');
-        const teachingInput = document.getElementById('teaching-input');
-        const addTeachingBtn = document.getElementById('add-teaching-btn');
-        const whatsappShareBtn = document.getElementById('whatsapp-share-btn');
-        const shareBtn = document.getElementById('share-btn');
-        const saveBtn = document.getElementById('save-btn');
-        const newBtn = document.getElementById('new-btn');
-        const modal = document.getElementById('modal');
-        const closeModalBtn = document.getElementById('close-modal');
-        const modalTitle = document.getElementById('modal-title');
-        const modalText = document.getElementById('modal-text');
-        const historyPanel = document.getElementById('history-panel');
-        const historyList = document.getElementById('history-list');
+      
+      const prédicaContent = document.getElementById('prédica-content');
+      const slideMenu = document.getElementById('slide-menu');
+      const openMenuBtn = document.getElementById('open-menu-btn');
+      const closeMenuBtn = document.getElementById('close-menu-btn');
+      const menuOverlay = document.getElementById('menu-overlay');
+      const listaPrédicasGuardadas = document.getElementById('prédicas-guardadas-lista');
+      const btnLimpiarTodo = document.getElementById('limpiar-todo-btn');
+      
+      const books = [
+        { name: "Genesis", abrev: "GN" }, { name: "Exodo", abrev: "EX" }, { name: "Levitico", abrev: "LV" },
+        { name: "Numeros", abrev: "NM" }, { name: "Deuteronomio", abrev: "DT" }, { name: "Josue", abrev: "JOS" },
+        { name: "Jueces", abrev: "JUE" }, { name: "Rut", abrev: "RT" }, { name: "1-Samuel", abrev: "1S" },
+        { name: "2-Samuel", abrev: "2S" }, { name: "1-Reyes", abrev: "1R" }, { name: "2-Reyes", abrev: "2R" },
+        { name: "1-Cronicas", abrev: "1CR" }, { name: "2-Cronicas", abrev: "2CR" }, { name: "Esdras", abrev: "ESD" },
+        { name: "Nehemias", abrev: "NEH" }, { name: "Ester", abrev: "EST" }, { name: "Job", abrev: "JOB" },
+        { name: "Salmos", abrev: "SAL" }, { name: "Proverbios", abrev: "PR" }, { name: "Eclesiastes", abrev: "EC" },
+        { name: "Cantares", abrev: "CNT" }, { name: "Isaias", abrev: "IS" }, { name: "Jeremias", abrev: "JER" },
+        { name: "Lamentaciones", abrev: "LM" }, { name: "Ezequiel", abrev: "EZ" }, { name: "Daniel", abrev: "DN" },
+        { name: "Oseas", abrev: "OS" }, { name: "Joel", abrev: "JL" }, { name: "Amos", abrev: "AM" },
+        { name: "Abdias", abrev: "ABD" }, { name: "Jonas", abrev: "JON" }, { name: "Miqueas", abrev: "MI" },
+        { name: "Nahum", abrev: "NAH" }, { name: "Habacuc", abrev: "HAB" }, { name: "Sofonias", abrev: "SOF" },
+        { name: "Hageo", abrev: "HAG" }, { name: "Zacarias", abrev: "ZAC" }, { name: "Malaquias", abrev: "MAL" },
+        { name: "Mateo", abrev: "MT" }, { name: "Marcos", abrev: "MR" }, { name: "Lucas", abrev: "LC" },
+        { name: "Juan", abrev: "JN" }, { name: "Hechos", abrev: "HCH" }, { name: "Romanos", abrev: "RO" },
+        { name: "1-Corintios", abrev: "1CO" }, { name: "2-Corintios", abrev: "2CO" }, { name: "Galatas", abrev: "GA" },
+        { name: "Efesios", abrev: "EF" }, { name: "Filipenses", abrev: "FIL" }, { name: "Colosenses", abrev: "COL" },
+        { name: "1-Tesalonicenses", abrev: "1TS" }, { name: "2-Tesalonicenses", abrev: "2TS" },
+        { name: "1-Timoteo", abrev: "1TI" }, { name: "2-Timoteo", abrev: "2TI" }, { name: "Tito", abrev: "TIT" },
+        { name: "Filemon", abrev: "FLM" }, { name: "Hebreos", abrev: "HE" }, { name: "Santiago", abrev: "STG" },
+        { name: "1-Pedro", abrev: "1P" }, { name: "2-Pedro", abrev: "2P" }, { name: "1-Juan", abrev: "1JN" },
+        { name: "2-Juan", abrev: "2JN" }, { name: "3-Juan", abrev: "3JN" }, { name: "Judas", abrev: "JUD" },
+        { name: "Apocalipsis", abrev: "AP" }
+      ];
 
-        // Estado de la aplicación
-        let cultos = [];
-        let currentCultoIndex = null;
-        let saveTimeout;
-        let isEditingVerse = false;
+      function findBookAbrev(bookName) {
+        const normalizedName = bookName.toLowerCase().replace(/[\s-]/g, '');
+        for (const book of books) {
+          const normalizedBookName = book.name.toLowerCase().replace(/[\s-]/g, '');
+          if (normalizedBookName.includes(normalizedName)) {
+            return book.abrev;
+          }
+        }
+        return null;
+      }
 
-        // Mapeo de libros para la API
-        const books = [
-            { name: "Génesis", abrev: "GN" }, { name: "Éxodo", abrev: "EX" }, { name: "Levítico", abrev: "LV" },
-            { name: "Números", abrev: "NM" }, { name: "Deuteronomio", abrev: "DT" }, { name: "Josué", abrev: "JOS" },
-            { name: "Jueces", abrev: "JUE" }, { name: "Rut", abrev: "RT" }, { name: "1 Samuel", abrev: "1S" },
-            { name: "2 Samuel", abrev: "2S" }, { name: "1 Reyes", abrev: "1R" }, { name: "2 Reyes", abrev: "2R" },
-            { name: "1 Crónicas", abrev: "1CR" }, { name: "2 Crónicas", abrev: "2CR" }, { name: "Esdras", abrev: "ESD" },
-            { name: "Nehemías", abrev: "NEH" }, { name: "Ester", abrev: "EST" }, { name: "Job", abrev: "JOB" },
-            { name: "Salmos", abrev: "SAL" }, { name: "Proverbios", abrev: "PR" }, { name: "Eclesiastés", abrev: "EC" },
-            { name: "Cantares", abrev: "CNT" }, { name: "Isaías", abrev: "IS" }, { name: "Jeremías", abrev: "JER" },
-            { name: "Lamentaciones", abrev: "LM" }, { name: "Ezequiel", abrev: "EZ" }, { name: "Daniel", abrev: "DN" },
-            { name: "Oseas", abrev: "OS" }, { name: "Joel", abrev: "JL" }, { name: "Amós", abrev: "AM" },
-            { name: "Abdías", abrev: "ABD" }, { name: "Jonás", abrev: "JON" }, { name: "Miqueas", abrev: "MI" },
-            { name: "Nahúm", abrev: "NAH" }, { name: "Habacuc", abrev: "HAB" }, { name: "Sofonías", abrev: "SOF" },
-            { name: "Hageo", abrev: "HAG" }, { name: "Zacarías", abrev: "ZAC" }, { name: "Malaquías", abrev: "MAL" },
-            { name: "Mateo", abrev: "MT" }, { name: "Marcos", abrev: "MR" }, { name: "Lucas", abrev: "LC" },
-            { name: "Juan", abrev: "JN" }, { name: "Hechos", abrev: "HCH" }, { name: "Romanos", abrev: "RO" },
-            { name: "1 Corintios", abrev: "1CO" }, { name: "2 Corintios", abrev: "2CO" }, { name: "Gálatas", abrev: "GA" },
-            { name: "Efesios", abrev: "EF" }, { name: "Filipenses", abrev: "FIL" }, { name: "Colosenses", abrev: "COL" },
-            { name: "1 Tesalonicenses", abrev: "1TS" }, { name: "2 Tesalonicenses", abrev: "2TS" },
-            { name: "1 Timoteo", abrev: "1TI" }, { name: "2 Timoteo", abrev: "2TI" }, { name: "Tito", abrev: "TIT" },
-            { name: "Filemón", abrev: "FLM" }, { name: "Hebreos", abrev: "HE" }, { name: "Santiago", abrev: "STG" },
-            { name: "1 Pedro", abrev: "1P" }, { name: "2 Pedro", abrev: "2P" }, { name: "1 Juan", abrev: "1JN" },
-            { name: "2 Juan", abrev: "2JN" }, { name: "3 Juan", abrev: "3JN" }, { name: "Judas", abrev: "JUD" },
-            { name: "Apocalipsis", abrev: "AP" }
-        ];
+      function parseInput(input) {
+        const regex = /(.+?)\s*(\d+):(\d+)(?:-(\d+))?$/i;
+        const match = input.trim().match(regex);
+        if (match) {
+          const bookName = match[1].trim();
+          const chapter = match[2];
+          const verse = match[3];
+          const verseEnd = match[4];
+          return { book: bookName, chapter, verse, verseEnd };
+        }
+        return null;
+      }
+      
+      // ==================================================================
+      // ========= FUNCIÓN CORREGIDA ======================================
+      // ==================================================================
+      async function fetchVerseData(reference) {
+          const trimmedRef = reference.trim();
+          if (!trimmedRef) return null;
+
+          try {
+              const parsed = parseInput(trimmedRef);
+              if (!parsed) { throw new Error('Formato de referencia inválido.'); }
+
+              const bookAbrev = findBookAbrev(parsed.book);
+              if (!bookAbrev) { throw new Error(`Libro no encontrado: ${parsed.book}`); }
+
+              let verseRange = parsed.verse;
+              if (parsed.verseEnd) {
+                  verseRange += `-${parsed.verseEnd}`;
+              }
+
+              const url = `https://bible-api.deno.dev/api/read/rv1960/${bookAbrev}/${parsed.chapter}/${verseRange}`;
+              const response = await fetch(url);
+              
+              if (!response.ok) {
+                  const error = await response.json();
+                  throw new Error(error.message || 'Error en la API');
+              }
+
+              const data = await response.json();
+
+              // ¡AQUÍ ESTÁ LA CORRECCIÓN DEFINITIVA!
+              // Si la 'data' no es un array (es un solo objeto), la envolvemos en un array.
+              // Si es un array, la usamos tal cual.
+              const dataAsArray = Array.isArray(data) ? data : [data];
+              
+              if (dataAsArray.length === 0) { throw new Error('Versículo no encontrado.'); }
+              
+              return dataAsArray; // Ahora estamos 100% seguros de que devolvemos un array.
+
+          } catch (error) {
+              console.error(`Error al buscar "${trimmedRef}":`, error);
+              return null;
+          }
+      }
+
+      const pasajePrincipalInput = document.getElementById('pasaje-principal');
+      const citaPasajeTextarea = document.getElementById('cita-pasaje');
+
+      pasajePrincipalInput.addEventListener('blur', async () => {
+          citaPasajeTextarea.value = 'Buscando...';
+          const data = await fetchVerseData(pasajePrincipalInput.value);
+          if (data) {
+              citaPasajeTextarea.value = data.map(v => v.verse).join(' ');
+              saveToLocalStorage();
+          } else {
+              citaPasajeTextarea.value = 'No se pudo encontrar el versículo. Revisa la referencia.';
+          }
+      });
+
+      const openMenu = () => {
+        slideMenu.classList.add('open');
+        menuOverlay.classList.add('open');
+      };
+      const closeMenu = () => {
+        slideMenu.classList.remove('open');
+        menuOverlay.classList.remove('open');
+      };
+
+      openMenuBtn.addEventListener('click', openMenu);
+      closeMenuBtn.addEventListener('click', closeMenu);
+      menuOverlay.addEventListener('click', closeMenu);
+      
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' && !slideMenu.classList.contains('open')) {
+          openMenu();
+        }
+      });
+      
+      let touchStartX = 0;
+      let touchEndX = 0;
+      prédicaContent.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+      });
+      prédicaContent.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        if (touchEndX - touchStartX > 100 && !slideMenu.classList.contains('open')) {
+          openMenu();
+        } else if (touchStartX - touchEndX > 100 && slideMenu.classList.contains('open')) {
+          closeMenu();
+        }
+      });
+
+      const getFormattedContentGuia = () => {
+        const title = document.getElementById('prédica-título').value || 'Título no especificado';
+        const predicador = document.getElementById('predicador-nombre').value || 'Anónimo';
+        const fecha = document.getElementById('fecha-actual').textContent;
+        const versiculoPrincipal = document.getElementById('pasaje-principal').value || 'Versículo no especificado';
+        const citaPrincipal = document.getElementById('cita-pasaje').value || 'Cita no especificada';
+        const datos = Array.from(document.querySelectorAll('#puntos-lista input')).map(input => input.value).filter(val => val.trim() !== '');
+        const situacion = document.getElementById('situación-texto').value;
+        const historias = document.getElementById('historias-texto').value;
+        const cosecha = document.getElementById('cosecha-texto').value;
+        const pregunta1 = document.getElementById('pregunta1-texto').value;
         
-        // --- MANEJO DE DATOS ---
+        let text = `*Guía para Predicar: "${title}"*\n\n`;
+        text += `*Predicador:* ${predicador}\n`;
+        text += `*Fecha:* ${fecha}\n\n`;
+        text += `--- *Inicio de la Prédica* ---\n\n`;
+        text += `*Introducción:* Puedes comenzar con una pregunta o una anécdota que se conecte con el tema de la prédica. Luego, presenta el versículo base.\n\n`;
+        text += `*Versículo Principal:* ${versiculoPrincipal}\n`;
+        text += `_"${citaPrincipal}"_\n\n`;
+        text += `*Contexto (Situación):* Explica brevemente el trasfondo de este versículo. ¿A quién se le escribió y por qué era importante para ellos? (_Apunte: ${situacion}_)\n`;
         
-        function debounceSave() {
-            clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(saveCurrentCulto, 500);
-        }
-
-        function saveAllCultos() {
-            localStorage.setItem('cultoNotes', JSON.stringify(cultos));
-            renderHistoryList();
-        }
-
-        function saveCurrentCulto() {
-            if (currentCultoIndex === null) {
-                // Nuevo culto, lo agregamos al inicio de la lista
-                cultos.unshift({
-                    id: Date.now(),
-                    title: titleInput.value,
-                    date: new Date().toLocaleDateString(),
-                    verses: Array.from(versesContainer.querySelectorAll('.verse-text')).map(span => span.textContent),
-                    teachings: Array.from(teachingsContainer.querySelectorAll('.teaching-input')).map(input => input.value),
-                    conclusion: conclusionInput.value
-                });
-                currentCultoIndex = 0;
-            } else {
-                // Editando un culto existente
-                cultos[currentCultoIndex].title = titleInput.value;
-                cultos[currentCultoIndex].verses = Array.from(versesContainer.querySelectorAll('.verse-text')).map(span => span.textContent);
-                cultos[currentCultoIndex].teachings = Array.from(teachingsContainer.querySelectorAll('.teaching-input')).map(input => input.value);
-                cultos[currentCultoIndex].conclusion = conclusionInput.value;
-            }
-            saveAllCultos();
-        }
-
-        function loadData(cultoData) {
-            titleInput.value = cultoData.title || '';
-            conclusionInput.value = cultoData.conclusion || '';
-            versesContainer.innerHTML = '';
-            teachingsContainer.innerHTML = '';
-
-            if (Array.isArray(cultoData.verses)) {
-                cultoData.verses.forEach(verse => renderVerse(verse));
-            }
-            if (Array.isArray(cultoData.teachings)) {
-                cultoData.teachings.forEach(teaching => renderTeaching(teaching));
-            }
-        }
-        
-        function newCulto() {
-            if (currentCultoIndex !== null) {
-                saveCurrentCulto();
-            }
-            currentCultoIndex = null;
-            titleInput.value = '';
-            conclusionInput.value = '';
-            versesContainer.innerHTML = '';
-            teachingsContainer.innerHTML = '';
-            teachingInput.value = '';
-            saveAllCultos(); // Guarda la lista con el nuevo culto si existe
-            showToast('Nuevo culto creado');
-        }
-
-        function renderHistoryList() {
-            historyList.innerHTML = '';
-            cultos.forEach((culto, index) => {
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.innerHTML = `
-                    <p class="font-bold text-dark-blue">${culto.title || 'Culto sin título'}</p>
-                    <p class="text-sm text-gray-600">${culto.date}</p>
-                `;
-                item.addEventListener('click', () => {
-                    if (currentCultoIndex !== null) saveCurrentCulto();
-                    currentCultoIndex = index;
-                    loadData(culto);
-                    toggleHistoryPanel();
-                    showToast(`Cargando: ${culto.title || 'Culto sin título'}`);
-                });
-                historyList.appendChild(item);
+        if (datos.length > 0) {
+            text += `\n*Puntos Clave:* Aquí puedes desarrollar los siguientes puntos para tu prédica:\n`;
+            datos.forEach((dato, index) => {
+                if (dato) text += `\n  - *Punto ${index + 1}:* ${dato}\n`;
             });
         }
         
-        function showToast(message) {
-            const toast = document.createElement('div');
-            toast.className = 'fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-md shadow-lg z-50';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        // --- LÓGICA DE BÍBLIA Y API ---
-        function parseInput(input) {
-            let bookName = null;
-            let remaining = input;
-            
-            // Revisa si el input comienza con el nombre de algún libro
-            const sortedBooks = books.slice().sort((a, b) => b.name.length - a.name.length);
-            for (const book of sortedBooks) {
-                const normalizedInput = input.toLowerCase().trim();
-                const normalizedBookName = book.name.toLowerCase();
-                if (normalizedInput.startsWith(normalizedBookName) || normalizedInput.startsWith(book.abrev.toLowerCase())) {
-                    bookName = book.name;
-                    remaining = input.substring(bookName.length).trim();
-                    break;
-                }
-            }
-            
-            if (!bookName) return null;
-
-            const regex = /(\d+):(\d+)(?:-(\d+))?/;
-            const match = remaining.match(regex);
-            if (match) {
-                const chapter = match[1];
-                const verse = match[2];
-                const verseEnd = match[3];
-                return { book: bookName, chapter, verse, verseEnd };
-            }
-            return null;
-        }
-
-        function findBookAbrev(bookName) {
-            for (const book of books) {
-                if (book.name === bookName) {
-                    return book.abrev;
-                }
-            }
-            return null;
-        }
-
-        async function checkVerse(verseRef) {
-            const parsed = parseInput(verseRef);
-            if (!parsed) return false;
-            const bookAbrev = findBookAbrev(parsed.book);
-            if (!bookAbrev) return false;
-
-            let verseRange = parsed.verse;
-            if (parsed.verseEnd) {
-                verseRange += `-${parsed.verseEnd}`;
-            }
-
-            try {
-                const url = `https://bible-api.deno.dev/api/read/rv1960/${bookAbrev}/${parsed.chapter}/${verseRange}`;
-                const response = await fetch(url);
-                const data = await response.json();
-                return response.ok && data.length > 0;
-            } catch (error) {
-                return false;
-            }
-        }
-
-        async function getVerseContent(verseRef) {
-            const parsed = parseInput(verseRef);
-            if (!parsed) {
-                return { error: `Formato de referencia incorrecto: "${verseRef}". Por favor, verifica el formato (ej: Juan 3:16).` };
-            }
-            const bookAbrev = findBookAbrev(parsed.book);
-            if (!bookAbrev) {
-                return { error: `No se encontró el libro "${parsed.book}".` };
-            }
-
-            let verseRange = parsed.verse;
-            if (parsed.verseEnd) {
-                verseRange += `-${parsed.verseEnd}`;
-            }
-            
-            try {
-                const url = `https://bible-api.deno.dev/api/read/rv1960/${bookAbrev}/${parsed.chapter}/${verseRange}`;
-                const response = await fetch(url);
-                const data = await response.json();
-                
-                if (data.length === 0) {
-                    return { error: `Versículo no encontrado o referencia inválida: "${verseRef}". Por favor, verifica la referencia.` };
-                } else {
-                    return { verses: data };
-                }
-            } catch (error) {
-                console.error('Error al obtener el versículo:', error);
-                return { error: 'No se pudo cargar el versículo. Inténtalo de nuevo más tarde.' };
-            }
-        }
-
-        // --- RENDERIZADO Y LÓGICA DE UI ---
+        text += `\n*Conexiones (Historias Relacionadas):* Fortalece tu mensaje con versículos o historias de la Biblia que refuercen estos puntos. (_Apunte: ${historias}_)\n`;
+        text += `\n*Aplicación (La Cosecha de la Verdad):* ¿Cómo se aplica esta verdad en nuestras vidas hoy? Muestra cómo la gente puede vivir este mensaje. (_Apunte: ${cosecha}_)\n`;
+        text += `\n*Cierre:* Concluye con un llamado a la acción. ¿Qué es lo más importante que se debe recordar? (_Apunte: ${pregunta1}_)\n\n`;
+        text += `--- *Fin de la Prédica* ---\n\n`;
+        text += `¡Que Dios te use poderosamente!`;
         
-        async function renderVerse(verseText) {
-            const verseDiv = document.createElement('div');
-            verseDiv.className = 'verse-item';
-            
-            const verseTextSpan = document.createElement('span');
-            verseTextSpan.className = 'verse-text cursor-pointer';
-            verseTextSpan.textContent = verseText;
-            verseTextSpan.onclick = () => showVerseModal(verseText);
-            
-            const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'verse-actions';
+        return encodeURIComponent(text);
+      };
 
-            const statusIndicator = document.createElement('div');
-            statusIndicator.className = 'status-indicator status-pending';
-            
-            const isValid = await checkVerse(verseText);
-            statusIndicator.className = `status-indicator ${isValid ? 'status-valid' : 'status-invalid'}`;
-
-            const editIcon = document.createElement('iconify-icon');
-            editIcon.setAttribute('icon', 'mdi:pencil');
-            editIcon.className = 'edit-btn text-xl';
-            editIcon.onclick = () => {
-                if (!isEditingVerse) {
-                    enableVerseEdit(verseDiv, verseTextSpan, editIcon, verseText);
-                }
-            };
-
-            const deleteIcon = document.createElement('iconify-icon');
-            deleteIcon.setAttribute('icon', 'mdi:close-circle-outline');
-            deleteIcon.className = 'delete-btn text-xl';
-            deleteIcon.onclick = () => {
-                verseDiv.remove();
-                debounceSave();
-            };
-
-            actionsDiv.appendChild(statusIndicator);
-            actionsDiv.appendChild(editIcon);
-            actionsDiv.appendChild(deleteIcon);
-            
-            verseDiv.appendChild(verseTextSpan);
-            verseDiv.appendChild(actionsDiv);
-            versesContainer.appendChild(verseDiv);
-        }
+      const getFormattedContentEvangelizacion = () => {
+        const title = document.getElementById('prédica-título').value || 'Prédica de Hoy';
+        const versiculoPrincipal = document.getElementById('pasaje-principal').value || 'Juan 3:16';
+        const citaPrincipal = document.getElementById('cita-pasaje').value || 'Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.';
         
-        function enableVerseEdit(verseDiv, verseTextSpan, editIcon, verseText) {
-            isEditingVerse = true;
-            const originalText = verseTextSpan.textContent;
-            
-            const verseInput = document.createElement('input');
-            verseInput.type = 'text';
-            verseInput.className = 'verse-text-input';
-            verseInput.value = originalText;
+        const text = `¡Hola! Quería compartirte un mensaje que me impactó hoy.\n\nLa prédica de hoy se basó en el pasaje de *${versiculoPrincipal}*\n\n_"${citaPrincipal}"_\n\nMe hizo reflexionar sobre el amor de Dios. Si quieres saber más, no dudes en preguntarme. ¡Bendiciones!`;
+        return encodeURIComponent(text);
+      };
 
-            verseDiv.replaceChild(verseInput, verseTextSpan);
-            verseInput.focus();
+      const getFormattedContentEstudio = () => {
+        const title = document.getElementById('prédica-título').value || 'Estudio de Prédica';
+        const predicador = document.getElementById('predicador-nombre').value || 'Anónimo';
+        const fecha = document.getElementById('fecha-actual').textContent;
+        const versiculoPrincipal = document.getElementById('pasaje-principal').value || 'Versículo no especificado';
+        const pregunta1 = document.getElementById('pregunta1-texto').value || '¿Qué es lo más importante que Dios me está diciendo en esta prédica?';
+        const pregunta2 = document.getElementById('pregunta2-texto').value || '¿Cómo debo aplicar esta verdad en mi vida esta semana?';
+        const pregunta3 = document.getElementById('pregunta3-texto').value || '¿Con quién puedo compartir esta enseñanza?';
 
-            editIcon.setAttribute('icon', 'mdi:content-save-check-outline');
-            editIcon.className = 'save-edit-btn text-xl';
-            
-            const saveEdit = async () => {
-                const newText = verseInput.value.trim();
-                if (newText) {
-                    verseTextSpan.textContent = newText;
-                    verseDiv.replaceChild(verseTextSpan, verseInput);
-                    debounceSave();
-                    // Actualizar el estado del versículo
-                    const statusIndicator = verseDiv.querySelector('.status-indicator');
-                    statusIndicator.className = 'status-indicator status-pending';
-                    const isValid = await checkVerse(newText);
-                    statusIndicator.className = `status-indicator ${isValid ? 'status-valid' : 'status-invalid'}`;
-                } else {
-                    verseDiv.remove();
-                    debounceSave();
-                }
-                editIcon.setAttribute('icon', 'mdi:pencil');
-                editIcon.className = 'edit-btn text-xl';
-                isEditingVerse = false;
-            };
-
-            editIcon.onclick = saveEdit;
-            verseInput.addEventListener('keypress', async (e) => {
-                if (e.key === 'Enter') saveEdit();
-            });
-            verseInput.addEventListener('blur', () => {
-                if (isEditingVerse) saveEdit();
-            });
-        }
-
-        async function showVerseModal(verseRef) {
-            modalTitle.textContent = verseRef;
-            modalText.innerHTML = 'Cargando...';
-            modal.style.display = 'flex';
-            
-            const result = await getVerseContent(verseRef);
-
-            if (result.error) {
-                modalText.textContent = result.error;
-            } else {
-                const versesHtml = result.verses.map(verseData => `
-                    <p class="mb-2">
-                        <span class="font-bold text-dark-blue">${verseData.number}.</span> ${verseData.verse}
-                    </p>
-                `).join('');
-                modalText.innerHTML = versesHtml;
-            }
-        }
+        let text = `*Estudio de Prédica: "${title}"*\n\n`;
+        text += `*Basado en:* ${versiculoPrincipal}\n\n`;
+        text += `--- *Para Reflexionar* ---\n\n`;
+        text += `1. *¿Qué es lo más importante?*\n${pregunta1}\n\n`;
+        text += `2. *¿Cómo lo aplico?*\n${pregunta2}\n\n`;
+        text += `3. *¿Con quién lo comparto?*\n${pregunta3}\n`;
         
-        function renderTeaching(text) {
-            const teachingDiv = document.createElement('div');
-            teachingDiv.className = 'teaching-item';
-            
-            const teachingInput = document.createElement('input');
-            teachingInput.type = 'text';
-            teachingInput.className = 'teaching-input';
-            teachingInput.placeholder = 'Enseñanza';
-            teachingInput.value = text;
-            teachingInput.addEventListener('input', debounceSave);
-            
-            const teachingTextSpan = document.createElement('span');
-            teachingTextSpan.className = 'teaching-text-display';
-            teachingTextSpan.innerHTML = formatTeachingText(text);
-
-            const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'teaching-actions ml-auto';
-
-            const viewIcon = document.createElement('iconify-icon');
-            viewIcon.setAttribute('icon', 'mdi:eye-outline');
-            viewIcon.className = 'view-btn text-xl';
-            viewIcon.onclick = () => showTeachingModal(text);
-
-            const deleteIcon = document.createElement('iconify-icon');
-            deleteIcon.setAttribute('icon', 'mdi:close-circle-outline');
-            deleteIcon.className = 'delete-btn text-xl ml-2';
-            deleteIcon.onclick = () => {
-                teachingDiv.remove();
-                debounceSave();
-            };
-            
-            teachingDiv.appendChild(document.createTextNode('•'));
-            teachingDiv.appendChild(teachingInput);
-            teachingDiv.appendChild(actionsDiv);
-            
-            actionsDiv.appendChild(viewIcon);
-            actionsDiv.appendChild(deleteIcon);
-            
-            teachingsContainer.appendChild(teachingDiv);
-        }
-
-        function formatTeachingText(text) {
-            // Reemplaza texto entre comillas dobles con etiquetas <i>
-            return text.replace(/"(.*?)"/g, '<i>"$1"</i>');
-        }
-
-        function showTeachingModal(text) {
-            modalTitle.textContent = 'Enseñanza';
-            modalText.innerHTML = `<p>${formatTeachingText(text)}</p>`;
-            modal.style.display = 'flex';
-        }
-
-        function handleAddTeaching() {
-            const teachingText = teachingInput.value.trim();
-            if (teachingText) {
-                renderTeaching(teachingText);
-                teachingInput.value = '';
-            }
-            teachingInput.focus();
-            debounceSave();
-        }
-
-        // --- MANEJO DE PANELES ---
-        function toggleHistoryPanel() {
-            historyPanel.classList.toggle('show');
-        }
-
-        let touchStartX = 0;
-        let touchEndX = 0;
-        let swipeThreshold = 50;
-        
-        mainContent.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-        
-        mainContent.addEventListener('touchend', e => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipeGesture();
-        });
-
-        function handleSwipeGesture() {
-            if (touchEndX - touchStartX > swipeThreshold) {
-                toggleHistoryPanel();
-            } else if (touchStartX - touchEndX > swipeThreshold) {
-                if (historyPanel.classList.contains('show')) {
-                    toggleHistoryPanel();
-                }
-            }
-        }
-        
-        // --- EVENT LISTENERS ---
-
-        mainContent.addEventListener('input', debounceSave);
-        
-        // Versículos
-        verseInput.addEventListener('input', () => {
-            const input = verseInput.value.trim();
-            verseSuggestions.innerHTML = '';
-            if (input.length < 2) {
-                verseSuggestions.classList.remove('show');
-                return;
-            }
-            const suggestions = books.map(book => book.name).filter(book => book.toLowerCase().startsWith(input.toLowerCase()));
-            if (suggestions.length > 0) {
-                suggestions.forEach(book => {
-                    const div = document.createElement('div');
-                    div.className = 'suggestion-item';
-                    div.textContent = book;
-                    div.onclick = () => {
-                        verseInput.value = book + ' ';
-                        verseInput.focus();
-                        verseSuggestions.classList.remove('show');
-                    };
-                    verseSuggestions.appendChild(div);
+        return encodeURIComponent(text);
+      };
+      
+      const saveToLocalStorage = () => {
+        const versiculosData = [];
+        document.querySelectorAll('#versículos-citados-lista li').forEach(li => {
+            const input = li.querySelector('input');
+            const textDiv = li.querySelector('.verse-text-display');
+            if (input) {
+                versiculosData.push({
+                    ref: input.value,
+                    text: textDiv ? textDiv.innerHTML : ''
                 });
-                verseSuggestions.classList.add('show');
-            } else {
-                verseSuggestions.classList.remove('show');
             }
         });
 
-        document.addEventListener('click', (e) => {
-            if (e.target !== verseInput) verseSuggestions.classList.remove('show');
-        });
-
-        const handleAddVerse = () => {
-            const verseText = verseInput.value.trim();
-            if (verseText) {
-                renderVerse(verseText);
-                verseInput.value = '';
-                debounceSave();
-            }
+        const data = {
+            title: document.getElementById('prédica-título').value,
+            predicador: document.getElementById('predicador-nombre').value,
+            pasajePrincipal: document.getElementById('pasaje-principal').value,
+            citaPasaje: document.getElementById('cita-pasaje').value,
+            puntos: Array.from(document.querySelectorAll('#puntos-lista input')).map(input => input.value),
+            versiculos: versiculosData,
+            situacion: document.getElementById('situación-texto').value,
+            historias: document.getElementById('historias-texto').value,
+            cosecha: document.getElementById('cosecha-texto').value,
+            pregunta1: document.getElementById('pregunta1-texto').value,
+            pregunta2: document.getElementById('pregunta2-texto').value,
+            pregunta3: document.getElementById('pregunta3-texto').value
         };
-        addVerseBtn.addEventListener('click', handleAddVerse);
-        verseInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleAddVerse(); });
+        localStorage.setItem('currentPrédicaData', JSON.stringify(data));
+      };
 
-        // Enseñanzas
-        addTeachingBtn.addEventListener('click', handleAddTeaching);
-        teachingInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                handleAddTeaching();
-            }
-        });
+      const loadFromLocalStorage = () => {
+        const data = JSON.parse(localStorage.getItem('currentPrédicaData'));
+        if (data) {
+          fillForm(data);
+        } else {
+          clearForm();
+        }
+      };
+
+      const clearForm = () => {
+        prédicaContent.querySelectorAll('input[type="text"], textarea').forEach(input => input.value = '');
+        document.getElementById('puntos-lista').innerHTML = '';
+        document.getElementById('versículos-citados-lista').innerHTML = '';
+        crearNuevoPunto();
+        crearNuevoVersiculo();
+        saveToLocalStorage();
+      };
+      
+      const savePrédica = () => {
+        const title = document.getElementById('prédica-título').value.trim() || 'Sin Título';
+        const date = document.getElementById('fecha-actual').textContent;
+        const key = `prédica-${title}-${date}-${Date.now()}`;
+        saveToLocalStorage(); 
+        const currentData = localStorage.getItem('currentPrédicaData');
         
-        // Botones de acción
-        saveBtn.addEventListener('click', () => {
-            saveCurrentCulto();
-            showToast('Apuntes guardados correctamente');
-        });
-
-        newBtn.addEventListener('click', () => {
-            newCulto();
-        });
+        if (currentData) {
+            const dataToSave = JSON.parse(currentData);
+            dataToSave.title = title;
+            dataToSave.date = date;
+            localStorage.setItem(key, JSON.stringify(dataToSave));
+            updatePrédicasMenu();
+        }
+      };
+      
+      const fillForm = (data) => {
+        document.getElementById('prédica-título').value = data.title || '';
+        document.getElementById('predicador-nombre').value = data.predicador || '';
+        document.getElementById('pasaje-principal').value = data.pasajePrincipal || '';
+        document.getElementById('cita-pasaje').value = data.citaPasaje || '';
+        document.getElementById('situación-texto').value = data.situacion || '';
+        document.getElementById('historias-texto').value = data.historias || '';
+        document.getElementById('cosecha-texto').value = data.cosecha || '';
+        document.getElementById('pregunta1-texto').value = data.pregunta1 || '';
+        document.getElementById('pregunta2-texto').value = data.pregunta2 || '';
+        document.getElementById('pregunta3-texto').value = data.pregunta3 || '';
         
-        shareBtn.addEventListener('click', async () => {
-            const title = titleInput.value.trim() || 'Apuntes de Culto';
-            const verses = Array.from(versesContainer.querySelectorAll('.verse-text')).map(span => `- ${span.textContent}`);
-            const teachings = Array.from(teachingsContainer.querySelectorAll('.teaching-input')).map(input => `- ${input.value}`);
-            const conclusion = conclusionInput.value.trim();
-
-            let shareText = `${title}\n\n`;
-            if (verses.length > 0) shareText += `Versículos:\n${verses.join('\n')}\n\n`;
-            if (teachings.length > 0) shareText += `Enseñanzas:\n${teachings.join('\n')}\n\n`;
-            if (conclusion) shareText += `Conclusión:\n${conclusion}`;
-            
-            await navigator.clipboard.writeText(shareText);
-            showToast('¡Apuntes copiados al portapapeles!');
-        });
-
-        whatsappShareBtn.addEventListener('click', async () => {
-            const title = titleInput.value.trim() || 'Apuntes de Culto';
-            const verses = Array.from(versesContainer.querySelectorAll('.verse-text')).map(span => `- ${span.textContent}`);
-            const teachings = Array.from(teachingsContainer.querySelectorAll('.teaching-input')).map(input => {
-                const formattedText = input.value.replace(/"(.*?)"/g, '_$1_');
-                return `- ${formattedText}`;
-            });
-            const conclusion = conclusionInput.value.trim();
-
-            let shareText = `*${title}*\n\n`;
-            if (verses.length > 0) shareText += `*Versículos:*\n${verses.join('\n')}\n\n`;
-            if (teachings.length > 0) shareText += `*Enseñanzas:*\n${teachings.join('\n')}\n\n`;
-            if (conclusion) shareText += `*Conclusión:*\n${conclusion}`;
-
-            const url = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
-            window.open(url, '_blank');
-        });
-
-        // Modal
-        closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
-        modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
-        
-        // Carga inicial de datos
-        function initialLoad() {
-            const savedData = localStorage.getItem('cultoNotes');
-            if (savedData) {
-                cultos = JSON.parse(savedData);
-                if (cultos.length > 0) {
-                    currentCultoIndex = 0;
-                    loadData(cultos[currentCultoIndex]);
-                    renderHistoryList();
-                } else {
-                    newCulto();
-                }
-            } else {
-                newCulto();
-            }
+        listaPuntos.innerHTML = '';
+        if (data.puntos && data.puntos.length > 0) {
+            data.puntos.forEach(value => crearNuevoPunto(value));
+        } else {
+            crearNuevoPunto();
         }
 
-        initialLoad();
+        listaVersículos.innerHTML = '';
+        if (data.versiculos && data.versiculos.length > 0) {
+            data.versiculos.forEach(v => crearNuevoVersiculo(v.ref, v.text));
+        } else {
+            crearNuevoVersiculo();
+        }
+      };
+
+      const updatePrédicasMenu = () => {
+        listaPrédicasGuardadas.innerHTML = '';
+        const prédicas = Object.keys(localStorage).filter(key => key.startsWith('prédica-'));
+        if (prédicas.length === 0) {
+          listaPrédicasGuardadas.innerHTML = '<li class="text-gray-500 text-center text-sm">No hay prédicas guardadas.</li>';
+          btnLimpiarTodo.style.display = 'none';
+        } else {
+          btnLimpiarTodo.style.display = 'block';
+          prédicas.forEach(key => {
+            const data = JSON.parse(localStorage.getItem(key));
+            const li = document.createElement('li');
+            li.className = 'flex justify-between items-center bg-gray-100 p-2 rounded-md hover:bg-gray-200 transition-colors cursor-pointer';
+            li.dataset.key = key;
+            li.innerHTML = `
+              <div class="flex-grow" data-key="${key}">
+                <p class="font-semibold text-gray-800">${data.title}</p>
+                <p class="text-sm text-gray-500">${data.date}</p>
+              </div>
+              <button class="eliminar-prédica text-red-400 hover:text-red-600 ml-4">
+                <span class="iconify" data-icon="material-symbols:delete-forever-rounded"></span>
+              </button>
+            `;
+            listaPrédicasGuardadas.appendChild(li);
+          });
+        }
+      };
+
+      listaPrédicasGuardadas.addEventListener('click', (e) => {
+        const target = e.target.closest('li div[data-key]');
+        const deleteButton = e.target.closest('.eliminar-prédica');
+        
+        if (target) {
+          const key = target.dataset.key;
+          const data = JSON.parse(localStorage.getItem(key));
+          if (data) {
+            fillForm(data);
+            localStorage.setItem('currentPrédicaData', JSON.stringify(data));
+            closeMenu();
+          }
+        } else if (deleteButton) {
+          const key = deleteButton.closest('li').dataset.key;
+          localStorage.removeItem(key);
+          updatePrédicasMenu();
+        }
+      });
+      
+      btnLimpiarTodo.addEventListener('click', () => {
+        if (confirm('¿Estás seguro de que quieres eliminar TODAS las prédicas guardadas? Esta acción no se puede deshacer.')) {
+          Object.keys(localStorage).filter(key => key.startsWith('prédica-')).forEach(key => {
+            localStorage.removeItem(key);
+          });
+          updatePrédicasMenu();
+        }
+      });
+
+      const fechaElement = document.getElementById('fecha-actual');
+      const horaElement = document.getElementById('hora-actual');
+      const opcionesFecha = { year: 'numeric', month: 'long', day: 'numeric' };
+      const opcionesHora = { hour: '2-digit', minute: '2-digit' };
+      
+      const ahora = new Date();
+      fechaElement.textContent = ahora.toLocaleDateString('es-ES', opcionesFecha);
+      horaElement.textContent = ahora.toLocaleTimeString('es-ES', opcionesHora);
+
+      const listaPuntos = document.getElementById('puntos-lista');
+      const botónAñadirPunto = document.getElementById('añadir-punto');
+      let contadorPuntos = 0;
+      const coloresMarcador = ['bg-red-500/30', 'bg-blue-500/30', 'bg-green-500/30', 'bg-yellow-500/30', 'bg-purple-500/30', 'bg-pink-500/30'];
+
+      const crearNuevoPunto = (value = '') => {
+        contadorPuntos++;
+        const nuevoPunto = document.createElement('li');
+        nuevoPunto.className = 'flex items-center group relative';
+        nuevoPunto.innerHTML = `
+          <div class="relative w-full">
+            <input type="text" placeholder="Escribe aquí el dato de la prédica..." class="w-full text-gray-800 p-2 pr-12 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" value="${value}">
+            <span class="point-number-text absolute right-12 top-1/2 -translate-y-1/2 text-gray-600 font-bold text-sm">[${contadorPuntos}]</span>
+            <button class="eliminar-punto absolute right-3 top-1/2 -translate-y-1/2 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span class="iconify text-xl" data-icon="material-symbols:delete-forever-rounded"></span>
+            </button>
+          </div>
+        `;
+        listaPuntos.appendChild(nuevoPunto);
+        reordenarPuntos();
+      };
+
+      const reordenarPuntos = () => {
+        const puntos = listaPuntos.querySelectorAll('li');
+        puntos.forEach((punto, index) => {
+          punto.querySelector('.point-number-text').textContent = `[${index + 1}]`;
+          const input = punto.querySelector('input[type="text"]');
+          input.className = `w-full text-gray-800 p-2 pr-12 rounded-md ${coloresMarcador[index % coloresMarcador.length]} focus:outline-none focus:ring-2 focus:ring-indigo-500`;
+        });
+        contadorPuntos = puntos.length;
+        saveToLocalStorage();
+      };
+
+      listaPuntos.addEventListener('click', (e) => {
+        if (e.target.closest('.eliminar-punto')) {
+          e.target.closest('li').remove();
+          reordenarPuntos();
+        }
+      });
+      
+      botónAñadirPunto.addEventListener('click', () => {
+        crearNuevoPunto();
+        saveToLocalStorage();
+      });
+
+      const listaVersículos = document.getElementById('versículos-citados-lista');
+      const botónAñadirVersiculo = document.getElementById('añadir-versiculo');
+
+      const crearNuevoVersiculo = (refValue = '', textValue = '') => {
+          const nuevoVersiculo = document.createElement('li');
+          nuevoVersiculo.className = 'flex flex-col group relative';
+          nuevoVersiculo.innerHTML = `
+            <div class="relative w-full flex items-center">
+              <input type="text" placeholder="Ej: Romanos 8:28" class="w-full text-gray-800 p-2 pr-10 rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500" value="${refValue}">
+              <button class="eliminar-punto absolute right-2 top-1/2 -translate-y-1/2 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span class="iconify text-xl" data-icon="material-symbols:delete-forever-rounded"></span>
+              </button>
+            </div>
+            <div class="verse-text-display">${textValue}</div>
+          `;
+          listaVersículos.appendChild(nuevoVersiculo);
+      };
+
+      listaVersículos.addEventListener('blur', async (e) => {
+          if (e.target && e.target.tagName === 'INPUT') {
+              const input = e.target;
+              const textDisplay = input.closest('li').querySelector('.verse-text-display');
+              if (input.value.trim() === '') {
+                  textDisplay.innerHTML = '';
+                  saveToLocalStorage();
+                  return;
+              }
+              textDisplay.innerHTML = 'Buscando...';
+              const data = await fetchVerseData(input.value);
+              if (data && textDisplay) {
+                  textDisplay.innerHTML = data.map(v => `<span class="font-bold text-slate-800">${v.number}.</span> ${v.verse}`).join('<br>');
+              } else if (textDisplay) {
+                  textDisplay.innerHTML = '<span class="text-red-500">No se encontró la referencia.</span>';
+              }
+              saveToLocalStorage();
+          }
+      }, true); 
+
+
+      listaVersículos.addEventListener('click', (e) => {
+        if (e.target.closest('.eliminar-punto')) {
+          e.target.closest('li').remove();
+          saveToLocalStorage();
+        }
+      });
+      botónAñadirVersiculo.addEventListener('click', () => {
+        crearNuevoVersiculo();
+        saveToLocalStorage();
+      });
+
+      const btnEvangelizar = document.getElementById('btn-evangelizar');
+      const btnNuevaPrédica = document.getElementById('nueva-prédica-btn');
+      const shareOptionsMenu = document.getElementById('share-options-menu');
+      const closeShareMenuBtn = document.getElementById('close-share-menu-btn');
+      const shareEvangelizacionBtn = document.getElementById('share-evangelizacion');
+      const shareGuiaBtn = document.getElementById('share-guia');
+      const shareEstudioBtn = document.getElementById('share-estudio');
+
+      const openShareMenu = () => shareOptionsMenu.classList.add('open');
+      const closeShareMenu = () => shareOptionsMenu.classList.remove('open');
+
+      btnEvangelizar.addEventListener('click', openShareMenu);
+      closeShareMenuBtn.addEventListener('click', closeShareMenu);
+
+      shareEvangelizacionBtn.addEventListener('click', () => {
+        const text = getFormattedContentEvangelizacion();
+        window.open(`https://wa.me/?text=${text}`, '_blank');
+        closeShareMenu();
+      });
+
+      shareGuiaBtn.addEventListener('click', () => {
+        const text = getFormattedContentGuia();
+        window.open(`https://wa.me/?text=${text}`, '_blank');
+        closeShareMenu();
+      });
+
+      shareEstudioBtn.addEventListener('click', () => {
+        const text = getFormattedContentEstudio();
+        window.open(`https://wa.me/?text=${text}`, '_blank');
+        closeShareMenu();
+      });
+      
+      btnNuevaPrédica.addEventListener('click', () => {
+        savePrédica();
+        clearForm();
+        updatePrédicasMenu();
+        closeMenu();
+      });
+
+      prédicaContent.addEventListener('input', saveToLocalStorage);
+      
+      loadFromLocalStorage();
+      updatePrédicasMenu();
     });
-    </script>
+  </script>
 </body>
 </html>
