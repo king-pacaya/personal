@@ -19,8 +19,9 @@
       scroll-behavior: smooth;
     }
     textarea {
-      min-height: 100px;
       transition: all 0.3s ease;
+      resize: none; /* Evita que el usuario lo redimensione manualmente */
+      overflow: hidden; /* Oculta la barra de desplazamiento */
     }
     textarea:focus {
       border-color: #6366f1;
@@ -89,9 +90,6 @@
       background-color: #f8fafc;
       padding: 0.75rem;
       border-radius: 0.5rem;
-    }
-    .title-font {
-      font-family: 'Playfair Display', serif;
     }
     .card {
       transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -198,7 +196,7 @@
       </button>
       <div class="max-w-2xl mx-auto">
         <h1 class="text-3xl md:text-4xl font-bold text-indigo-800 mb-3">
-          <input type="text" id="prédica-título" placeholder="Título de la Prédica" class="w-full text-center bg-transparent p-2 rounded-lg font-bold text-2xl md:text-3xl text-indigo-800 focus:bg-gray-50 focus:ring-2 focus:ring-indigo-200 input-field">
+          <textarea id="prédica-título" placeholder="Título de la Prédica" class="w-full text-center bg-transparent p-2 rounded-lg font-bold text-2xl md:text-3xl text-indigo-800 focus:bg-gray-50 focus:ring-2 focus:ring-indigo-200 input-field" rows="1"></textarea>
         </h1>
         <p class="text-lg text-gray-600">Por: 
           <input type="text" id="predicador-nombre" placeholder="Nombre del Predicador" class="bg-transparent p-2 rounded-lg text-gray-600 text-base md:text-lg text-center font-medium focus:bg-gray-50 focus:ring-2 focus:ring-indigo-200 input-field">
@@ -228,7 +226,7 @@
             <p class="text-indigo-600 text-sm uppercase tracking-wide font-semibold">Versículo Principal</p>
           </div>
           <input type="text" id="pasaje-principal" placeholder="Juan 3:16" class="w-full text-center bg-gray-50 p-3 rounded-lg font-bold text-xl md:text-2xl text-gray-900 mb-3 input-field">
-          <textarea id="cita-pasaje" placeholder="El texto del versículo aparecerá aquí..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field"></textarea>
+          <textarea id="cita-pasaje" placeholder="El texto del versículo aparecerá aquí..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field" rows="1"></textarea>
         </div>
       </div>
       
@@ -273,7 +271,7 @@
             <h3 class="text-lg font-bold text-indigo-700">Contexto Histórico</h3>
           </div>
           <p class="text-gray-600 text-sm mb-4">¿A quién se le escribió y por qué? ¿Qué estaba pasando en ese tiempo?</p>
-          <textarea id="situación-texto" placeholder="Ej: Este evangelio fue escrito para los judíos y griegos..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field"></textarea>
+          <textarea id="situación-texto" placeholder="Ej: Este evangelio fue escrito para los judíos y griegos..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field" rows="1"></textarea>
         </div>
         <div class="bg-white rounded-2xl shadow-md p-6 card">
           <div class="flex items-center mb-3">
@@ -283,7 +281,7 @@
             <h3 class="text-lg font-bold text-indigo-700">Conexiones Bíblicas</h3>
           </div>
           <p class="text-gray-600 text-sm mb-4">Vincula este pasaje con otros versículos o historias de la Biblia.</p>
-          <textarea id="historias-texto" placeholder="Ej: Conectar Juan 3:16 con Romanos 5:8..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field"></textarea>
+          <textarea id="historias-texto" placeholder="Ej: Conectar Juan 3:16 con Romanos 5:8..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field" rows="1"></textarea>
         </div>
         <div class="bg-white rounded-2xl shadow-md p-6 card">
           <div class="flex items-center mb-3">
@@ -293,7 +291,7 @@
             <h3 class="text-lg font-bold text-indigo-700">Aplicación Práctica</h3>
           </div>
           <p class="text-gray-600 text-sm mb-4">¿Cómo esta verdad bíblica se manifiesta en nuestra vida?</p>
-          <textarea id="cosecha-texto" placeholder="Ej: La cosecha es la seguridad de la salvación eterna..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field"></textarea>
+          <textarea id="cosecha-texto" placeholder="Ej: La cosecha es la seguridad de la salvación eterna..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field" rows="1"></textarea>
         </div>
       </div>
     </section>
@@ -311,7 +309,7 @@
             </div>
             <p class="font-semibold text-gray-900">¿Qué es lo más importante que Dios me está diciendo?</p>
           </div>
-          <textarea id="pregunta1-texto" placeholder="Ej: El amor de Dios es incondicional..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field"></textarea>
+          <textarea id="pregunta1-texto" placeholder="Ej: El amor de Dios es incondicional..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field" rows="1"></textarea>
         </div>
         <div>
           <div class="flex items-center mb-2">
@@ -320,7 +318,7 @@
             </div>
             <p class="font-semibold text-gray-900">¿Cómo aplicar esta verdad en mi vida esta semana?</p>
           </div>
-          <textarea id="pregunta2-texto" placeholder="Ej: Orar por mis seres queridos..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field"></textarea>
+          <textarea id="pregunta2-texto" placeholder="Ej: Orar por mis seres queridos..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field" rows="1"></textarea>
         </div>
         <div>
           <div class="flex items-center mb-2">
@@ -329,7 +327,7 @@
             </div>
             <p class="font-semibold text-gray-900">¿Con quién puedo compartir esta enseñanza?</p>
           </div>
-          <textarea id="pregunta3-texto" placeholder="Ej: Con mi amigo de la universidad..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field"></textarea>
+          <textarea id="pregunta3-texto" placeholder="Ej: Con mi amigo de la universidad..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field" rows="1"></textarea>
         </div>
       </div>
     </section>
@@ -391,8 +389,6 @@
   </div>
 
   <script>
-    // [El resto del código JavaScript permanece exactamente igual]
-    // Solo se han realizado cambios en el HTML y CSS para mejorar el diseño
     document.addEventListener('DOMContentLoaded', function() {
       
       const prédicaContent = document.getElementById('prédica-content');
@@ -454,9 +450,6 @@
         return null;
       }
       
-      // ==================================================================
-      // ========= FUNCIÓN CORREGIDA ======================================
-      // ==================================================================
       async function fetchVerseData(reference) {
           const trimmedRef = reference.trim();
           if (!trimmedRef) return null;
@@ -483,14 +476,11 @@
 
               const data = await response.json();
 
-              // ¡AQUÍ ESTÁ LA CORRECCIÓN DEFINITIVA!
-              // Si la 'data' no es un array (es un solo objeto), la envolvemos en un array.
-              // Si es un array, la usamos tal cual.
               const dataAsArray = Array.isArray(data) ? data : [data];
               
               if (dataAsArray.length === 0) { throw new Error('Versículo no encontrado.'); }
               
-              return dataAsArray; // Ahora estamos 100% seguros de que devolvemos un array.
+              return dataAsArray;
 
           } catch (error) {
               console.error(`Error al buscar "${trimmedRef}":`, error);
@@ -498,17 +488,45 @@
           }
       }
 
+      // Función para auto-ajustar la altura del textarea
+      const autoResizeTextarea = (textarea) => {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+      };
+
       const pasajePrincipalInput = document.getElementById('pasaje-principal');
       const citaPasajeTextarea = document.getElementById('cita-pasaje');
+      const tituloPrédicaTextarea = document.getElementById('prédica-título');
+
+      // Escuchadores para auto-ajustar la altura de los textareas al escribir
+      const textareas = document.querySelectorAll('textarea');
+      textareas.forEach(textarea => {
+        textarea.addEventListener('input', (e) => {
+          autoResizeTextarea(e.target);
+          saveToLocalStorage();
+        });
+        // Ajusta la altura inicial al cargar el contenido
+        autoResizeTextarea(textarea);
+      });
+
+      // Asegurarse de que el textarea de título se ajuste al cargar
+      tituloPrédicaTextarea.addEventListener('input', (e) => {
+        autoResizeTextarea(e.target);
+        saveToLocalStorage();
+      });
+      autoResizeTextarea(tituloPrédicaTextarea);
 
       pasajePrincipalInput.addEventListener('blur', async () => {
           citaPasajeTextarea.value = 'Buscando...';
+          autoResizeTextarea(citaPasajeTextarea);
           const data = await fetchVerseData(pasajePrincipalInput.value);
           if (data) {
               citaPasajeTextarea.value = data.map(v => v.verse).join(' ');
+              autoResizeTextarea(citaPasajeTextarea);
               saveToLocalStorage();
           } else {
               citaPasajeTextarea.value = 'No se pudo encontrar el versículo. Revisa la referencia.';
+              autoResizeTextarea(citaPasajeTextarea);
           }
       });
 
@@ -551,7 +569,7 @@
         const fecha = document.getElementById('fecha-actual').textContent;
         const versiculoPrincipal = document.getElementById('pasaje-principal').value || 'Versículo no especificado';
         const citaPrincipal = document.getElementById('cita-pasaje').value || 'Cita no especificada';
-        const datos = Array.from(document.querySelectorAll('#puntos-lista input')).map(input => input.value).filter(val => val.trim() !== '');
+        const datos = Array.from(document.querySelectorAll('#puntos-lista textarea')).map(input => input.value).filter(val => val.trim() !== '');
         const situacion = document.getElementById('situación-texto').value;
         const historias = document.getElementById('historias-texto').value;
         const cosecha = document.getElementById('cosecha-texto').value;
@@ -628,7 +646,8 @@
             predicador: document.getElementById('predicador-nombre').value,
             pasajePrincipal: document.getElementById('pasaje-principal').value,
             citaPasaje: document.getElementById('cita-pasaje').value,
-            puntos: Array.from(document.querySelectorAll('#puntos-lista input')).map(input => input.value),
+            // Modificado para capturar los valores de los textareas
+            puntos: Array.from(document.querySelectorAll('#puntos-lista textarea')).map(input => input.value),
             versiculos: versiculosData,
             situacion: document.getElementById('situación-texto').value,
             historias: document.getElementById('historias-texto').value,
@@ -653,8 +672,6 @@
         prédicaContent.querySelectorAll('input[type="text"], textarea').forEach(input => input.value = '');
         document.getElementById('puntos-lista').innerHTML = '';
         document.getElementById('versículos-citados-lista').innerHTML = '';
-        crearNuevoPunto();
-        crearNuevoVersiculo();
         saveToLocalStorage();
       };
       
@@ -686,18 +703,17 @@
         document.getElementById('pregunta2-texto').value = data.pregunta2 || '';
         document.getElementById('pregunta3-texto').value = data.pregunta3 || '';
         
+        // Ajustar altura de todos los textareas después de rellenarlos
+        textareas.forEach(textarea => autoResizeTextarea(textarea));
+
         listaPuntos.innerHTML = '';
         if (data.puntos && data.puntos.length > 0) {
             data.puntos.forEach(value => crearNuevoPunto(value));
-        } else {
-            crearNuevoPunto();
         }
 
         listaVersículos.innerHTML = '';
         if (data.versiculos && data.versiculos.length > 0) {
             data.versiculos.forEach(v => crearNuevoVersiculo(v.ref, v.text));
-        } else {
-            crearNuevoVersiculo();
         }
       };
 
@@ -778,7 +794,7 @@
         nuevoPunto.className = 'flex items-center group relative';
         nuevoPunto.innerHTML = `
           <div class="relative w-full">
-            <input type="text" placeholder="Escribe aquí el dato de la prédica..." class="w-full text-gray-800 p-3 pr-12 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 input-field" value="${value}">
+            <textarea placeholder="Escribe aquí el dato de la prédica..." class="w-full text-gray-800 p-3 pr-12 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 input-field" rows="1">${value}</textarea>
             <span class="point-number-text absolute right-12 top-1/2 -translate-y-1/2 text-gray-600 font-bold text-sm">[${contadorPuntos}]</span>
             <button class="eliminar-punto absolute right-3 top-1/2 -translate-y-1/2 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
               <span class="iconify text-xl" data-icon="material-symbols:delete-forever-rounded"></span>
@@ -787,13 +803,20 @@
         `;
         listaPuntos.appendChild(nuevoPunto);
         reordenarPuntos();
+        
+        const newTextarea = nuevoPunto.querySelector('textarea');
+        newTextarea.addEventListener('input', (e) => {
+          autoResizeTextarea(e.target);
+          saveToLocalStorage();
+        });
+        autoResizeTextarea(newTextarea);
       };
 
       const reordenarPuntos = () => {
         const puntos = listaPuntos.querySelectorAll('li');
         puntos.forEach((punto, index) => {
           punto.querySelector('.point-number-text').textContent = `[${index + 1}]`;
-          const input = punto.querySelector('input[type="text"]');
+          const input = punto.querySelector('textarea');
           input.className = `w-full text-gray-800 p-3 pr-12 rounded-lg ${coloresMarcador[index % coloresMarcador.length]} focus:outline-none focus:ring-2 focus:ring-indigo-500 input-field`;
         });
         contadorPuntos = puntos.length;
@@ -828,6 +851,11 @@
             <div class="verse-text-display">${textValue}</div>
           `;
           listaVersículos.appendChild(nuevoVersiculo);
+          // Si hay texto, ajusta la altura
+          if (textValue) {
+            const textDisplay = nuevoVersiculo.querySelector('.verse-text-display');
+            autoResizeTextarea(textDisplay);
+          }
       };
 
       listaVersículos.addEventListener('blur', async (e) => {
@@ -849,7 +877,6 @@
               saveToLocalStorage();
           }
       }, true); 
-
 
       listaVersículos.addEventListener('click', (e) => {
         if (e.target.closest('.eliminar-punto')) {
@@ -950,8 +977,6 @@
         }
       });
 
-      // Se elimina la fuente Playfair Display del título
-      document.querySelector('.title-font')?.classList.remove('title-font');
     });
   </script>
 </body>
