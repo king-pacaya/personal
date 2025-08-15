@@ -10,6 +10,19 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
   <style>
+    :root {
+      --dark-blue: #203855;
+      --blue: #1D54C0;
+      --light-blue: #A0C3EA;
+      --extra-light-blue: #EDF5FF;
+      --accent-color: #6366f1;
+      --accent-color-hover: #4f46e5;
+      --highlight-yellow: #ffeb3b;
+      --highlight-green: #a5d6a7;
+      --highlight-blue: #90caf9;
+      --highlight-purple: #ce93d8;
+      --highlight-pink: #f48fb1;
+    }
     * {
       font-family: 'Montserrat', sans-serif;
       box-sizing: border-box;
@@ -18,36 +31,64 @@
     html {
       scroll-behavior: smooth;
     }
-    textarea {
-      transition: all 0.3s ease;
-      resize: none; /* Evita que el usuario lo redimensione manualmente */
-      overflow: hidden; /* Oculta la barra de desplazamiento */
+    body {
+      background-color: #f5f5f5;
+      background-image: linear-gradient(#eee 0.1em, transparent 0.1em);
+      background-size: 100% 1.6em;
+      line-height: 1.6;
+      color: var(--dark-blue);
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
     }
-    textarea:focus {
-      border-color: #6366f1;
-      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    .main-content-wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      position: relative;
     }
-    .point-number {
-      width: 28px;
-      height: 28px;
-      line-height: 28px;
+    .main-content-wrapper::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 40px;
+      width: 2px;
+      height: 100%;
+      background-color: var(--extra-light-blue);
+      z-index: -1;
+    }
+    textarea, input[type="text"] {
+      background-color: transparent;
+      border: none;
+      border-bottom: 1px dashed var(--light-blue);
+      border-radius: 0;
+      padding: 4px 0;
+      line-height: 1.6;
+      color: var(--dark-blue);
+      resize: none;
+      min-height: 1.6rem;
+      overflow: hidden;
+    }
+    textarea:focus, input[type="text"]:focus {
+      outline: none;
+      border-bottom: 1px solid var(--blue);
     }
     .slide-menu {
       position: fixed;
       top: 0;
-      right: -100%;
+      left: -100%;
       width: 80%;
       max-width: 350px;
       height: 100%;
-      background-color: white;
-      box-shadow: -2px 0 15px rgba(0,0,0,0.1);
-      transition: right 0.3s ease-in-out;
+      background-color: #fff;
+      box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+      transition: left 0.3s ease-in-out;
       z-index: 50;
       padding: 1.5rem;
       overflow-y: auto;
     }
     .slide-menu.open {
-      right: 0;
+      left: 0;
     }
     .menu-overlay {
       position: fixed;
@@ -68,7 +109,7 @@
       bottom: 6rem;
       left: 50%;
       transform: translateX(-50%);
-      background-color: white;
+      background-color: #fff;
       border-radius: 16px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
       z-index: 60;
@@ -76,10 +117,10 @@
       width: 90%;
       max-width: 320px;
       display: none;
+      animation: slideUp 0.3s ease-out;
     }
     .share-options-menu.open {
       display: block;
-      animation: slideUp 0.3s ease-out;
     }
     .verse-text-display {
       font-size: 0.9rem;
@@ -98,41 +139,18 @@
       transform: translateY(-2px);
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     }
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translate(-50%, 20px);
-      }
-      to {
-        opacity: 1;
-        transform: translate(-50%, 0);
-      }
-    }
-    .input-field {
-      transition: all 0.3s ease;
-      border: 1px solid #e2e8f0;
-    }
-    .input-field:focus {
-      border-color: #6366f1;
-      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-    }
     .btn-primary {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      transition: all 0.3s ease;
+      background-color: var(--accent-color);
+      transition: background-color 0.3s ease;
     }
     .btn-primary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      background-color: var(--accent-color-hover);
     }
     .btn-secondary {
-      background: linear-gradient(135deg, #f59e0b, #f97316);
+      background-color: #f97316;
     }
     .btn-secondary:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-    }
-    .header-gradient {
-      background: linear-gradient(135deg, #f3f4f6, #e0e7ff);
+      background-color: #ea580c;
     }
     .section-title {
       position: relative;
@@ -146,7 +164,7 @@
       transform: translateY(-50%);
       height: 70%;
       width: 5px;
-      background: linear-gradient(to bottom, #6366f1, #8b5cf6);
+      background-color: var(--accent-color);
       border-radius: 5px;
     }
     .saved-sermon-item {
@@ -154,19 +172,76 @@
       border-left: 4px solid transparent;
     }
     .saved-sermon-item:hover {
-      border-left-color: #6366f1;
+      border-left-color: var(--accent-color);
       background-color: #f8fafc;
     }
     .fullscreen-btn {
-        position: absolute;
-        top: 6px;
-        right: 6px;
-        padding: 10px;
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      padding: 10px;
+    }
+
+    /* NUEVOS ESTILOS SOLICITADOS */
+    .editable-point {
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #000;
+      position: relative;
+      padding-bottom: 2px;
+      background-image: linear-gradient(90deg, var(--highlight-yellow) 0%, var(--highlight-yellow) 100%);
+      background-repeat: no-repeat;
+      background-size: 100% 0.25em;
+      background-position: 0 88%;
+      transition: background-size 0.2s;
+    }
+    .editable-point:focus {
+      background-size: 100% 0.4em;
+    }
+    .editable-point:nth-child(5n+1) {
+      background-image: linear-gradient(90deg, var(--highlight-yellow) 0%, var(--highlight-yellow) 100%);
+    }
+    .editable-point:nth-child(5n+2) {
+      background-image: linear-gradient(90deg, var(--highlight-green) 0%, var(--highlight-green) 100%);
+    }
+    .editable-point:nth-child(5n+3) {
+      background-image: linear-gradient(90deg, var(--highlight-blue) 0%, var(--highlight-blue) 100%);
+    }
+    .editable-point:nth-child(5n+4) {
+      background-image: linear-gradient(90deg, var(--highlight-purple) 0%, var(--highlight-purple) 100%);
+    }
+    .editable-point:nth-child(5n+5) {
+      background-image: linear-gradient(90deg, var(--highlight-pink) 0%, var(--highlight-pink) 100%);
+    }
+    #prédica-título {
+      text-transform: uppercase;
+    }
+    textarea::-webkit-scrollbar,
+    input::-webkit-scrollbar,
+    div::-webkit-scrollbar {
+      display: none;
+    }
+    textarea, input, div {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
     }
   </style>
   <title>Apuntes | IBBV</title>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body>
 
   <div id="slide-menu" class="slide-menu">
     <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
@@ -185,163 +260,160 @@
   </div>
   <div id="menu-overlay" class="menu-overlay"></div>
 
-  <div class="container mx-auto px-4 md:px-6 py-6" id="prédica-content">
-    
-    <header class="bg-white rounded-2xl shadow-md p-6 mb-8 text-center relative header-gradient card">
-      <button id="open-menu-btn" class="absolute top-6 right-6 text-indigo-600 hover:text-indigo-800 transition-colors">
-        <span class="iconify text-3xl" data-icon="mdi:bookmark-multiple-outline"></span>
-      </button>
-      <button id="fullscreen-btn" class="absolute top-6 left-6 text-indigo-600 hover:text-indigo-800 transition-colors">
-          <span class="iconify text-3xl" data-icon="ic:baseline-fullscreen"></span>
-      </button>
+  <div class="main-content-wrapper">
+    <header class="text-center relative py-6">
       <div class="max-w-2xl mx-auto">
-        <h1 class="text-3xl md:text-4xl font-bold text-indigo-800 mb-3">
-          <textarea id="prédica-título" placeholder="Título de la Prédica" class="w-full text-center bg-transparent p-2 rounded-lg font-bold text-2xl md:text-3xl text-indigo-800 focus:bg-gray-50 focus:ring-2 focus:ring-indigo-200 input-field" rows="1"></textarea>
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+          <textarea id="prédica-título" placeholder="Título de la Prédica" class="w-full text-center p-2 font-bold text-2xl md:text-3xl text-gray-900" rows="1"></textarea>
         </h1>
         <p class="text-lg text-gray-600">Por: 
-          <input type="text" id="predicador-nombre" placeholder="Nombre del Predicador" class="bg-transparent p-2 rounded-lg text-gray-600 text-base md:text-lg text-center font-medium focus:bg-gray-50 focus:ring-2 focus:ring-indigo-200 input-field">
+          <input type="text" id="predicador-nombre" placeholder="Nombre del Predicador" class="bg-transparent p-2 text-gray-600 text-base md:text-lg text-center font-medium">
         </p>
         <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-gray-500 mt-4 text-sm">
-          <div class="flex items-center bg-white px-3 py-1 rounded-full shadow-sm">
-            <span class="iconify mr-2 text-indigo-500" data-icon="clarity:date-line"></span>
+          <div class="flex items-center px-3 py-1">
+            <span class="iconify mr-2 text-gray-500" data-icon="clarity:date-solid"></span>
             <span id="fecha-actual" class="font-medium"></span>
           </div>
-          <div class="flex items-center bg-white px-3 py-1 rounded-full shadow-sm">
-            <span class="iconify mr-2 text-indigo-500" data-icon="ic:baseline-watch-line"></span>
+          <div class="flex items-center px-3 py-1">
+            <span class="iconify mr-2 text-gray-500" data-icon="weui:time-filled"></span>
             <span id="hora-actual" class="font-medium"></span>
           </div>
-          <div class="flex items-center bg-white px-3 py-1 rounded-full shadow-sm">
-            <span class="iconify mr-2 text-indigo-500" data-icon="ic:baseline-location-on"></span>
+          <div class="flex items-center px-3 py-1">
+            <span class="iconify mr-2 text-gray-500" data-icon="ic:baseline-location-on"></span>
             <span class="font-medium">IBB La Verdad</span>
           </div>
         </div>
       </div>
+      <button id="open-menu-btn" class="absolute top-6 left-6 text-gray-600 hover:text-gray-800 transition-colors">
+        <span class="iconify text-3xl" data-icon="mdi:bookmark-multiple-outline"></span>
+      </button>
+      <button id="fullscreen-btn" class="absolute top-6 right-6 text-gray-600 hover:text-gray-800 transition-colors">
+        <span class="iconify text-3xl" data-icon="ic:baseline-fullscreen"></span>
+      </button>
     </header>
 
-    <section class="grid md:grid-cols-2 gap-6 mb-8">
-      <div class="bg-white rounded-2xl shadow-md p-6 flex items-center justify-center card">
+    <main class="space-y-8">
+      <section>
         <div class="text-center w-full">
           <div class="flex items-center justify-center mb-3">
-            <span class="iconify text-2xl text-indigo-500 mr-2" data-icon="mdi:bible"></span>
-            <p class="text-indigo-600 text-sm uppercase tracking-wide font-semibold">Versículo Principal</p>
+            <span class="iconify text-2xl text-gray-500 mr-2" data-icon="mdi:bible"></span>
+            <p class="text-gray-600 text-sm uppercase tracking-wide font-semibold">Versículo Principal</p>
           </div>
-          <input type="text" id="pasaje-principal" placeholder="Juan 3:16" class="w-full text-center bg-gray-50 p-3 rounded-lg font-bold text-xl md:text-2xl text-gray-900 mb-3 input-field">
-          <textarea id="cita-pasaje" placeholder="El texto del versículo aparecerá aquí..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field" rows="1"></textarea>
+          <input type="text" id="pasaje-principal" placeholder="Juan 3:16" class="w-full text-center p-3 font-bold text-xl md:text-2xl text-gray-900 mb-3">
+          <textarea id="cita-pasaje" placeholder="El texto del versículo aparecerá aquí..." class="w-full p-3 text-gray-700" rows="1"></textarea>
         </div>
-      </div>
+      </section>
       
-      <div class="bg-white rounded-2xl shadow-md p-6 card">
-        <h2 class="text-xl font-bold text-indigo-700 mb-4 flex items-center section-title">
-          <span class="iconify mr-2 text-2xl text-indigo-500" data-icon="clarity:list-line"></span> 
+      <section>
+        <h2 class="text-xl font-bold text-gray-700 mb-4 flex items-center section-title">
+          <span class="iconify mr-2 text-2xl text-gray-500" data-icon="clarity:list-line"></span> 
           Puntos de la Prédica
         </h2>
         <ul id="puntos-lista" class="space-y-3"></ul>
         <div class="flex gap-4 mt-5">
-          <button id="añadir-punto" class="flex-grow btn-primary text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center">
+          <button id="añadir-punto" class="flex-grow bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center">
             <span class="iconify mr-2" data-icon="mdi:plus"></span>
             Añadir Punto
           </button>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="bg-white rounded-2xl shadow-md p-6 mb-8 card">
-      <h2 class="text-xl font-bold text-indigo-700 mb-4 flex items-center section-title">
-        <span class="iconify mr-2 text-2xl text-indigo-500" data-icon="clarity:link-line"></span> 
-        Versículos Citados
-      </h2>
-      <ul id="versículos-citados-lista" class="space-y-4"></ul>
-      <button id="añadir-versiculo" class="mt-4 w-full btn-primary text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center">
-        <span class="iconify mr-2" data-icon="mdi:plus"></span>
-        Añadir Versículo
-      </button>
-    </section>
+      <section>
+        <h2 class="text-xl font-bold text-gray-700 mb-4 flex items-center section-title">
+          <span class="iconify mr-2 text-2xl text-gray-500" data-icon="clarity:link-line"></span> 
+          Versículos Citados
+        </h2>
+        <ul id="versículos-citados-lista" class="space-y-4"></ul>
+        <button id="añadir-versiculo" class="mt-4 w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center">
+          <span class="iconify mr-2" data-icon="mdi:plus"></span>
+          Añadir Versículo
+        </button>
+      </section>
 
-    <section class="mb-8">
-      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center section-title">
-        <span class="iconify mr-2 text-2xl text-indigo-500" data-icon="clarity:search-line"></span> 
-        Estudio Profundo
-      </h2>
-      <div class="grid md:grid-cols-3 gap-6">
-        <div class="bg-white rounded-2xl shadow-md p-6 card">
-          <div class="flex items-center mb-3">
-            <div class="bg-indigo-100 p-2 rounded-full mr-3">
-              <span class="iconify text-xl text-indigo-600" data-icon="clarity:book-line"></span>
+      <section>
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center section-title">
+          <span class="iconify mr-2 text-2xl text-gray-500" data-icon="clarity:pencil-line"></span> 
+          Reflexión Final
+        </h2>
+        <div class="space-y-6">
+          <div>
+            <div class="flex items-center mb-2">
+              <div class="bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                <span class="iconify text-gray-600" data-icon="mdi:lightbulb-on-outline"></span>
+              </div>
+              <p class="font-semibold text-gray-900">¿Qué es lo más importante que Dios me está diciendo?</p>
             </div>
-            <h3 class="text-lg font-bold text-indigo-700">Contexto Histórico</h3>
+            <textarea id="pregunta1-texto" placeholder="Ej: El amor de Dios es incondicional..." class="w-full p-3 text-gray-700" rows="1"></textarea>
           </div>
-          <p class="text-gray-600 text-sm mb-4">¿A quién se le escribió y por qué? ¿Qué estaba pasando en ese tiempo?</p>
-          <textarea id="situación-texto" placeholder="Ej: Este evangelio fue escrito para los judíos y griegos..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field" rows="1"></textarea>
-        </div>
-        <div class="bg-white rounded-2xl shadow-md p-6 card">
-          <div class="flex items-center mb-3">
-            <div class="bg-indigo-100 p-2 rounded-full mr-3">
-              <span class="iconify text-xl text-indigo-600" data-icon="clarity:link-line"></span>
+          <div>
+            <div class="flex items-center mb-2">
+              <div class="bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                <span class="iconify text-gray-600" data-icon="mdi:hand-okay"></span>
+              </div>
+              <p class="font-semibold text-gray-900">¿Cómo aplicar esta verdad en mi vida esta semana?</p>
             </div>
-            <h3 class="text-lg font-bold text-indigo-700">Conexiones Bíblicas</h3>
+            <textarea id="pregunta2-texto" placeholder="Ej: Orar por mis seres queridos..." class="w-full p-3 text-gray-700" rows="1"></textarea>
           </div>
-          <p class="text-gray-600 text-sm mb-4">Vincula este pasaje con otros versículos o historias de la Biblia.</p>
-          <textarea id="historias-texto" placeholder="Ej: Conectar Juan 3:16 con Romanos 5:8..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field" rows="1"></textarea>
-        </div>
-        <div class="bg-white rounded-2xl shadow-md p-6 card">
-          <div class="flex items-center mb-3">
-            <div class="bg-indigo-100 p-2 rounded-full mr-3">
-              <span class="iconify text-xl text-indigo-600" data-icon="clarity:star-line"></span>
+          <div>
+            <div class="flex items-center mb-2">
+              <div class="bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                <span class="iconify text-gray-600" data-icon="mdi:account-multiple-outline"></span>
+              </div>
+              <p class="font-semibold text-gray-900">¿Con quién puedo compartir esta enseñanza?</p>
             </div>
-            <h3 class="text-lg font-bold text-indigo-700">Aplicación Práctica</h3>
+            <textarea id="pregunta3-texto" placeholder="Ej: Con mi amigo de la universidad..." class="w-full p-3 text-gray-700" rows="1"></textarea>
           </div>
-          <p class="text-gray-600 text-sm mb-4">¿Cómo esta verdad bíblica se manifiesta en nuestra vida?</p>
-          <textarea id="cosecha-texto" placeholder="Ej: La cosecha es la seguridad de la salvación eterna..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field" rows="1"></textarea>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="bg-white rounded-2xl shadow-md p-6 mb-8 card">
-      <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center section-title">
-        <span class="iconify mr-2 text-2xl text-indigo-500" data-icon="clarity:pencil-line"></span> 
-        Reflexión Final
-      </h2>
-      <div class="space-y-6">
-        <div>
-          <div class="flex items-center mb-2">
-            <div class="bg-indigo-100 w-8 h-8 rounded-full flex items-center justify-center mr-3">
-              <span class="iconify text-indigo-600" data-icon="mdi:lightbulb-on-outline"></span>
+      <section>
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center section-title">
+          <span class="iconify mr-2 text-2xl text-gray-500" data-icon="clarity:search-line"></span> 
+          Estudio Profundo
+        </h2>
+        <div class="space-y-6">
+          <div>
+            <div class="flex items-center mb-2">
+              <div class="bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                <span class="iconify text-gray-600" data-icon="clarity:book-line"></span>
+              </div>
+              <h3 class="text-lg font-bold text-gray-700">Contexto Histórico</h3>
             </div>
-            <p class="font-semibold text-gray-900">¿Qué es lo más importante que Dios me está diciendo?</p>
+            <p class="text-gray-600 text-sm mb-2">¿A quién se le escribió y por qué? ¿Qué estaba pasando en ese tiempo?</p>
+            <textarea id="situación-texto" placeholder="Ej: Este evangelio fue escrito para los judíos y griegos..." class="w-full p-3 text-gray-700" rows="1"></textarea>
           </div>
-          <textarea id="pregunta1-texto" placeholder="Ej: El amor de Dios es incondicional..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field" rows="1"></textarea>
-        </div>
-        <div>
-          <div class="flex items-center mb-2">
-            <div class="bg-indigo-100 w-8 h-8 rounded-full flex items-center justify-center mr-3">
-              <span class="iconify text-indigo-600" data-icon="mdi:hand-okay"></span>
+          <div>
+            <div class="flex items-center mb-2">
+              <div class="bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                <span class="iconify text-gray-600" data-icon="clarity:link-line"></span>
+              </div>
+              <h3 class="text-lg font-bold text-gray-700">Conexiones Bíblicas</h3>
             </div>
-            <p class="font-semibold text-gray-900">¿Cómo aplicar esta verdad en mi vida esta semana?</p>
+            <p class="text-gray-600 text-sm mb-2">Vincula este pasaje con otros versículos o historias de la Biblia.</p>
+            <textarea id="historias-texto" placeholder="Ej: Conectar Juan 3:16 con Romanos 5:8..." class="w-full p-3 text-gray-700" rows="1"></textarea>
           </div>
-          <textarea id="pregunta2-texto" placeholder="Ej: Orar por mis seres queridos..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field" rows="1"></textarea>
-        </div>
-        <div>
-          <div class="flex items-center mb-2">
-            <div class="bg-indigo-100 w-8 h-8 rounded-full flex items-center justify-center mr-3">
-              <span class="iconify text-indigo-600" data-icon="mdi:account-multiple-outline"></span>
+          <div>
+            <div class="flex items-center mb-2">
+              <div class="bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                <span class="iconify text-gray-600" data-icon="clarity:star-line"></span>
+              </div>
+              <h3 class="text-lg font-bold text-gray-700">Aplicación Práctica</h3>
             </div>
-            <p class="font-semibold text-gray-900">¿Con quién puedo compartir esta enseñanza?</p>
+            <p class="text-gray-600 text-sm mb-2">¿Cómo esta verdad bíblica se manifiesta en nuestra vida?</p>
+            <textarea id="cosecha-texto" placeholder="Ej: La cosecha es la seguridad de la salvación eterna..." class="w-full p-3 text-gray-700" rows="1"></textarea>
           </div>
-          <textarea id="pregunta3-texto" placeholder="Ej: Con mi amigo de la universidad..." class="w-full bg-gray-50 p-3 rounded-lg text-gray-700 input-field" rows="1"></textarea>
         </div>
-      </div>
-    </section>
+      </section>
+    </main>
 
-    <section class="p-4 flex justify-center space-x-6 mb-16">
-      <button id="nueva-prédica-btn" class="flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 shadow-md">
+    <footer class="p-4 flex justify-center space-x-4 mb-16">
+      <button id="nueva-prédica-btn" class="flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold p-4 rounded-full transition-colors duration-300 shadow-lg">
         <span class="iconify text-2xl" data-icon="mdi:plus"></span>
-        <span>Nueva Prédica</span>
       </button>
-      <button id="btn-evangelizar" class="flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transition-colors duration-300 shadow-md">
+      <button id="btn-evangelizar" class="flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold p-4 rounded-full transition-colors duration-300 shadow-lg">
         <span class="iconify text-2xl" data-icon="mdi:share-variant-outline"></span>
-        <span>Compartir</span>
       </button>
-    </section>
+    </footer>
   </div>
 
   <div id="share-options-menu" class="share-options-menu">
@@ -353,9 +425,9 @@
     </div>
     <ul class="space-y-3">
       <li>
-        <button id="share-evangelizacion" class="flex items-center w-full p-3 bg-gray-50 rounded-lg hover:bg-indigo-50 transition-colors">
-          <div class="bg-indigo-100 p-2 rounded-full mr-3">
-            <span class="iconify text-xl text-indigo-600" data-icon="ic:round-format-quote"></span>
+        <button id="share-evangelizacion" class="flex items-center w-full p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+          <div class="bg-gray-100 p-2 rounded-full mr-3">
+            <span class="iconify text-xl text-gray-600" data-icon="ic:round-format-quote"></span>
           </div>
           <div class="text-left">
             <span class="font-semibold text-gray-800 block">Mensaje Evangelístico</span>
@@ -364,9 +436,9 @@
         </button>
       </li>
       <li>
-        <button id="share-guia" class="flex items-center w-full p-3 bg-gray-50 rounded-lg hover:bg-indigo-50 transition-colors">
-          <div class="bg-indigo-100 p-2 rounded-full mr-3">
-            <span class="iconify text-xl text-indigo-600" data-icon="mdi:book-open-outline"></span>
+        <button id="share-guia" class="flex items-center w-full p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+          <div class="bg-gray-100 p-2 rounded-full mr-3">
+            <span class="iconify text-xl text-gray-600" data-icon="mdi:book-open-outline"></span>
           </div>
           <div class="text-left">
             <span class="font-semibold text-gray-800 block">Guía Completa</span>
@@ -375,9 +447,9 @@
         </button>
       </li>
       <li>
-        <button id="share-estudio" class="flex items-center w-full p-3 bg-gray-50 rounded-lg hover:bg-indigo-50 transition-colors">
-          <div class="bg-indigo-100 p-2 rounded-full mr-3">
-            <span class="iconify text-xl text-indigo-600" data-icon="mdi:text-box-search-outline"></span>
+        <button id="share-estudio" class="flex items-center w-full p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+          <div class="bg-gray-100 p-2 rounded-full mr-3">
+            <span class="iconify text-xl text-gray-600" data-icon="mdi:text-box-search-outline"></span>
           </div>
           <div class="text-left">
             <span class="font-semibold text-gray-800 block">Estudio Bíblico</span>
@@ -390,8 +462,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      
-      const prédicaContent = document.getElementById('prédica-content');
+      const prédicaContent = document.querySelector('.main-content-wrapper');
       const slideMenu = document.getElementById('slide-menu');
       const openMenuBtn = document.getElementById('open-menu-btn');
       const closeMenuBtn = document.getElementById('close-menu-btn');
@@ -399,7 +470,52 @@
       const listaPrédicasGuardadas = document.getElementById('prédicas-guardadas-lista');
       const btnLimpiarTodo = document.getElementById('limpiar-todo-btn');
       const fullscreenBtn = document.getElementById('fullscreen-btn');
-      
+
+      // --- INICIO: LÓGICA PARA MANTENER PANTALLA ENCENDIDA ---
+      let wakeLock = null;
+      let wakeLockTimer = null;
+      const requestWakeLock = async () => {
+        if ('wakeLock' in navigator && document.visibilityState === 'visible') {
+          try {
+            wakeLock = await navigator.wakeLock.request('screen');
+            console.log('Screen Wake Lock está activo.');
+            wakeLock.addEventListener('release', () => {
+              console.log('Screen Wake Lock fue liberado.');
+              wakeLock = null;
+            });
+          } catch (err) {
+            console.error(`${err.name}, ${err.message}`);
+          }
+        }
+      };
+
+      const releaseWakeLock = () => {
+        if (wakeLock) {
+          wakeLock.release();
+          wakeLock = null;
+        }
+        if (wakeLockTimer) {
+          clearTimeout(wakeLockTimer);
+          wakeLockTimer = null;
+        }
+      };
+
+      const resetWakeLockTimer = async () => {
+        if (wakeLockTimer) clearTimeout(wakeLockTimer);
+        if (!wakeLock) await requestWakeLock();
+        wakeLockTimer = setTimeout(() => releaseWakeLock(), 600000);
+      };
+
+      ['click', 'input', 'scroll'].forEach(evt => document.addEventListener(evt, resetWakeLockTimer));
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          resetWakeLockTimer();
+        } else {
+          releaseWakeLock();
+        }
+      });
+      // --- FIN: LÓGICA PARA MANTENER PANTALLA ENCENDIDA ---
+
       const books = [
         { name: "Genesis", abrev: "GN" }, { name: "Exodo", abrev: "EX" }, { name: "Levitico", abrev: "LV" },
         { name: "Numeros", abrev: "NM" }, { name: "Deuteronomio", abrev: "DT" }, { name: "Josue", abrev: "JOS" },
@@ -453,63 +569,51 @@
       async function fetchVerseData(reference) {
           const trimmedRef = reference.trim();
           if (!trimmedRef) return null;
-
           try {
               const parsed = parseInput(trimmedRef);
               if (!parsed) { throw new Error('Formato de referencia inválido.'); }
-
               const bookAbrev = findBookAbrev(parsed.book);
               if (!bookAbrev) { throw new Error(`Libro no encontrado: ${parsed.book}`); }
-
               let verseRange = parsed.verse;
               if (parsed.verseEnd) {
                   verseRange += `-${parsed.verseEnd}`;
               }
-
               const url = `https://bible-api.deno.dev/api/read/rv1960/${bookAbrev}/${parsed.chapter}/${verseRange}`;
               const response = await fetch(url);
-              
               if (!response.ok) {
                   const error = await response.json();
                   throw new Error(error.message || 'Error en la API');
               }
-
               const data = await response.json();
-
               const dataAsArray = Array.isArray(data) ? data : [data];
-              
               if (dataAsArray.length === 0) { throw new Error('Versículo no encontrado.'); }
-              
               return dataAsArray;
-
           } catch (error) {
               console.error(`Error al buscar "${trimmedRef}":`, error);
               return null;
           }
       }
 
-      // Función para auto-ajustar la altura del textarea
       const autoResizeTextarea = (textarea) => {
-        textarea.style.height = 'auto';
-        textarea.style.height = textarea.scrollHeight + 'px';
+        if(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        }
       };
 
       const pasajePrincipalInput = document.getElementById('pasaje-principal');
       const citaPasajeTextarea = document.getElementById('cita-pasaje');
       const tituloPrédicaTextarea = document.getElementById('prédica-título');
 
-      // Escuchadores para auto-ajustar la altura de los textareas al escribir
       const textareas = document.querySelectorAll('textarea');
       textareas.forEach(textarea => {
         textarea.addEventListener('input', (e) => {
           autoResizeTextarea(e.target);
           saveToLocalStorage();
         });
-        // Ajusta la altura inicial al cargar el contenido
         autoResizeTextarea(textarea);
       });
 
-      // Asegurarse de que el textarea de título se ajuste al cargar
       tituloPrédicaTextarea.addEventListener('input', (e) => {
         autoResizeTextarea(e.target);
         saveToLocalStorage();
@@ -546,6 +650,8 @@
       document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowRight' && !slideMenu.classList.contains('open')) {
           openMenu();
+        } else if (e.key === 'ArrowLeft' && slideMenu.classList.contains('open')) {
+          closeMenu();
         }
       });
       
@@ -569,7 +675,7 @@
         const fecha = document.getElementById('fecha-actual').textContent;
         const versiculoPrincipal = document.getElementById('pasaje-principal').value || 'Versículo no especificado';
         const citaPrincipal = document.getElementById('cita-pasaje').value || 'Cita no especificada';
-        const datos = Array.from(document.querySelectorAll('#puntos-lista textarea')).map(input => input.value).filter(val => val.trim() !== '');
+        const datos = Array.from(document.querySelectorAll('#puntos-lista .editable-point')).map(div => div.textContent).filter(val => val.trim() !== '');
         const situacion = document.getElementById('situación-texto').value;
         const historias = document.getElementById('historias-texto').value;
         const cosecha = document.getElementById('cosecha-texto').value;
@@ -603,7 +709,7 @@
       const getFormattedContentEvangelizacion = () => {
         const title = document.getElementById('prédica-título').value || 'Prédica de Hoy';
         const versiculoPrincipal = document.getElementById('pasaje-principal').value || 'Juan 3:16';
-        const citaPrincipal = document.getElementById('cita-pasaje').value || 'Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel que en él cree, no se pierda, mas tenga vida eterna.';
+        const citaPrincipal = document.getElementById('cita-pasaje').value || 'Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito, para que todo aquel en él cree, no se pierda, mas tenga vida eterna.';
         
         const text = `¡Hola! Quería compartirte un mensaje que me impactó hoy.\n\nLa prédica de hoy se basó en el pasaje de *${versiculoPrincipal}*\n\n_"${citaPrincipal}"_\n\nMe hizo reflexionar sobre el amor de Dios. Si quieres saber más, no dudes en preguntarme. ¡Bendiciones!`;
         return encodeURIComponent(text);
@@ -641,13 +747,16 @@
             }
         });
 
+        const puntosContent = Array.from(document.querySelectorAll('#puntos-lista .editable-point')).map(div => {
+          return div.classList.contains('is-placeholder') ? '' : div.innerHTML;
+        });
+
         const data = {
             title: document.getElementById('prédica-título').value,
             predicador: document.getElementById('predicador-nombre').value,
             pasajePrincipal: document.getElementById('pasaje-principal').value,
             citaPasaje: document.getElementById('cita-pasaje').value,
-            // Modificado para capturar los valores de los textareas
-            puntos: Array.from(document.querySelectorAll('#puntos-lista textarea')).map(input => input.value),
+            puntos: puntosContent,
             versiculos: versiculosData,
             situacion: document.getElementById('situación-texto').value,
             historias: document.getElementById('historias-texto').value,
@@ -703,8 +812,7 @@
         document.getElementById('pregunta2-texto').value = data.pregunta2 || '';
         document.getElementById('pregunta3-texto').value = data.pregunta3 || '';
         
-        // Ajustar altura de todos los textareas después de rellenarlos
-        textareas.forEach(textarea => autoResizeTextarea(textarea));
+        document.querySelectorAll('textarea').forEach(textarea => autoResizeTextarea(textarea));
 
         listaPuntos.innerHTML = '';
         if (data.puntos && data.puntos.length > 0) {
@@ -728,7 +836,7 @@
           prédicas.forEach(key => {
             const data = JSON.parse(localStorage.getItem(key));
             const li = document.createElement('li');
-            li.className = 'saved-sermon-item bg-white p-3 rounded-lg shadow-sm mb-2 cursor-pointer';
+            li.className = 'saved-sermon-item p-3 rounded-lg flex justify-between items-center transition-colors cursor-pointer';
             li.dataset.key = key;
             li.innerHTML = `
               <div class="flex justify-between items-center" data-key="${key}">
@@ -747,9 +855,15 @@
       };
 
       listaPrédicasGuardadas.addEventListener('click', (e) => {
-        const target = e.target.closest('li div[data-key]');
         const deleteButton = e.target.closest('.eliminar-prédica');
-        
+        if (deleteButton) {
+          e.stopPropagation();
+          const key = deleteButton.closest('li').dataset.key;
+          localStorage.removeItem(key);
+          updatePrédicasMenu();
+          return;
+        }
+        const target = e.target.closest('li[data-key]');
         if (target) {
           const key = target.dataset.key;
           const data = JSON.parse(localStorage.getItem(key));
@@ -758,10 +872,6 @@
             localStorage.setItem('currentPrédicaData', JSON.stringify(data));
             closeMenu();
           }
-        } else if (deleteButton) {
-          const key = deleteButton.closest('li').dataset.key;
-          localStorage.removeItem(key);
-          updatePrédicasMenu();
         }
       });
       
@@ -776,57 +886,84 @@
 
       const fechaElement = document.getElementById('fecha-actual');
       const horaElement = document.getElementById('hora-actual');
-      const opcionesFecha = { year: 'numeric', month: 'long', day: 'numeric' };
-      const opcionesHora = { hour: '2-digit', minute: '2-digit' };
       
-      const ahora = new Date();
-      fechaElement.textContent = ahora.toLocaleDateString('es-ES', opcionesFecha);
-      horaElement.textContent = ahora.toLocaleTimeString('es-ES', opcionesHora);
+      const updateDateTime = () => {
+        const ahora = new Date();
+        const opcionesFecha = { year: 'numeric', month: 'long', day: 'numeric' };
+        const opcionesHora = { hour: '2-digit', minute: '2-digit' };
+        fechaElement.textContent = ahora.toLocaleDateString('es-ES', opcionesFecha);
+        horaElement.textContent = ahora.toLocaleTimeString('es-ES', opcionesHora);
+      }
+      updateDateTime();
+      setInterval(updateDateTime, 60000);
 
       const listaPuntos = document.getElementById('puntos-lista');
       const botónAñadirPunto = document.getElementById('añadir-punto');
       let contadorPuntos = 0;
-      const coloresMarcador = ['bg-red-500/20', 'bg-blue-500/20', 'bg-green-500/20', 'bg-yellow-500/20', 'bg-purple-500/20', 'bg-pink-500/20'];
 
       const crearNuevoPunto = (value = '') => {
-        contadorPuntos++;
-        const nuevoPunto = document.createElement('li');
-        nuevoPunto.className = 'flex items-center group relative';
-        nuevoPunto.innerHTML = `
-          <div class="relative w-full">
-            <textarea placeholder="Escribe aquí el dato de la prédica..." class="w-full text-gray-800 p-3 pr-12 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 input-field" rows="1">${value}</textarea>
-            <span class="point-number-text absolute right-12 top-1/2 -translate-y-1/2 text-gray-600 font-bold text-sm">[${contadorPuntos}]</span>
-            <button class="eliminar-punto absolute right-3 top-1/2 -translate-y-1/2 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
-              <span class="iconify text-xl" data-icon="material-symbols:delete-forever-rounded"></span>
-            </button>
-          </div>
-        `;
-        listaPuntos.appendChild(nuevoPunto);
-        reordenarPuntos();
-        
-        const newTextarea = nuevoPunto.querySelector('textarea');
-        newTextarea.addEventListener('input', (e) => {
-          autoResizeTextarea(e.target);
-          saveToLocalStorage();
-        });
-        autoResizeTextarea(newTextarea);
+          const nuevoPunto = document.createElement('li');
+          nuevoPunto.className = 'flex items-start group';
+
+          const placeholderText = "Escribe aquí el dato de la prédica...";
+          const initialContent = value || placeholderText;
+          const isPlaceholder = !value;
+
+          nuevoPunto.innerHTML = `
+              <div class="flex-grow flex items-start p-2 rounded-lg">
+                  <div contenteditable="true" data-placeholder="${placeholderText}" class="editable-point w-full text-gray-800 focus:outline-none ${isPlaceholder ? 'is-placeholder' : ''}">${initialContent}</div>
+                  <span class="point-number-text text-gray-500 font-medium text-sm ml-2 select-none"></span>
+              </div>
+              <button class="eliminar-punto text-red-400 hover:text-red-600 ml-1 p-2 self-center">
+                  <span class="iconify text-xl" data-icon="material-symbols:delete-forever-rounded"></span>
+              </button>
+          `;
+          listaPuntos.appendChild(nuevoPunto);
+
+          const editableDiv = nuevoPunto.querySelector('.editable-point');
+          editableDiv.addEventListener('focus', () => {
+              if (editableDiv.classList.contains('is-placeholder')) {
+                  editableDiv.textContent = '';
+                  editableDiv.classList.remove('is-placeholder');
+              }
+          });
+          editableDiv.addEventListener('blur', () => {
+              if (!editableDiv.textContent.trim()) {
+                  editableDiv.textContent = placeholderText;
+                  editableDiv.classList.add('is-placeholder');
+              }
+              saveToLocalStorage();
+          });
+          editableDiv.addEventListener('input', saveToLocalStorage);
+          editableDiv.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              const allPoints = Array.from(listaPuntos.querySelectorAll('.editable-point'));
+              const currentIndex = allPoints.indexOf(editableDiv);
+              if (currentIndex < allPoints.length - 1) {
+                allPoints[currentIndex + 1].focus();
+              } else {
+                botónAñadirPunto.click();
+                setTimeout(() => listaPuntos.querySelector('.editable-point:last-child').focus(), 0);
+              }
+            }
+          });
+          reordenarPuntos();
       };
 
       const reordenarPuntos = () => {
-        const puntos = listaPuntos.querySelectorAll('li');
-        puntos.forEach((punto, index) => {
-          punto.querySelector('.point-number-text').textContent = `[${index + 1}]`;
-          const input = punto.querySelector('textarea');
-          input.className = `w-full text-gray-800 p-3 pr-12 rounded-lg ${coloresMarcador[index % coloresMarcador.length]} focus:outline-none focus:ring-2 focus:ring-indigo-500 input-field`;
-        });
-        contadorPuntos = puntos.length;
-        saveToLocalStorage();
+          const puntos = listaPuntos.querySelectorAll('li');
+          puntos.forEach((punto, index) => {
+              punto.querySelector('.point-number-text').textContent = `[${index + 1}]`;
+          });
+          contadorPuntos = puntos.length;
       };
 
       listaPuntos.addEventListener('click', (e) => {
         if (e.target.closest('.eliminar-punto')) {
           e.target.closest('li').remove();
           reordenarPuntos();
+          saveToLocalStorage();
         }
       });
       
@@ -840,18 +977,20 @@
 
       const crearNuevoVersiculo = (refValue = '', textValue = '') => {
           const nuevoVersiculo = document.createElement('li');
-          nuevoVersiculo.className = 'flex flex-col group relative';
+          nuevoVersiculo.className = 'flex flex-col relative space-y-2';
           nuevoVersiculo.innerHTML = `
-            <div class="relative w-full flex items-center">
-              <input type="text" placeholder="Ej: Romanos 8:28" class="w-full text-gray-800 p-3 pr-10 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 input-field" value="${refValue}">
-              <button class="eliminar-punto absolute right-2 top-1/2 -translate-y-1/2 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                <span class="iconify text-xl" data-icon="material-symbols:delete-forever-rounded"></span>
+            <div class="relative w-full flex items-center space-x-2">
+              <input type="text" placeholder="Ej: Romanos 8:28" class="flex-grow text-gray-800 p-3" value="${refValue}">
+              <button class="convert-to-main-verse text-gray-500 hover:text-gray-700 p-2" title="Hacer Versículo Principal">
+                  <span class="iconify text-xl" data-icon="mdi:star-outline"></span>
+              </button>
+              <button class="eliminar-punto text-red-400 hover:text-red-600 p-2">
+                  <span class="iconify text-xl" data-icon="material-symbols:delete-forever-rounded"></span>
               </button>
             </div>
             <div class="verse-text-display">${textValue}</div>
           `;
           listaVersículos.appendChild(nuevoVersiculo);
-          // Si hay texto, ajusta la altura
           if (textValue) {
             const textDisplay = nuevoVersiculo.querySelector('.verse-text-display');
             autoResizeTextarea(textDisplay);
@@ -870,7 +1009,7 @@
               textDisplay.innerHTML = 'Buscando...';
               const data = await fetchVerseData(input.value);
               if (data && textDisplay) {
-                  textDisplay.innerHTML = data.map(v => `<span class="font-bold text-slate-800">${v.number}.</span> ${v.verse}`).join('<br>');
+                  textDisplay.innerHTML = data.map(v => `<span class="font-bold text-gray-800">${v.number}.</span> ${v.verse}`).join('<br>');
               } else if (textDisplay) {
                   textDisplay.innerHTML = '<span class="text-red-500">No se encontró la referencia.</span>';
               }
@@ -879,10 +1018,39 @@
       }, true); 
 
       listaVersículos.addEventListener('click', (e) => {
-        if (e.target.closest('.eliminar-punto')) {
-          e.target.closest('li').remove();
-          saveToLocalStorage();
-        }
+          const deleteButton = e.target.closest('.eliminar-punto');
+          if (deleteButton) {
+              deleteButton.closest('li').remove();
+              saveToLocalStorage();
+              return;
+          }
+
+          const convertButton = e.target.closest('.convert-to-main-verse');
+          if (convertButton) {
+              const listItem = convertButton.closest('li');
+              const refInput = listItem.querySelector('input');
+              const textDisplay = listItem.querySelector('.verse-text-display');
+              
+              if (refInput.value && textDisplay.innerHTML && !textDisplay.querySelector('.text-red-500')) {
+                  // Guardar el principal actual
+                  const currentPrincipalRef = document.getElementById('pasaje-principal').value;
+                  const currentPrincipalText = document.getElementById('cita-pasaje').value;
+                  
+                  // Mover el actual a citado
+                  if (currentPrincipalRef && currentPrincipalText) {
+                      crearNuevoVersiculo(currentPrincipalRef, currentPrincipalText);
+                  }
+                  
+                  // Poner el nuevo como principal
+                  document.getElementById('pasaje-principal').value = refInput.value;
+                  const cleanText = textDisplay.innerHTML.replace(/<span.*?<\/span>/g, '').replace(/<br>/g, ' ').trim();
+                  document.getElementById('cita-pasaje').value = cleanText;
+                  autoResizeTextarea(document.getElementById('cita-pasaje'));
+                  
+                  listItem.remove();
+                  saveToLocalStorage();
+              }
+          }
       });
       botónAñadirVersiculo.addEventListener('click', () => {
         crearNuevoVersiculo();
@@ -922,52 +1090,41 @@
       });
       
       btnNuevaPrédica.addEventListener('click', () => {
-        savePrédica();
+        if(document.getElementById('prédica-título').value.trim()){
+            savePrédica();
+        }
         clearForm();
         updatePrédicasMenu();
         closeMenu();
       });
 
-      prédicaContent.addEventListener('input', saveToLocalStorage);
+      prédicaContent.addEventListener('input', () => {
+        clearTimeout(window.saveTimeout);
+        window.saveTimeout = setTimeout(saveToLocalStorage, 2000);
+      });
       
       loadFromLocalStorage();
       updatePrédicasMenu();
 
-      // Funcionalidad de pantalla completa
       function toggleFullscreen() {
           const docElm = document.documentElement;
-          if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
-              if (docElm.requestFullscreen) {
-                  docElm.requestFullscreen();
-              } else if (docElm.mozRequestFullScreen) { // Firefox
-                  docElm.mozRequestFullScreen();
-              } else if (docElm.webkitRequestFullscreen) { // Chrome, Safari and Opera
-                  docElm.webkitRequestFullscreen();
-              } else if (docElm.msRequestFullscreen) { // IE/Edge
-                  docElm.msRequestFullscreen();
-              }
-              fullscreenBtn.querySelector('.iconify').setAttribute('data-icon', 'ic:baseline-fullscreen-exit');
+          if (!document.fullscreenElement) {
+              docElm.requestFullscreen().catch(err => {
+                  alert(`Error al intentar entrar en pantalla completa: ${err.message} (${err.name})`);
+              });
           } else {
-              if (document.exitFullscreen) {
-                  document.exitFullscreen();
-              } else if (document.mozCancelFullScreen) { // Firefox
-                  document.mozCancelFullScreen();
-              } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
-                  document.webkitExitFullscreen();
-              } else if (document.msExitFullscreen) { // IE/Edge
-                  document.msExitFullscreen();
-              }
-              fullscreenBtn.querySelector('.iconify').setAttribute('data-icon', 'ic:baseline-fullscreen');
+              document.exitFullscreen();
           }
       }
 
       fullscreenBtn.addEventListener('click', toggleFullscreen);
 
-      document.addEventListener('fullscreenchange', (event) => {
+      document.addEventListener('fullscreenchange', () => {
+        const icon = fullscreenBtn.querySelector('.iconify');
         if (document.fullscreenElement) {
-          fullscreenBtn.querySelector('.iconify').setAttribute('data-icon', 'ic:baseline-fullscreen-exit');
+          icon.setAttribute('data-icon', 'ic:baseline-fullscreen-exit');
         } else {
-          fullscreenBtn.querySelector('.iconify').setAttribute('data-icon', 'ic:baseline-fullscreen');
+          icon.setAttribute('data-icon', 'ic:baseline-fullscreen');
         }
       });
       document.addEventListener('keydown', (e) => {
@@ -976,7 +1133,6 @@
           toggleFullscreen();
         }
       });
-
     });
   </script>
 </body>
