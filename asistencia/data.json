@@ -1,0 +1,76 @@
+{
+  "nombre_horario": "Horario de Clases",
+  "estudiante": {
+    "nombre": "Kraut",
+    "carrera": "Software Engineer",
+    "universidad": "USIL"
+  },
+  "cursos": [
+    {
+      "nombre": "Gerenciamiento de Datos I",
+      "dias": ["Martes", "Miércoles"],
+      "horario_inicio": "07:00",
+      "horario_fin": "08:40",
+      "frecuencia_semanal": 2,
+      "modalidad": "Remoto",
+      "ubicacion_aula": "C1X488"
+    },
+    {
+      "nombre": "Ética y Ciudadanía",
+      "dias": ["Martes"],
+      "horario_inicio": "09:50",
+      "horario_fin": "12:40",
+      "frecuencia_semanal": 1,
+      "modalidad": "Remoto",
+      "ubicacion_aula": "C1X461"
+    },
+    {
+      "nombre": "Física General",
+      "dias": ["Martes", "Jueves", "Viernes"],
+      "horario_inicio": "15:00",
+      "horario_fin": "16:40",
+      "frecuencia_semanal": 3,
+      "modalidad": "Híbrido",
+      "ubicacion_aula": "C2D202"
+    },
+    {
+      "nombre": "Inferencia Estadística",
+      "dias": ["Martes", "Jueves"],
+      "horario_inicio": "17:00",
+      "horario_fin": "18:40",
+      "frecuencia_semanal": 2,
+      "modalidad": "Híbrido",
+      "ubicacion_aula": {
+        "Martes": "C2D202",
+        "Jueves": "C2A702"
+      }
+    },
+    {
+      "nombre": "Reto de Ingeniería",
+      "dias": ["Martes"],
+      "horario_inicio": "19:00",
+      "horario_fin": "22:40",
+      "frecuencia_semanal": 1,
+      "modalidad": "Presencial",
+      "ubicacion_aula": "C2A805"
+    },
+    {
+      "nombre": "Ingeniería de Software I",
+      "dias": ["Miércoles"],
+      "horario_inicio": "15:00",
+      "horario_fin": "18:40",
+      "frecuencia_semanal": 1,
+      "modalidad": "Híbrido",
+      "ubicacion_aula": "C2A504"
+    },
+    {
+      "nombre": "Fundamentos del Método Científico",
+      "dias": ["Viernes"],
+      "horario_inicio": "17:50",
+      "horario_fin": "19:50",
+      "frecuencia_semanal": 1,
+      "modalidad": "Híbrido",
+      "ubicacion_aula": "C2C401"
+    }
+  ]
+}
