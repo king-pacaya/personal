@@ -18,14 +18,19 @@ const closeModalBtn = document.getElementById('close-modal-btn');
 const editModal = document.getElementById('edit-modal');
 const editModalContent = document.getElementById('edit-modal-content');
 const closeEditModalBtn = document.getElementById('close-edit-modal-btn');
-const shareBtn = document.getElementById('share-btn');
-const pasteBtn = document.getElementById('paste-btn');
 const pasteModal = document.getElementById('paste-modal');
 const closePasteModalBtn = document.getElementById('close-paste-modal-btn');
 const jsonInput = document.getElementById('json-input');
 const importBtn = document.getElementById('import-btn');
-const clearBtn = document.getElementById('clear-btn');
 const semanaActualDisplay = document.getElementById('semana-actual-display');
+
+// FAB Buttons
+const fabMain = document.getElementById('fab-main');
+const fabMenu = document.getElementById('fab-menu');
+const shareBtn = document.getElementById('share-btn');
+const pasteBtn = document.getElementById('paste-btn');
+const clearBtn = document.getElementById('clear-btn');
+
 
 // Simulamos los datos del JSON
 const data = {
@@ -154,7 +159,6 @@ function renderizarCursoActual(cursoActual) {
     const semanaActual = getSemanaActual();
     const totalClasesTeoricas = cursoActual.frecuencia_semanal * SEMANAS_DEL_CICLO;
     
-    // Obtener los datos de asistencias para el curso actual
     if (!asistenciasData[cursoActual.nombre]) {
         asistenciasData[cursoActual.nombre] = { asistencias: 0, inasistencias: 0, virtuales: 0, presenciales: 0, registros: [] };
     }
@@ -176,7 +180,6 @@ function renderizarCursoActual(cursoActual) {
 
     const inasistenciasMaximas = Math.floor(totalClasesTeoricas * LIMITE_INASISTENCIAS_PORCENTAJE);
 
-    // Calcular porcentajes para la barra de progreso
     const totalParaBarra = totalClasesTeoricas;
 
     let porcentajePresencial = 0;
@@ -184,50 +187,52 @@ function renderizarCursoActual(cursoActual) {
     let porcentajeInasistencia = 0;
     let statsHTML = '';
 
-    if (cursoActual.modalidad === 'Remoto') {
-        porcentajeVirtual = (virtuales / totalParaBarra) * 100;
-        porcentajeInasistencia = (inasistencias / totalParaBarra) * 100;
-        statsHTML = `
-            <div class="flex flex-col items-center">
-                <span class="text-blue-500">${virtuales} Virtuales</span>
-                <span class="text-blue-500">(${porcentajeVirtual.toFixed(1)}%)</span>
-            </div>
-            <div class="flex flex-col items-center">
-                <span class="text-red-500">${inasistencias} Faltas</span>
-                <span class="text-red-500">(${porcentajeInasistencia.toFixed(1)}%)</span>
-            </div>
-        `;
-    } else if (cursoActual.modalidad === 'Presencial') {
-        porcentajePresencial = (presenciales / totalParaBarra) * 100;
-        porcentajeInasistencia = (inasistencias / totalParaBarra) * 100;
-        statsHTML = `
-            <div class="flex flex-col items-center">
-                <span class="text-green-500">${presenciales} Presenciales</span>
-                <span class="text-green-500">(${porcentajePresencial.toFixed(1)}%)</span>
-            </div>
-            <div class="flex flex-col items-center">
-                <span class="text-red-500">${inasistencias} Faltas</span>
-                <span class="text-red-500">(${porcentajeInasistencia.toFixed(1)}%)</span>
-            </div>
-        `;
-    } else if (cursoActual.modalidad === 'Híbrido') {
-        porcentajePresencial = (presenciales / totalParaBarra) * 100;
-        porcentajeVirtual = (virtuales / totalParaBarra) * 100;
-        porcentajeInasistencia = (inasistencias / totalParaBarra) * 100;
-        statsHTML = `
-            <div class="flex flex-col items-center">
-                <span class="text-blue-500">${virtuales} Virtuales</span>
-                <span class="text-blue-500">(${porcentajeVirtual.toFixed(1)}%)</span>
-            </div>
-            <div class="flex flex-col items-center">
-                <span class="text-green-500">${presenciales} Presenciales</span>
-                <span class="text-green-500">(${porcentajePresencial.toFixed(1)}%)</span>
-            </div>
-            <div class="flex flex-col items-center">
-                <span class="text-red-500">${inasistencias} Faltas</span>
-                <span class="text-red-500">(${porcentajeInasistencia.toFixed(1)}%)</span>
-            </div>
-        `;
+    if (totalParaBarra > 0) {
+        if (cursoActual.modalidad === 'Remoto') {
+            porcentajeVirtual = (virtuales / totalParaBarra) * 100;
+            porcentajeInasistencia = (inasistencias / totalParaBarra) * 100;
+            statsHTML = `
+                <div class="flex flex-col items-center">
+                    <span class="text-blue-500">${virtuales} Virtuales</span>
+                    <span class="text-blue-500">(${porcentajeVirtual.toFixed(1)}%)</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-red-500">${inasistencias} Faltas</span>
+                    <span class="text-red-500">(${porcentajeInasistencia.toFixed(1)}%)</span>
+                </div>
+            `;
+        } else if (cursoActual.modalidad === 'Presencial') {
+            porcentajePresencial = (presenciales / totalParaBarra) * 100;
+            porcentajeInasistencia = (inasistencias / totalParaBarra) * 100;
+            statsHTML = `
+                <div class="flex flex-col items-center">
+                    <span class="text-green-500">${presenciales} Presenciales</span>
+                    <span class="text-green-500">(${porcentajePresencial.toFixed(1)}%)</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-red-500">${inasistencias} Faltas</span>
+                    <span class="text-red-500">(${porcentajeInasistencia.toFixed(1)}%)</span>
+                </div>
+            `;
+        } else if (cursoActual.modalidad === 'Híbrido') {
+            porcentajePresencial = (presenciales / totalParaBarra) * 100;
+            porcentajeVirtual = (virtuales / totalParaBarra) * 100;
+            porcentajeInasistencia = (inasistencias / totalParaBarra) * 100;
+            statsHTML = `
+                <div class="flex flex-col items-center">
+                    <span class="text-blue-500">${virtuales} Virtuales</span>
+                    <span class="text-blue-500">(${porcentajeVirtual.toFixed(1)}%)</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-green-500">${presenciales} Presenciales</span>
+                    <span class="text-green-500">(${porcentajePresencial.toFixed(1)}%)</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-red-500">${inasistencias} Faltas</span>
+                    <span class="text-red-500">(${porcentajeInasistencia.toFixed(1)}%)</span>
+                </div>
+            `;
+        }
     }
 
     let botonesHTML = `
@@ -263,14 +268,14 @@ function renderizarCursoActual(cursoActual) {
     }
 
     cursoActualInfo.innerHTML = `
-        <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full">
-            <h2 class="text-3xl font-bold">${cursoActual.nombre}</h2>
-            <p class="mt-2 text-gray-600 dark:text-gray-400 text-lg">${cursoActual.dias.join(', ')} | ${cursoActual.horario_inicio} - ${cursoActual.horario_fin}</p>
+        <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-lg shadow-xl w-full">
+            <h2 class="text-2xl md:text-3xl font-bold">${cursoActual.nombre}</h2>
+            <p class="mt-2 text-gray-600 dark:text-gray-400 text-base md:text-lg">${cursoActual.dias.join(', ')} | ${cursoActual.horario_inicio} - ${cursoActual.horario_fin}</p>
             <p class="text-sm font-semibold text-gray-500 dark:text-gray-400 mt-1">Modalidad: ${cursoActual.modalidad} | Aula: ${ubicacion}</p>
         </div>
 
         <div class="mt-6 w-full text-center">
-            <h3 class="font-semibold text-lg mb-2">
+            <h3 class="font-semibold text-base md:text-lg mb-2">
                 Progreso del Ciclo <span class="text-sm font-bold text-gray-500 dark:text-gray-400">(${totalClasesHastaHoy} / ${totalClasesTeoricas})</span>
             </h3>
             <div class="flex items-center space-x-2 w-full max-w-lg mx-auto">
@@ -280,7 +285,7 @@ function renderizarCursoActual(cursoActual) {
                     <div class="absolute inset-y-0 left-0 bg-red-500 transition-all duration-500" style="left: ${porcentajeVirtual + porcentajePresencial}%; width: ${porcentajeInasistencia}%;"></div>
                 </div>
             </div>
-            <div class="flex justify-between w-full max-w-lg mx-auto mt-2 text-xs font-semibold">
+            <div class="flex justify-around w-full max-w-lg mx-auto mt-2 text-xs font-semibold">
                 ${statsHTML}
             </div>
         </div>
@@ -309,97 +314,99 @@ function renderizarCursos() {
         const virtualesRestantes = totalVirtualesPermitidas - virtuales;
         const puedeAsistirVirtual = curso.modalidad === 'Híbrido' && virtuales < totalVirtualesPermitidas;
 
-        // Cálculos para la barra de progreso
         const totalParaBarra = totalClasesTeoricas;
 
         let porcentajePresencial = 0;
         let porcentajeVirtual = 0;
-        let porcentajeInasistencia = (inasistencias / totalParaBarra) * 100;
+        let porcentajeInasistencia = 0;
         let statsHTML = '';
         let botonesHTML = '';
         let contadoresHTML = '';
 
-        if (curso.modalidad === 'Remoto') {
-            porcentajeVirtual = (virtuales / totalParaBarra) * 100;
-            contadoresHTML = `
-                <div>
-                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Asistencias Virtuales</p>
-                    <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">${virtuales} / ${totalClasesTeoricas - inasistenciasMaximas}</p>
-                </div>
-            `;
-            statsHTML = `
-                <div class="flex flex-col items-center">
-                    <span class="text-blue-500">${porcentajeVirtual.toFixed(1)}%</span>
-                    <span class="text-blue-500">Virtual</span>
-                </div>
-                <div class="flex flex-col items-center">
-                    <span class="text-red-500">${porcentajeInasistencia.toFixed(1)}%</span>
-                    <span class="text-red-500">Inasistencia</span>
-                </div>
-            `;
-            botonesHTML = `
-                <button onclick="registrarAsistencia('${curso.nombre}', 'asistencia', 'virtual')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold p-3 rounded-full transition-colors w-12 h-12 flex items-center justify-center shadow-lg">
-                    <span class="iconify w-6 h-6" data-icon="mdi:laptop"></span>
-                </button>
-            `;
-        } else if (curso.modalidad === 'Presencial') {
-            porcentajePresencial = (asistencias / totalParaBarra) * 100;
-            contadoresHTML = `
-                <div>
-                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Asistencias Presenciales</p>
-                    <p class="text-2xl font-bold text-green-600 dark:text-green-400">${presenciales} / ${totalClasesTeoricas - inasistenciasMaximas}</p>
-                </div>
-            `;
-            statsHTML = `
-                <div class="flex flex-col items-center">
-                    <span class="text-green-500">${porcentajePresencial.toFixed(1)}%</span>
-                    <span class="text-green-500">Presencial</span>
-                </div>
-                <div class="flex flex-col items-center">
-                    <span class="text-red-500">${porcentajeInasistencia.toFixed(1)}%</span>
-                    <span class="text-red-500">Inasistencia</span>
-                </div>
-            `;
-            botonesHTML = `
-                <button onclick="registrarAsistencia('${curso.nombre}', 'asistencia')" class="bg-green-500 hover:bg-green-600 text-white font-bold p-3 rounded-full transition-colors w-12 h-12 flex items-center justify-center shadow-lg">
-                    <span class="iconify w-6 h-6" data-icon="ph:check-circle-bold"></span>
-                </button>
-            `;
-        } else if (curso.modalidad === 'Híbrido') {
-            porcentajePresencial = (presenciales / totalParaBarra) * 100;
-            porcentajeVirtual = (virtuales / totalParaBarra) * 100;
-            contadoresHTML = `
-                <div>
-                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Virtual</p>
-                    <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">${virtuales} / ${totalVirtualesPermitidas}</p>
-                </div>
-                <div>
-                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Presencial</p>
-                    <p class="text-2xl font-bold text-green-600 dark:text-green-400">${presenciales} / ${totalClasesTeoricas - totalVirtualesPermitidas}</p>
-                </div>
-            `;
-            statsHTML = `
-                <div class="flex flex-col items-center">
-                    <span class="text-blue-500">${porcentajeVirtual.toFixed(1)}%</span>
-                    <span class="text-blue-500">Virtual</span>
-                </div>
-                <div class="flex flex-col items-center">
-                    <span class="text-green-500">${porcentajePresencial.toFixed(1)}%</span>
-                    <span class="text-green-500">Presencial</span>
-                </div>
-                <div class="flex flex-col items-center">
-                    <span class="text-red-500">${porcentajeInasistencia.toFixed(1)}%</span>
-                    <span class="text-red-500">Inasistencia</span>
-                </div>
-            `;
-            botonesHTML = `
-                <button onclick="registrarAsistencia('${curso.nombre}', 'asistencia', 'virtual')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold p-3 rounded-full transition-colors w-12 h-12 flex items-center justify-center shadow-lg ${!puedeAsistirVirtual ? 'opacity-50 cursor-not-allowed' : ''}" ${!puedeAsistirVirtual ? 'disabled' : ''}>
-                    <span class="iconify w-6 h-6" data-icon="mdi:laptop"></span>
-                </button>
-                <button onclick="registrarAsistencia('${curso.nombre}', 'asistencia', 'presencial')" class="bg-green-500 hover:bg-green-600 text-white font-bold p-3 rounded-full transition-colors w-12 h-12 flex items-center justify-center shadow-lg">
-                    <span class="iconify w-6 h-6" data-icon="ph:house-simple-bold"></span>
-                </button>
-            `;
+        if (totalParaBarra > 0) {
+            porcentajeInasistencia = (inasistencias / totalParaBarra) * 100;
+            if (curso.modalidad === 'Remoto') {
+                porcentajeVirtual = (virtuales / totalParaBarra) * 100;
+                contadoresHTML = `
+                    <div>
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Asistencias Virtuales</p>
+                        <p class="text-xl md:text-2xl font-bold text-blue-600 dark:text-blue-400">${virtuales}</p>
+                    </div>
+                `;
+                statsHTML = `
+                    <div class="flex flex-col items-center">
+                        <span class="text-blue-500">${porcentajeVirtual.toFixed(1)}%</span>
+                        <span class="text-xs text-blue-500">Virtual</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-red-500">${porcentajeInasistencia.toFixed(1)}%</span>
+                        <span class="text-xs text-red-500">Faltas</span>
+                    </div>
+                `;
+                botonesHTML = `
+                    <button onclick="registrarAsistencia('${curso.nombre}', 'asistencia', 'virtual')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold p-3 rounded-full transition-colors w-12 h-12 flex items-center justify-center shadow-lg">
+                        <span class="iconify w-6 h-6" data-icon="mdi:laptop"></span>
+                    </button>
+                `;
+            } else if (curso.modalidad === 'Presencial') {
+                porcentajePresencial = (presenciales / totalParaBarra) * 100;
+                contadoresHTML = `
+                    <div>
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Asistencias Presenciales</p>
+                        <p class="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">${presenciales}</p>
+                    </div>
+                `;
+                statsHTML = `
+                    <div class="flex flex-col items-center">
+                        <span class="text-green-500">${porcentajePresencial.toFixed(1)}%</span>
+                        <span class="text-xs text-green-500">Presencial</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-red-500">${porcentajeInasistencia.toFixed(1)}%</span>
+                        <span class="text-xs text-red-500">Faltas</span>
+                    </div>
+                `;
+                botonesHTML = `
+                    <button onclick="registrarAsistencia('${curso.nombre}', 'asistencia', 'presencial')" class="bg-green-500 hover:bg-green-600 text-white font-bold p-3 rounded-full transition-colors w-12 h-12 flex items-center justify-center shadow-lg">
+                        <span class="iconify w-6 h-6" data-icon="ph:check-circle-bold"></span>
+                    </button>
+                `;
+            } else if (curso.modalidad === 'Híbrido') {
+                porcentajePresencial = (presenciales / totalParaBarra) * 100;
+                porcentajeVirtual = (virtuales / totalParaBarra) * 100;
+                contadoresHTML = `
+                    <div>
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Virtual</p>
+                        <p class="text-xl md:text-2xl font-bold text-blue-600 dark:text-blue-400">${virtuales} / ${totalVirtualesPermitidas}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Presencial</p>
+                        <p class="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">${presenciales}</p>
+                    </div>
+                `;
+                statsHTML = `
+                    <div class="flex flex-col items-center">
+                        <span class="text-blue-500">${porcentajeVirtual.toFixed(1)}%</span>
+                        <span class="text-xs text-blue-500">Virtual</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-green-500">${porcentajePresencial.toFixed(1)}%</span>
+                        <span class="text-xs text-green-500">Presencial</span>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span class="text-red-500">${porcentajeInasistencia.toFixed(1)}%</span>
+                        <span class="text-xs text-red-500">Faltas</span>
+                    </div>
+                `;
+                botonesHTML = `
+                    <button onclick="registrarAsistencia('${curso.nombre}', 'asistencia', 'virtual')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold p-3 rounded-full transition-colors w-12 h-12 flex items-center justify-center shadow-lg ${!puedeAsistirVirtual ? 'opacity-50 cursor-not-allowed' : ''}" ${!puedeAsistirVirtual ? 'disabled' : ''}>
+                        <span class="iconify w-6 h-6" data-icon="mdi:laptop"></span>
+                    </button>
+                    <button onclick="registrarAsistencia('${curso.nombre}', 'asistencia', 'presencial')" class="bg-green-500 hover:bg-green-600 text-white font-bold p-3 rounded-full transition-colors w-12 h-12 flex items-center justify-center shadow-lg">
+                        <span class="iconify w-6 h-6" data-icon="ph:house-simple-bold"></span>
+                    </button>
+                `;
+            }
         }
 
         const ubicacionHTML = typeof curso.ubicacion_aula === 'string'
@@ -407,13 +414,13 @@ function renderizarCursos() {
             : ``;
         
         const cursoCard = document.createElement('div');
-        cursoCard.className = `bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border-l-4 ${inasistencias >= inasistenciasMaximas ? 'border-red-500' : 'border-blue-500'}`;
+        cursoCard.className = `bg-white dark:bg-gray-800 p-4 md:p-6 rounded-lg shadow-lg border-l-4 ${inasistencias >= inasistenciasMaximas ? 'border-red-500' : 'border-blue-500'}`;
         cursoCard.innerHTML = `
             <div class="flex items-center justify-between">
-                <h2 class="text-xl font-bold">${curso.nombre}</h2>
-                <span class="text-sm font-semibold text-gray-500 dark:text-gray-400">${curso.modalidad}</span>
+                <h2 class="text-lg md:text-xl font-bold">${curso.nombre}</h2>
+                <span class="text-xs md:text-sm font-semibold text-gray-500 dark:text-gray-400">${curso.modalidad}</span>
             </div>
-            <div class="mt-2 flex justify-between items-center">
+            <div class="mt-2 flex justify-between items-center text-xs md:text-sm">
                 <p class="text-gray-600 dark:text-gray-400">
                     ${curso.dias.join(', ')} | ${curso.horario_inicio} - ${curso.horario_fin}
                 </p>
@@ -423,13 +430,13 @@ function renderizarCursos() {
                 ${contadoresHTML}
                 <div>
                     <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Inasistencias</p>
-                    <p class="text-2xl font-bold text-red-600 dark:text-red-400">${inasistencias} / ${inasistenciasMaximas}</p>
+                    <p class="text-xl md:text-2xl font-bold text-red-600 dark:text-red-400">${inasistencias} / ${inasistenciasMaximas}</p>
                 </div>
             </div>
 
             <div class="mt-6">
                 <h3 class="font-semibold text-sm mb-2">
-                    Progreso del Ciclo <span class="text-sm font-bold text-gray-500 dark:text-gray-400">(${totalClasesHastaHoy} / ${totalClasesTeoricas})</span>
+                    Progreso del Ciclo <span class="text-xs font-bold text-gray-500 dark:text-gray-400">(${totalClasesHastaHoy} / ${totalClasesTeoricas})</span>
                 </h3>
                 <div class="flex items-center space-x-2 w-full">
                     <div class="relative w-full h-6 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -438,12 +445,12 @@ function renderizarCursos() {
                         <div class="absolute inset-y-0 left-0 bg-red-500 transition-all duration-500" style="left: ${porcentajePresencial + porcentajeVirtual}%; width: ${porcentajeInasistencia}%;"></div>
                     </div>
                 </div>
-                <div class="flex justify-between w-full mt-2 text-xs font-semibold">
+                <div class="flex justify-around w-full mt-2 text-xs font-semibold">
                     ${statsHTML}
                 </div>
             </div>
             
-            <div class="mt-6 flex justify-center space-x-4">
+            <div class="mt-6 flex justify-center space-x-2 md:space-x-4">
                 <button onclick="showEditModal('${curso.nombre}')" class="bg-gray-500 hover:bg-gray-600 text-white font-bold p-3 rounded-full transition-colors w-12 h-12 flex items-center justify-center shadow-lg">
                     <span class="iconify w-6 h-6" data-icon="fluent:edit-48-regular"></span>
                 </button>
@@ -467,7 +474,7 @@ function registrarAsistencia(nombreCurso, tipo, modalidadAsistencia = null, esDe
         asistenciasData[nombreCurso].asistencias += 1;
         if (modalidadAsistencia === 'virtual') {
             asistenciasData[nombreCurso].virtuales += 1;
-        } else { // Presencial o Normal
+        } else {
             asistenciasData[nombreCurso].presenciales += 1;
         }
     } else if (tipo === 'inasistencia') {
@@ -478,7 +485,6 @@ function registrarAsistencia(nombreCurso, tipo, modalidadAsistencia = null, esDe
     const fecha = ahora.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
     const hora = ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
-    // Guardamos la fecha y hora en el registro
     asistenciasData[nombreCurso].registros.push({
         tipo: tipo.charAt(0).toUpperCase() + tipo.slice(1),
         fecha: fecha,
@@ -486,10 +492,8 @@ function registrarAsistencia(nombreCurso, tipo, modalidadAsistencia = null, esDe
         modalidad: modalidadAsistencia || 'Normal'
     });
 
-    // Guardamos los cambios en localStorage
     localStorage.setItem('asistencias', JSON.stringify(asistenciasData));
     
-    // Volvemos a renderizar
     renderizarCursos();
     if (esDesdeCursoActual) {
         renderizarPantallaPrincipal();
@@ -530,26 +534,23 @@ function showEditModal(nombreCurso) {
 function editarAsistencia(nombreCurso, index) {
     const registro = asistenciasData[nombreCurso].registros[index];
     if (registro) {
-        // Deshacemos el registro
         if (registro.tipo === 'Asistencia') {
             asistenciasData[nombreCurso].asistencias -= 1;
             if (registro.modalidad === 'virtual') {
                 asistenciasData[nombreCurso].virtuales -= 1;
-            } else { // Presencial o Normal
+            } else {
                 asistenciasData[nombreCurso].presenciales -= 1;
             }
         } else if (registro.tipo === 'Inasistencia') {
             asistenciasData[nombreCurso].inasistencias -= 1;
         }
         
-        // Eliminamos el registro del array
         asistenciasData[nombreCurso].registros.splice(index, 1);
         
-        // Guardamos y actualizamos la UI
         localStorage.setItem('asistencias', JSON.stringify(asistenciasData));
         renderizarCursos();
         renderizarPantallaPrincipal();
-        showEditModal(nombreCurso); // Volvemos a mostrar el modal actualizado
+        showEditModal(nombreCurso);
     }
 }
 
@@ -559,53 +560,67 @@ menuBtn.addEventListener('click', () => {
     cursosModal.classList.remove('hidden');
 });
 
-// Cierran los modales al hacer clic en el fondo
+closeModalBtn.addEventListener('click', () => cursosModal.classList.add('hidden'));
 cursosModal.addEventListener('click', (e) => {
     if (e.target === cursosModal) {
         cursosModal.classList.add('hidden');
     }
 });
-closeModalBtn.addEventListener('click', () => {
-    cursosModal.classList.add('hidden');
-});
 
+closeEditModalBtn.addEventListener('click', () => editModal.classList.add('hidden'));
 editModal.addEventListener('click', (e) => {
-    if (e.target === editModal || e.target.closest('#close-edit-modal-btn')) {
+    if (e.target === editModal) {
         editModal.classList.add('hidden');
     }
 });
 
+closePasteModalBtn.addEventListener('click', () => pasteModal.classList.add('hidden'));
 pasteModal.addEventListener('click', (e) => {
-    if (e.target === pasteModal || e.target.closest('#close-paste-modal-btn')) {
+    if (e.target === pasteModal) {
         pasteModal.classList.add('hidden');
+    }
+});
+
+
+// FAB Menu Logic
+fabMain.addEventListener('click', () => {
+    fabMenu.classList.toggle('open');
+});
+
+document.addEventListener('click', (e) => {
+    if (!fabMain.contains(e.target) && !fabMenu.contains(e.target)) {
+        fabMenu.classList.remove('open');
     }
 });
 
 shareBtn.addEventListener('click', () => {
     const dataToShare = JSON.stringify(asistenciasData, null, 2);
     const text = `¡Mis datos de asistencia del ciclo! Pega esto en la app para sincronizar:\n\n` + dataToShare;
-    const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(text)}`;
     navigator.clipboard.writeText(dataToShare).then(() => {
-        alert('JSON copiado al portapapeles y preparando para compartir en WhatsApp.');
+        alert('JSON copiado al portapapeles. ¡Ahora compartilo!');
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
         window.open(whatsappUrl, '_blank');
     }).catch(err => {
         alert('No se pudo copiar el JSON. Por favor, inténtalo de nuevo.');
         console.error('Error al copiar el JSON: ', err);
     });
+    fabMenu.classList.remove('open');
 });
 
 pasteBtn.addEventListener('click', () => {
     pasteModal.classList.remove('hidden');
+    fabMenu.classList.remove('open');
 });
 
 importBtn.addEventListener('click', () => {
     try {
         const pastedData = JSON.parse(jsonInput.value);
-        if (typeof pastedData === 'object' && !Array.isArray(pastedData)) {
+        if (typeof pastedData === 'object' && !Array.isArray(pastedData) && pastedData !== null) {
             asistenciasData = pastedData;
             localStorage.setItem('asistencias', JSON.stringify(asistenciasData));
             alert('¡Datos importados con éxito!');
             pasteModal.classList.add('hidden');
+            jsonInput.value = '';
             renderizarPantallaPrincipal();
             renderizarCursos();
         } else {
@@ -618,19 +633,18 @@ importBtn.addEventListener('click', () => {
 });
 
 clearBtn.addEventListener('click', () => {
-    if (confirm('¿Estás seguro que quieres borrar todos los datos de asistencias? Esta acción no se puede deshacer.')) {
+    if (confirm('¿Estás seguro que querés borrar todos los datos de asistencias? Esta acción no se puede deshacer.')) {
         localStorage.removeItem('asistencias');
         asistenciasData = {};
         renderizarPantallaPrincipal();
         renderizarCursos();
         alert('¡Todos los datos de asistencias han sido borrados!');
     }
+    fabMenu.classList.remove('open');
 });
 
 // Inicializamos la app
 renderizarPantallaPrincipal();
 
 // Actualizar la vista cada 60 segundos para el curso actual
-setInterval(() => {
-    renderizarPantallaPrincipal();
-}, 60000);
+setInterval(renderizarPantallaPrincipal, 60000);

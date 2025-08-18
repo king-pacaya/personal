@@ -8,6 +8,8 @@
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@floating-ui/core@1.4.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.4.0"></script>
   <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
   <style>
     * {
@@ -22,21 +24,21 @@
         width: 8px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
-        background: #e2e8f0; /* bg-gray-200 */
+        background: #e2e8f0;
         border-radius: 10px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #94a3b8; /* bg-gray-400 */
+        background: #94a3b8;
         border-radius: 10px;
     }
     .dark .custom-scrollbar::-webkit-scrollbar-track {
-        background: #1f2937; /* bg-gray-700 */
+        background: #1f2937;
     }
     .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #4b5563; /* bg-gray-600 */
+        background: #4b5563;
     }
     .full-height-content {
-      min-height: calc(100vh - 4rem); /* Ajusta para el padding */
+      min-height: calc(100vh - 4rem);
     }
     @keyframes fadeIn {
         from { opacity: 0; }
@@ -45,77 +47,145 @@
     .animate-fadeIn {
         animation: fadeIn 0.5s ease-in-out;
     }
+    @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    .animate-slideUp {
+        animation: slideUp 0.3s ease-out;
+    }
+    .fab-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 50;
+    }
+    .fab-main {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+    .fab-menu {
+      position: absolute;
+      bottom: 70px;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+    }
+    .fab-menu.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    .fab-item {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: all 0.2s ease;
+    }
+    .fab-item:hover {
+      transform: scale(1.1);
+    }
+    @media (max-width: 640px) {
+      .fab-container {
+        bottom: 1rem;
+        right: 1rem;
+      }
+      .fab-menu {
+        bottom: 60px;
+      }
+    }
   </style>
   <title>Control de Asistencia</title>
 </head>
 <body>
-  <main class="min-h-screen p-8 bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+  <main class="min-h-screen p-4 md:p-8 bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
     <div class="max-w-4xl mx-auto full-height-content">
-      <header class="text-center mb-10 relative">
-        <h1 class="text-4xl font-extrabold text-blue-600 dark:text-blue-400">Control de Asistencia</h1>
-        <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">¡No te quedes sin cursar por faltas, pibe!</p>
-        <p class="mt-2 text-sm font-semibold text-gray-500 dark:text-gray-400">Semana del ciclo: <span id="semana-actual-display"></span></p>
-        <div class="absolute top-0 right-0 flex space-x-2">
+      <header class="text-center mb-6 md:mb-10 relative">
+        <h1 class="text-2xl md:text-4xl font-extrabold text-blue-600 dark:text-blue-400">Control de Asistencia</h1>
+        <p class="mt-1 md:mt-2 text-sm md:text-lg text-gray-600 dark:text-gray-400">¡No te quedes sin cursar por faltas!</p>
+        <p class="mt-1 text-xs md:text-sm font-semibold text-gray-500 dark:text-gray-400">Semana del ciclo: <span id="semana-actual-display"></span></p>
+        <div class="absolute top-0 right-0">
             <button id="menu-btn" class="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                <span class="iconify w-8 h-8" data-icon="ph:list-dashes-bold"></span>
-            </button>
-        </div>
-        <div class="absolute top-0 left-0 flex space-x-2">
-            <button id="share-btn" class="p-2 text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 transition-colors">
-                <span class="iconify w-8 h-8" data-icon="mdi:whatsapp"></span>
-            </button>
-            <button id="paste-btn" class="p-2 text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
-                <span class="iconify w-8 h-8" data-icon="ph:clipboard-text-bold"></span>
-            </button>
-            <button id="clear-btn" class="p-2 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors">
-                <span class="iconify w-8 h-8" data-icon="mdi:trash-can-outline"></span>
+                <span class="iconify w-6 h-6 md:w-8 md:h-8" data-icon="ph:list-dashes-bold"></span>
             </button>
         </div>
       </header>
 
       <section id="curso-actual-container" class="animate-fadeIn hidden">
-        <div id="curso-actual-info" class="p-6 rounded-lg shadow-xl text-center flex flex-col items-center"></div>
+        <div id="curso-actual-info" class="p-4 md:p-6 rounded-lg shadow-xl text-center flex flex-col items-center"></div>
       </section>
 
-      <section id="no-curso-container" class="animate-fadeIn flex flex-col items-center justify-center text-center p-10">
-        <span class="iconify w-24 h-24 text-gray-400 dark:text-gray-600 mb-4" data-icon="ph:clock-bold"></span>
-        <h2 class="text-2xl font-bold text-gray-500 dark:text-gray-400">Ahora no tenés ningún curso</h2>
-        <p class="mt-2 text-gray-400 dark:text-gray-500">¡Aprovecha para descansar o programar un rato!</p>
+      <section id="no-curso-container" class="animate-fadeIn flex flex-col items-center justify-center text-center p-6 md:p-10">
+        <span class="iconify w-16 h-16 md:w-24 md:h-24 text-gray-400 dark:text-gray-600 mb-4" data-icon="ph:clock-bold"></span>
+        <h2 class="text-xl md:text-2xl font-bold text-gray-500 dark:text-gray-400">Ahora no tenés ningún curso</h2>
+        <p class="mt-2 text-sm md:text-base text-gray-400 dark:text-gray-500">¡Aprovecha para descansar o programar un rato!</p>
       </section>
       
-      <div id="cursos-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar relative">
+      <div id="cursos-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden z-40">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-4 md:p-6 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar relative">
           <div class="flex justify-between items-center mb-4">
-            <h3 class="text-2xl font-bold">Mis Cursos</h3>
+            <h3 class="text-xl md:text-2xl font-bold">Mis Cursos</h3>
             <button id="close-modal-btn" class="text-gray-500 hover:text-red-500 transition-colors">
               <span class="iconify w-6 h-6" data-icon="mdi:close-circle-outline"></span>
             </button>
           </div>
-          <div id="clases-container" class="space-y-6"></div>
+          <div id="clases-container" class="space-y-4 md:space-y-6"></div>
         </div>
       </div>
 
-      <div id="edit-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden">
-        <div id="edit-modal-content" class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-2xl max-w-xl w-full relative">
+      <div id="edit-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div id="edit-modal-content" class="bg-white dark:bg-gray-800 rounded-lg p-4 md:p-6 shadow-2xl w-full max-w-xl relative">
             <button id="close-edit-modal-btn" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 transition-colors">
                 <span class="iconify w-6 h-6" data-icon="mdi:close-circle-outline"></span>
             </button>
         </div>
       </div>
       
-      <div id="paste-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-2xl max-w-xl w-full relative">
+      <div id="paste-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-4 md:p-6 shadow-2xl w-full max-w-xl relative">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-2xl font-bold">Pegar Datos de Asistencia</h3>
+                <h3 class="text-xl md:text-2xl font-bold">Pegar Datos de Asistencia</h3>
                 <button id="close-paste-modal-btn" class="text-gray-500 hover:text-red-500 transition-colors">
                     <span class="iconify w-6 h-6" data-icon="mdi:close-circle-outline"></span>
                 </button>
             </div>
             <textarea id="json-input" class="w-full h-48 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg resize-none custom-scrollbar" placeholder="Pega aquí el JSON de asistencias..."></textarea>
-            <button id="import-btn" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition-colors">
+            <button id="import-btn" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 md:py-3 rounded-lg transition-colors">
                 Importar Datos
             </button>
         </div>
+      </div>
+
+      <div class="fab-container">
+        <div class="fab-menu" id="fab-menu">
+          <button id="share-btn" class="fab-item bg-green-500 hover:bg-green-600 text-white animate-slideUp">
+            <span class="iconify w-5 h-5" data-icon="mdi:whatsapp"></span>
+          </button>
+          <button id="paste-btn" class="fab-item bg-purple-500 hover:bg-purple-600 text-white animate-slideUp">
+            <span class="iconify w-5 h-5" data-icon="ph:clipboard-text-bold"></span>
+          </button>
+          <button id="clear-btn" class="fab-item bg-red-500 hover:bg-red-600 text-white animate-slideUp">
+            <span class="iconify w-5 h-5" data-icon="mdi:trash-can-outline"></span>
+          </button>
+        </div>
+        <button id="fab-main" class="fab-main bg-blue-600 hover:bg-blue-700 text-white">
+          <span class="iconify w-6 h-6" data-icon="mdi:dots-vertical"></span>
+        </button>
       </div>
 
     </div>
