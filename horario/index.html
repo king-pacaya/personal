@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="favicon.png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+  <style>
+    * {
+      font-family: 'Montserrat', sans-serif;
+      box-sizing: border-box;
+      outline: none;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      background: linear-gradient(to bottom, #f0f4f8, #e0e8f0);
+      min-height: 100vh;
+    }
+    .progress-bar-container {
+      width: 100%;
+      background-color: #cbd5e1;
+      border-radius: 9999px;
+      height: 6px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(to right, #2563eb, #10b981);
+      transition: width 0.5s ease-in-out;
+    }
+    .course-item {
+      transition: all 0.2s ease;
+      border-left: 4px solid transparent;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    }
+    .course-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    .day-navigation button {
+      transition: background-color 0.2s;
+    }
+    .day-navigation button:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+    .modalidad-presencial {
+      background-color: #fce7f3;
+      color: #9d174d;
+    }
+    .modalidad-hibrido {
+      background-color: #f0f9ff;
+      color: #0c4a6e;
+    }
+    .modalidad-remoto {
+      background-color: #e0f2fe;
+      color: #0ea5e9;
+    }
+    .today-highlight {
+      border: 2px solid #3b82f6;
+    }
+  </style>
+  <title>Horario</title>
+</head>
+<body class="text-gray-800">
+
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <header class="mb-10 text-center">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-1" id="horario-nombre"></h1>
+      <p class="text-lg text-gray-600" id="estudiante-info"></p>
+    </header>
+
+    <div class="mb-12">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white/50 backdrop-blur-sm p-6 rounded-xl border border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
+            <span class="iconify mr-2" data-icon="mdi:clock-outline"></span>
+            Clase en Curso
+          </h2>
+          <div id="current-class-info" class="w-full text-left">
+            <p class="text-gray-400 italic">No hay clases en este momento.</p>
+          </div>
+        </div>
+
+        <div class="bg-white/50 backdrop-blur-sm p-6 rounded-xl border border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
+            <span class="iconify mr-2" data-icon="mdi:clock-fast"></span>
+            Próxima Clase
+          </h2>
+          <div id="next-class-info" class="w-full text-left">
+            <p class="text-gray-400 italic">No hay más clases hoy.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-8 border-gray-300">
+
+    <div class="mb-8">
+      <div class="flex flex-col md:flex-row items-center justify-between mb-6">
+        <div class="flex items-center space-x-4 mb-4 md:mb-0">
+          <button id="prev-day" class="p-2 rounded-full bg-white/50 border border-gray-300 hover:bg-gray-100 disabled:opacity-50">
+            <span class="iconify text-xl text-gray-600" data-icon="mdi:chevron-left"></span>
+          </button>
+          <h2 class="text-2xl font-bold text-gray-800 text-center" id="day-title"></h2>
+          <button id="next-day" class="p-2 rounded-full bg-white/50 border border-gray-300 hover:bg-gray-100 disabled:opacity-50">
+            <span class="iconify text-xl text-gray-600" data-icon="mdi:chevron-right"></span>
+          </button>
+        </div>
+        <div class="flex items-center text-sm font-medium text-gray-500">
+          <span class="iconify mr-1" data-icon="mdi:calendar-today"></span>
+          <span id="day-date"></span>
+        </div>
+      </div>
+      
+      <div id="daily-schedule" class="space-y-4">
+        </div>
+    </div>
+
+  </div>
+
+  <script>
+    const data = {
+      "nombre_horario": "Horario de Clases",
+      "estudiante": {
+          "nombre": "King",
+          "carrera": "Software Engineer",
+          "universidad": "USIL"
+      },
+      "cursos": [
+          {
+              "nombre": "Gerenciamiento de Datos I",
+              "dias": ["Martes", "Miércoles"],
+              "horario_inicio": "07:00",
+              "horario_fin": "08:40",
+              "frecuencia_semanal": 2,
+              "modalidad": "Remoto",
+              "ubicacion_aula": "C1X488"
+          },
+          {
+              "nombre": "Ética y Ciudadanía",
+              "dias": ["Martes"],
+              "horario_inicio": "09:50",
+              "horario_fin": "12:40",
+              "frecuencia_semanal": 1,
+              "modalidad": "Remoto",
+              "ubicacion_aula": "C1X461"
+          },
+          {
+              "nombre": "Física General",
+              "dias": ["Martes", "Jueves", "Viernes"],
+              "horario_inicio": "15:00",
+              "horario_fin": "16:40",
+              "frecuencia_semanal": 3,
+              "modalidad": "Híbrido",
+              "ubicacion_aula": "C2D202"
+          },
+          {
+              "nombre": "Inferencia Estadística",
+              "dias": ["Martes", "Jueves"],
+              "horario_inicio": "17:00",
+              "horario_fin": "18:40",
+              "frecuencia_semanal": 2,
+              "modalidad": "Híbrido",
+              "ubicacion_aula": {
+                  "Martes": "C2D202",
+                  "Jueves": "C2A702"
+              }
+          },
+          {
+              "nombre": "Reto de Ingeniería",
+              "dias": ["Martes"],
+              "horario_inicio": "19:00",
+              "horario_fin": "22:40",
+              "frecuencia_semanal": 1,
+              "modalidad": "Presencial",
+              "ubicacion_aula": "C2A805"
+          },
+          {
+              "nombre": "Ingeniería de Software I",
+              "dias": ["Miércoles"],
+              "horario_inicio": "15:00",
+              "horario_fin": "18:40",
+              "frecuencia_semanal": 1,
+              "modalidad": "Híbrido",
+              "ubicacion_aula": "C2A504"
+          },
+          {
+              "nombre": "Fundamentos del Método Científico",
+              "dias": ["Viernes"],
+              "horario_inicio": "17:50",
+              "horario_fin": "19:50",
+              "frecuencia_semanal": 1,
+              "modalidad": "Híbrido",
+              "ubicacion_aula": "C2C401"
+          }
+      ]
+    };
+
+    const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    let today = new Date();
+    const currentDate = new Date();
+
+    function parseTime(timeStr) {
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        const date = new Date();
+        date.setHours(hours, minutes, 0, 0);
+        return date;
+    }
+
+    function getUbicacion(curso, dia) {
+        if (typeof curso.ubicacion_aula === 'object') {
+            return curso.ubicacion_aula[dia] || 'No especificado';
+        }
+        return curso.ubicacion_aula;
+    }
+
+    function getModalidadClass(modalidad) {
+        switch(modalidad.toLowerCase()) {
+            case 'presencial': return 'modalidad-presencial';
+            case 'híbrido': return 'modalidad-hibrido';
+            case 'remoto': return 'modalidad-remoto';
+            default: return '';
+        }
+    }
+
+    function formatTimeRange(start, end) {
+        return `${start} - ${end}`;
+    }
+
+    function renderHeader() {
+        document.getElementById('horario-nombre').textContent = data.nombre_horario;
+        document.getElementById('estudiante-info').textContent = `${data.estudiante.nombre} • ${data.estudiante.carrera} • ${data.estudiante.universidad}`;
+    }
+    
+    function getDayLabel(date) {
+        const diffDays = Math.round((date.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (diffDays === 0) return 'Hoy';
+        if (diffDays === 1) return 'Mañana';
+        if (diffDays === -1) return 'Ayer';
+        return diasSemana[date.getDay()];
+    }
+
+    function renderDailySchedule(date) {
+        const day = diasSemana[date.getDay()];
+        const dailyScheduleContainer = document.getElementById('daily-schedule');
+        const dayTitle = document.getElementById('day-title');
+        const dayDate = document.getElementById('day-date');
+        
+        dayTitle.textContent = getDayLabel(date);
+        dayDate.textContent = date.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        dailyScheduleContainer.innerHTML = '';
+        
+        const clasesDelDia = data.cursos
+            .filter(c => c.dias.includes(day))
+            .sort((a, b) => {
+                const timeA = parseTime(a.horario_inicio);
+                const timeB = parseTime(b.horario_inicio);
+                return timeA - timeB;
+            });
+
+        if (clasesDelDia.length > 0) {
+            clasesDelDia.forEach(curso => {
+                const modalidadClass = getModalidadClass(curso.modalidad);
+                const isCurrentClass = isClassCurrentlyActive(curso, date);
+                const highlightClass = isCurrentClass ? 'today-highlight' : '';
+
+                let courseItem = `
+                    <div class="course-item p-4 rounded-lg bg-white ${highlightClass}">
+                        <h4 class="font-semibold text-gray-800">${curso.nombre}</h4>
+                        <div class="flex items-center mt-2 text-sm text-gray-600">
+                            <span class="iconify mr-1" data-icon="mdi:clock-time-four-outline"></span>
+                            ${formatTimeRange(curso.horario_inicio, curso.horario_fin)}
+                        </div>
+                        <div class="flex items-center mt-1 text-sm text-gray-600">
+                            <span class="iconify mr-1" data-icon="mdi:map-marker"></span>
+                            ${getUbicacion(curso, day)}
+                        </div>
+                        <div class="mt-2 text-xs ${modalidadClass} px-2 py-1 rounded-full inline-block font-semibold">
+                            ${curso.modalidad}
+                        </div>
+                    </div>
+                `;
+                dailyScheduleContainer.innerHTML += courseItem;
+            });
+        } else {
+            dailyScheduleContainer.innerHTML = `
+                <div class="text-center py-8 text-gray-400">
+                    <span class="iconify text-5xl inline-block mb-2" data-icon="mdi:calendar-blank"></span>
+                    <p class="text-xl">¡Día libre! No hay clases.</p>
+                </div>
+            `;
+        }
+    }
+    
+    function isClassCurrentlyActive(curso, date) {
+        const now = new Date();
+        const diaActual = diasSemana[now.getDay()];
+        const diaSeleccionado = diasSemana[date.getDay()];
+        if (diaSeleccionado !== diaActual) return false;
+
+        const startTime = parseTime(curso.horario_inicio);
+        const endTime = parseTime(curso.horario_fin);
+        return now >= startTime && now < endTime;
+    }
+
+    function renderCurrentAndNextClass() {
+        const now = new Date();
+        const diaActual = diasSemana[now.getDay()];
+        let claseActual = null;
+        let proximaClase = null;
+        
+        const clasesDeHoy = data.cursos
+            .filter(c => c.dias.includes(diaActual))
+            .sort((a, b) => parseTime(a.horario_inicio) - parseTime(b.horario_inicio));
+        
+        const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+        clasesDeHoy.forEach(curso => {
+            const startTimeMinutes = parseTime(curso.horario_inicio).getHours() * 60 + parseTime(curso.horario_inicio).getMinutes();
+            const endTimeMinutes = parseTime(curso.horario_fin).getHours() * 60 + parseTime(curso.horario_fin).getMinutes();
+
+            if (nowMinutes >= startTimeMinutes && nowMinutes < endTimeMinutes) {
+                claseActual = curso;
+            } else if (nowMinutes < startTimeMinutes && !proximaClase) {
+                proximaClase = curso;
+            }
+        });
+
+        const currentClassContainer = document.getElementById('current-class-info');
+        const nextClassContainer = document.getElementById('next-class-info');
+
+        currentClassContainer.innerHTML = '';
+        nextClassContainer.innerHTML = '';
+
+        if (claseActual) {
+            const totalDuration = parseTime(claseActual.horario_fin) - parseTime(claseActual.horario_inicio);
+            const elapsedDuration = now - parseTime(claseActual.horario_inicio);
+            const progress = (elapsedDuration / totalDuration) * 100;
+            const ubicacion = getUbicacion(claseActual, diaActual);
+            
+            currentClassContainer.innerHTML = `
+                <div class="space-y-2">
+                    <h3 class="text-lg font-bold text-gray-800">${claseActual.nombre}</h3>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <span class="iconify mr-1" data-icon="mdi:clock-time-four-outline"></span>
+                        ${formatTimeRange(claseActual.horario_inicio, claseActual.horario_fin)}
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <span class="iconify mr-1" data-icon="mdi:map-marker"></span>
+                        ${ubicacion}
+                    </div>
+                    <div class="flex items-center text-sm ${getModalidadClass(claseActual.modalidad)} px-2 py-1 rounded-full w-fit font-semibold">
+                        <span class="iconify mr-1" data-icon="mdi:laptop"></span>
+                        ${claseActual.modalidad}
+                    </div>
+                    <div class="mt-3">
+                        <div class="text-xs text-gray-500 mb-1">Progreso</div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: ${Math.min(100, progress)}%;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            currentClassContainer.innerHTML = `
+                <div class="text-center py-4">
+                    <span class="iconify inline-block text-4xl text-gray-300 mb-2" data-icon="mdi:school-off"></span>
+                    <p class="text-gray-400 text-sm">No hay clases en este momento.</p>
+                </div>
+            `;
+        }
+
+        if (proximaClase) {
+            const startTime = parseTime(proximaClase.horario_inicio);
+            const minsUntilNext = (startTime.getHours() * 60 + startTime.getMinutes()) - nowMinutes;
+            const hoursUntilNext = Math.floor(minsUntilNext / 60);
+            const minsRemaining = minsUntilNext % 60;
+            const ubicacion = getUbicacion(proximaClase, diaActual);
+
+            nextClassContainer.innerHTML = `
+                <div class="space-y-2">
+                    <h3 class="text-lg font-bold text-gray-800">${proximaClase.nombre}</h3>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <span class="iconify mr-1" data-icon="mdi:clock-time-four-outline"></span>
+                        ${formatTimeRange(proximaClase.horario_inicio, proximaClase.horario_fin)}
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <span class="iconify mr-1" data-icon="mdi:map-marker"></span>
+                        ${ubicacion}
+                    </div>
+                    <div class="flex items-center text-sm ${getModalidadClass(proximaClase.modalidad)} px-2 py-1 rounded-full w-fit font-semibold">
+                        <span class="iconify mr-1" data-icon="mdi:laptop"></span>
+                        ${proximaClase.modalidad}
+                    </div>
+                    <div class="mt-3 text-sm text-gray-600 flex items-center">
+                        <span class="iconify mr-1" data-icon="mdi:clock-alert-outline"></span>
+                        Comienza en ${hoursUntilNext > 0 ? `${hoursUntilNext}h ` : ''}${minsRemaining}m
+                    </div>
+                </div>
+            `;
+        } else {
+            nextClassContainer.innerHTML = `
+                <div class="text-center py-4">
+                    <span class="iconify inline-block text-4xl text-gray-300 mb-2" data-icon="mdi:calendar-remove"></span>
+                    <p class="text-gray-400 text-sm">No hay más clases hoy.</p>
+                </div>
+            `;
+        }
+    }
+
+    // Funcionalidad de navegación
+    const prevDayBtn = document.getElementById('prev-day');
+    const nextDayBtn = document.getElementById('next-day');
+
+    prevDayBtn.addEventListener('click', () => {
+        today.setDate(today.getDate() - 1);
+        renderDailySchedule(today);
+    });
+
+    nextDayBtn.addEventListener('click', () => {
+        today.setDate(today.getDate() + 1);
+        renderDailySchedule(today);
+    });
+
+    function init() {
+        renderHeader();
+        renderDailySchedule(today);
+        renderCurrentAndNextClass();
+        
+        setInterval(() => {
+            renderCurrentAndNextClass();
+            renderDailySchedule(today);
+        }, 60000); 
+    }
+
+    window.onload = init;
+  </script>
+
+</body>
+</html>
