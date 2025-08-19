@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="favicon.png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+  <style>
+    * {
+      font-family: 'Montserrat', sans-serif;
+      box-sizing: border-box;
+      outline: none;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    :root {
+      --primary: #6C5CE7;
+      --primary-dark: #5649C0;
+      --secondary: #00CEC9;
+      --accent: #FDCB6E;
+      --accent-dark: #E17055;
+      --light: #F5F6FA;
+      --dark: #2D3436;
+    }
+    
+    body {
+      background-color: var(--light);
+      color: var(--dark);
+    }
+    
+    .bg-primary {
+      background-color: var(--primary);
+    }
+    
+    .bg-secondary {
+      background-color: var(--secondary);
+    }
+    
+    .bg-accent {
+      background-color: var(--accent);
+    }
+
+    .bg-accent-dark {
+      background-color: var(--accent-dark);
+    }
+
+    .text-primary {
+      color: var(--primary);
+    }
+    
+    .text-secondary {
+      color: var(--secondary);
+    }
+    
+    .text-accent {
+      color: var(--accent-dark);
+    }
+    
+    .btn {
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+    
+    .btn-accent {
+      background-color: var(--accent-dark);
+      color: white;
+    }
+    
+    .btn-accent:hover {
+      background-color: #D63031;
+      transform: translateY(-2px);
+    }
+    
+    .platform-card {
+      transition: all 0.3s ease;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .platform-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+    }
+    
+    .twitch-card {
+      border-top: 4px solid #9147FF;
+    }
+    
+    .kick-card {
+      border-top: 4px solid #53FC18;
+    }
+    
+    .strategy-card {
+      border-left: 4px solid var(--secondary);
+      transition: all 0.3s ease;
+    }
+    
+    .strategy-card:hover {
+      transform: translateX(5px);
+    }
+    
+    @media (min-width: 768px) {
+      .hero-content {
+        background: linear-gradient(90deg, var(--light) 60%, transparent 100%);
+      }
+    }
+  </style>
+  <title>Stream Tips</title>
+</head>
+<body>
+  <section class="relative overflow-hidden">
+    <div class="hero-content container mx-auto px-4 py-16 md:py-24 relative z-10">
+      <div class="max-w-2xl">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 text-dark">Guía Estratégica para <span class="text-primary">Triunfar</span> en el Streaming</h1>
+        <p class="text-lg mb-8 text-gray-700">Aprende a elegir la mejor plataforma, crear contenido atractivo y dominar el arte de la viralización.</p>
+      </div>
+    </div>
+    <div class="absolute inset-0 z-0 opacity-10">
+      <span class="iconify absolute top-20 right-20" data-icon="mdi:twitch" data-width="200" style="color: var(--primary);"></span>
+      <span class="iconify absolute bottom-10 left-10" data-icon="simple-icons:kick" data-width="200" style="color: var(--secondary);"></span>
+    </div>
+  </section>
+
+  <section id="plataformas" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">La Gran Decisión: <span class="text-primary">Twitch vs. Kick</span></h2>
+        <p class="max-w-2xl mx-auto text-gray-600">Elige sabiamente donde plantarás tu bandera en el mundo del streaming.</p>
+      </div>
+      
+      <div class="grid md:grid-cols-2 gap-8 mb-12">
+        <div class="platform-card twitch-card bg-white p-6 shadow-lg">
+          <div class="flex items-center mb-4">
+            <span class="iconify mr-3" data-icon="mdi:twitch" data-width="40" style="color: #9147FF;"></span>
+            <h3 class="text-2xl font-bold">Twitch</h3>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <h4 class="font-bold text-lg mb-2 flex items-center">
+                <span class="iconify mr-2" data-icon="mdi:cash" data-width="20"></span>
+                Monetización
+              </h4>
+              <p class="text-gray-600">Twitch se queda con el 50% de las suscripciones. Con 1,000 suscriptores ganarías <span class="font-bold">\$2,500</span>.</p>
+            </div>
+            <div>
+              <h4 class="font-bold text-lg mb-2 flex items-center">
+                <span class="iconify mr-2" data-icon="mdi:account-group" data-width="20"></span>
+                Comunidad
+              </h4>
+              <p class="text-gray-600">Publicidad antes de los streams que puede molestar a los nuevos espectadores.</p>
+            </div>
+            <div>
+              <h4 class="font-bold text-lg mb-2 flex items-center">
+                <span class="iconify mr-2" data-icon="mdi:tools" data-width="20"></span>
+                Herramientas
+              </h4>
+              <p class="text-gray-600">Ofrece muchas extensiones y la posibilidad de activar "drops" para streams más interactivos.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="platform-card kick-card bg-white p-6 shadow-lg">
+          <div class="flex items-center mb-4">
+            <span class="iconify mr-3" data-icon="simple-icons:kick" data-width="40" style="color: #53FC18;"></span>
+            <h3 class="text-2xl font-bold">Kick</h3>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <h4 class="font-bold text-lg mb-2 flex items-center">
+                <span class="iconify mr-2" data-icon="mdi:cash" data-width="20"></span>
+                Monetización
+              </h4>
+              <p class="text-gray-600">Kick te da el 95% de las suscripciones. Con 1,000 suscriptores ganarías <span class="font-bold text-accent">\$4,750</span>.</p>
+            </div>
+            <div>
+              <h4 class="font-bold text-lg mb-2 flex items-center">
+                <span class="iconify mr-2" data-icon="mdi:account-group" data-width="20"></span>
+                Comunidad
+              </h4>
+              <p class="text-gray-600">Videos sin publicidad previa, eliminando barreras para nuevos espectadores.</p>
+            </div>
+            <div>
+              <h4 class="font-bold text-lg mb-2 flex items-center">
+                <span class="iconify mr-2" data-icon="mdi:tools" data-width="20"></span>
+                Herramientas
+              </h4>
+              <p class="text-gray-600">Más básico, pero con incentivos como pagos por horas de transmisión para partners.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-primary text-white p-6 rounded-lg shadow-lg">
+        <div class="flex items-start">
+          <span class="iconify mr-4 mt-1" data-icon="mdi:alert-circle" data-width="32"></span>
+          <div>
+            <h3 class="text-xl font-bold mb-2">Libertad vs. Reglas Estrictas</h3>
+            <p class="mb-2">Kick es conocido por normas más flexibles, enfocándose solo en casos extremos.</p>
+            <p>Twitch tiene políticas estrictas que pueden sancionarte incluso por cosas dichas fuera de la plataforma.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contenido" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Creando Contenido que <span class="text-secondary">Enganche</span></h2>
+        <p class="max-w-2xl mx-auto text-gray-600">Más allá del directo: estrategias para potenciar tu marca.</p>
+      </div>
+      
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div class="strategy-card bg-white p-6 shadow-md" style="border-left: 4px solid var(--primary);">
+          <div class="feature-icon bg-primary text-white">
+            <span class="iconify" data-icon="mdi:robot" data-width="24"></span>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Canales con IA</h3>
+          <p class="text-gray-600">Usa inteligencia artificial para crear contenido, ya sea en guiones, voces o avatares.</p>
+        </div>
+        
+        <div class="strategy-card bg-white p-6 shadow-md">
+          <div class="feature-icon bg-secondary text-white">
+            <span class="iconify" data-icon="fluent:sparkle-28-filled" data-width="24"></span>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Contenido con Valor Agregado</h3>
+          <p class="text-gray-600">Toma clips de otros y añade tu análisis, humor o edición para hacerlos únicos.</p>
+        </div>
+        
+        <div class="strategy-card bg-white p-6 shadow-md" style="border-left: 4px solid var(--accent-dark);">
+          <div class="feature-icon bg-accent-dark text-white">
+            <span class="iconify" data-icon="mdi:search-web" data-width="24"></span>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Canales de Búsqueda</h3>
+          <p class="text-gray-600">Enfócate en resolver problemas concretos que la gente busca (tutoriales, guías, etc.).</p>
+        </div>
+      </div>
+      
+      <div class="bg-white p-6 rounded-lg shadow-lg">
+        <h3 class="text-2xl font-bold mb-4 text-dark">Estrategia de Crecimiento</h3>
+        <div class="space-y-4">
+          <div class="flex items-start">
+            <span class="iconify mr-3 mt-1 text-accent-dark" data-icon="mdi:lightbulb" data-width="20"></span>
+            <p><span class="font-bold">Piensa a futuro:</span> Desde el día uno, considera qué patrocinios podrías conseguir.</p>
+          </div>
+          <div class="flex items-start">
+            <span class="iconify mr-3 mt-1 text-accent-dark" data-icon="mdi:chart-bar" data-width="20"></span>
+            <p><span class="font-bold">Analiza el nicho:</span> ¿Hay mucha gente interesada en lo que haces?</p>
+          </div>
+          <div class="flex items-start">
+            <span class="iconify mr-3 mt-1 text-accent-dark" data-icon="mdi:account-supervisor" data-width="20"></span>
+            <p><span class="font-bold">Busca un referente:</span> Encuentra a alguien exitoso y analiza su modelo para adaptarlo a tu estilo.</p>
+          </div>
+          <div class="flex items-start">
+            <span class="iconify mr-3 mt-1 text-accent-dark" data-icon="mdi:rocket" data-width="20"></span>
+            <p><span class="font-bold">Sé una máquina:</span> Una vez que encuentres tu ritmo, sube más contenido que tu competencia.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="viralizacion" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">El Arte de la <span class="text-accent-dark">Viralización</span></h2>
+        <p class="max-w-2xl mx-auto text-gray-600">Lecciones del maestro Mr. Beast para hacer contenido que todos quieren ver.</p>
+      </div>
+      
+      <div class="grid md:grid-cols-2 gap-8 mb-12">
+        <div class="bg-gray-50 p-6 rounded-lg">
+          <h3 class="text-xl font-bold mb-4 flex items-center">
+            <span class="iconify mr-2 text-accent-dark" data-icon="mdi:crown" data-width="24"></span>
+            Título y Miniatura son REYES
+          </h3>
+          <ul class="space-y-3">
+            <li class="flex items-start">
+              <span class="iconify mr-2 mt-1 text-primary" data-icon="mdi:check" data-width="16"></span>
+              <span>Deben ser como la tapa de un "periódico amarillista" que la gente no pueda evitar.</span>
+            </li>
+            <li class="flex items-start">
+              <span class="iconify mr-2 mt-1 text-primary" data-icon="mdi:check" data-width="16"></span>
+              <span>Apela a emociones fuertes. Lo negativo o polémico suele generar más interés.</span>
+            </li>
+            <li class="flex items-start">
+              <span class="iconify mr-2 mt-1 text-primary" data-icon="mdi:check" data-width="16"></span>
+              <span><span class="font-bold">Regla de oro:</span> ¡Cumple siempre con lo que prometes en la miniatura!</span>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="bg-gray-50 p-6 rounded-lg">
+          <h3 class="text-xl font-bold mb-4 flex items-center">
+            <span class="iconify mr-2 text-accent-dark" data-icon="mdi:eye" data-width="24"></span>
+            Mantén la Atención
+          </h3>
+          <ul class="space-y-3">
+            <li class="flex items-start">
+              <span class="iconify mr-2 mt-1 text-primary" data-icon="mdi:check" data-width="16"></span>
+              <span><span class="font-bold">Ritmo, ritmo, ritmo:</span> Usa cortes de cámara constantes para mantener al espectador enganchado.</span>
+            </li>
+            <li class="flex items-start">
+              <span class="iconify mr-2 mt-1 text-primary" data-icon="mdi:check" data-width="16"></span>
+              <span><span class="font-bold">Busca el asombro:</span> Haz algo que llame la atención y deje al espectador queriendo más.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="bg-primary text-white p-6 rounded-lg shadow-lg">
+        <div class="flex flex-col md:flex-row items-center">
+          <div class="md:w-1/2 mb-6 md:mb-0 md:pr-6">
+            <h3 class="text-2xl font-bold mb-3">Métricas Clave</h3>
+            <p>Lo más importante es medir tu <span class="font-bold">tasa de clics (CTR)</span> y la <span class="font-bold">retención del espectador</span>. Estos números te dirán si tu estrategia está funcionando.</p>
+          </div>
+          <div class="md:w-1/2 flex justify-center">
+            <span class="iconify" data-icon="mdi:analytics" data-width="120" style="color: white;"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Mobile menu toggle
+    document.getElementById('menu-toggle').addEventListener('click', function() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    });
+    
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('#mobile-menu a').forEach(link => {
+      link.addEventListener('click', function() {
+        document.getElementById('mobile-menu').classList.add('hidden');
+      });
+    });
+    
+    // Smooth scrolling for all links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+  </script>
+</body>
+</html>
