@@ -343,8 +343,20 @@
         if (claseActual) {
             const totalDuration = parseTime(claseActual.horario_fin) - parseTime(claseActual.horario_inicio);
             const elapsedDuration = now - parseTime(claseActual.horario_inicio);
+            const remainingDuration = totalDuration - elapsedDuration;
+
             const progress = (elapsedDuration / totalDuration) * 100;
             const ubicacion = getUbicacion(claseActual, diaActual);
+
+            const remainingMins = Math.ceil(remainingDuration / (1000 * 60));
+            let remainingText = '';
+            if (remainingMins > 60) {
+                const hours = Math.floor(remainingMins / 60);
+                const mins = remainingMins % 60;
+                remainingText = `${hours}h ${mins}m`;
+            } else {
+                remainingText = `${remainingMins}m`;
+            }
             
             currentClassContainer.innerHTML = `
                 <div class="space-y-2">
@@ -362,7 +374,10 @@
                         ${claseActual.modalidad}
                     </div>
                     <div class="mt-3">
-                        <div class="text-xs text-gray-500 mb-1">Progreso</div>
+                        <div class="flex justify-between items-center mb-1 text-sm text-gray-500">
+                            <span>Progreso</span>
+                            <span>Termina en ${remainingText}</span>
+                        </div>
                         <div class="progress-bar-container">
                             <div class="progress-bar" style="width: ${Math.min(100, progress)}%;"></div>
                         </div>
