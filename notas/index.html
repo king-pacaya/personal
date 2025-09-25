@@ -93,22 +93,21 @@
             outline: none;
             border-bottom: 1px solid var(--blue);
         }
-        .slide-menu {
+        .slide-menu-bottom {
             position: fixed;
-            top: 0;
-            left: -100%;
-            width: 80%;
-            max-width: 350px;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
             height: 100%;
             background-color: #fff;
-            box-shadow: 2px 0 15px rgba(0,0,0,0.1);
-            transition: left 0.3s ease-in-out;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            transition: bottom 0.3s ease-in-out;
             z-index: 50;
             padding: 1.5rem;
             overflow-y: auto;
         }
-        .slide-menu.open {
-            left: 0;
+        .slide-menu-bottom.open {
+            bottom: 0;
         }
         .menu-overlay {
             position: fixed;
@@ -173,12 +172,29 @@
             position: relative;
             padding-bottom: 2px;
             min-height: 1.6rem;
-            border-bottom: 1px dashed var(--light-blue);
             width: 100%;
             padding-top: 4px;
         }
-        .editable-point:focus {
+        .editable-point-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            border-bottom: 1px dashed var(--light-blue);
+        }
+        .editable-point-wrapper:focus-within {
             border-bottom: 1px solid var(--blue);
+        }
+        .editable-point:empty:before {
+            content: attr(data-placeholder);
+            color: #9CA3AF;
+            pointer-events: none;
+            position: absolute;
+            top: 4px;
+            left: 0;
+            font-style: normal;
+        }
+        .editable-point:focus:before {
+            content: none;
         }
         .buttons-footer {
             display: flex;
@@ -216,7 +232,7 @@
 </head>
 <body>
 
-<div id="slide-menu" class="slide-menu">
+<div id="slide-menu" class="slide-menu-bottom">
     <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
         <h3 class="text-2xl font-bold text-dark-blue">Prédicas</h3>
         <button id="close-menu-btn" class="text-gray-500 hover:text-gray-800 transition-colors">
@@ -265,7 +281,7 @@
         <section>
             <div class="text-center w-full">
                 <p class="text-gray-600 text-sm uppercase tracking-wide font-semibold mb-3">Versículo Principal</p>
-                <input type="text" id="pasaje-principal" placeholder="Ej: Juan 3:16" class="w-full text-center p-3 font-bold text-xl md:text-2xl text-gray-900 mb-3">
+                <input type="text" id="pasaje-principal" placeholder="Juan 3:16" class="w-full text-center p-3 font-bold text-xl md:text-2xl text-gray-900 mb-3">
                 <div id="cita-pasaje-container"></div>
             </div>
         </section>
@@ -282,7 +298,7 @@
         </section>
 
         <section>
-            <h2 class="text-xl font-bold text-gray-700 mb-4 section-title">Otros Versículos</h2>
+            <h2 class="text-xl font-bold text-gray-700 mb-4 section-title">Versículos</h2>
             <ul id="versículos-citados-lista" class="space-y-4"></ul>
             <button id="añadir-versiculo" class="mt-4 w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center">
                     <span class="iconify mr-2" data-icon="mdi:plus"></span>
@@ -368,26 +384,26 @@
         // --- FIN: LÓGICA PARA MANTENER PANTALLA ENCENDIDA ---
 
         const books = [
-            { name: "Genesis", abrev: "GN" }, { name: "Exodo", abrev: "EX" }, { name: "Levitico", abrev: "LV" },
-            { name: "Numeros", abrev: "NM" }, { name: "Deuteronomio", abrev: "DT" }, { name: "Josue", abrev: "JOS" },
+            { name: "Génesis", abrev: "GN" }, { name: "Éxodo", abrev: "EX" }, { name: "Levítico", abrev: "LV" },
+            { name: "Números", abrev: "NM" }, { name: "Deuteronomio", abrev: "DT" }, { name: "Josué", abrev: "JOS" },
             { name: "Jueces", abrev: "JUE" }, { name: "Rut", abrev: "RT" }, { name: "1-Samuel", abrev: "1S" },
             { name: "2-Samuel", abrev: "2S" }, { name: "1-Reyes", abrev: "1R" }, { name: "2-Reyes", abrev: "2R" },
-            { name: "1-Cronicas", abrev: "1CR" }, { name: "2-Cronicas", abrev: "2CR" }, { name: "Esdras", abrev: "ESD" },
-            { name: "Nehemias", abrev: "NEH" }, { name: "Ester", abrev: "EST" }, { name: "Job", abrev: "JOB" },
-            { name: "Salmos", abrev: "SAL" }, { name: "Proverbios", abrev: "PR" }, { name: "Eclesiastes", abrev: "EC" },
-            { name: "Cantares", abrev: "CNT" }, { name: "Isaias", abrev: "IS" }, { name: "Jeremias", abrev: "JER" },
+            { name: "1-Crónicas", abrev: "1CR" }, { name: "2-Crónicas", abrev: "2CR" }, { name: "Esdras", abrev: "ESD" },
+            { name: "Nehemías", abrev: "NEH" }, { name: "Ester", abrev: "EST" }, { name: "Job", abrev: "JOB" },
+            { name: "Salmos", abrev: "SAL" }, { name: "Proverbios", abrev: "PR" }, { name: "Eclesiastés", abrev: "EC" },
+            { name: "Cantares", abrev: "CNT" }, { name: "Isaías", abrev: "IS" }, { name: "Jeremías", abrev: "JER" },
             { name: "Lamentaciones", abrev: "LM" }, { name: "Ezequiel", abrev: "EZ" }, { name: "Daniel", abrev: "DN" },
-            { name: "Oseas", abrev: "OS" }, { name: "Joel", abrev: "JL" }, { name: "Amos", abrev: "AM" },
-            { name: "Abdias", abrev: "ABD" }, { name: "Jonas", abrev: "JON" }, { name: "Miqueas", abrev: "MI" },
-            { name: "Nahum", abrev: "NAH" }, { name: "Habacuc", abrev: "HAB" }, { name: "Sofonias", abrev: "SOF" },
-            { name: "Hageo", abrev: "HAG" }, { name: "Zacarias", abrev: "ZAC" }, { name: "Malaquias", abrev: "MAL" },
+            { name: "Oseas", abrev: "OS" }, { name: "Joel", abrev: "JL" }, { name: "Amós", abrev: "AM" },
+            { name: "Abdías", abrev: "ABD" }, { name: "Jonás", abrev: "JON" }, { name: "Miqueas", abrev: "MI" },
+            { name: "Nahúm", abrev: "NAH" }, { name: "Habacuc", abrev: "HAB" }, { name: "Sofonías", abrev: "SOF" },
+            { name: "Hageo", abrev: "HAG" }, { name: "Zacarías", abrev: "ZAC" }, { name: "Malaquías", abrev: "MAL" },
             { name: "Mateo", abrev: "MT" }, { name: "Marcos", abrev: "MR" }, { name: "Lucas", abrev: "LC" },
             { name: "Juan", abrev: "JN" }, { name: "Hechos", abrev: "HCH" }, { name: "Romanos", abrev: "RO" },
-            { name: "1-Corintios", abrev: "1CO" }, { name: "2-Corintios", abrev: "2CO" }, { name: "Galatas", abrev: "GA" },
+            { name: "1-Corintios", abrev: "1CO" }, { name: "2-Corintios", abrev: "2CO" }, { name: "Gálatas", abrev: "GA" },
             { name: "Efesios", abrev: "EF" }, { name: "Filipenses", abrev: "FIL" }, { name: "Colosenses", abrev: "COL" },
             { name: "1-Tesalonicenses", abrev: "1TS" }, { name: "2-Tesalonicenses", abrev: "2TS" },
             { name: "1-Timoteo", abrev: "1TI" }, { name: "2-Timoteo", abrev: "2TI" }, { name: "Tito", abrev: "TIT" },
-            { name: "Filemon", abrev: "FLM" }, { name: "Hebreos", abrev: "HE" }, { name: "Santiago", abrev: "STG" },
+            { name: "Filemón", abrev: "FLM" }, { name: "Hebreos", abrev: "HE" }, { name: "Santiago", abrev: "STG" },
             { name: "1-Pedro", abrev: "1P" }, { name: "2-Pedro", abrev: "2P" }, { name: "1-Juan", abrev: "1JN" },
             { name: "2-Juan", abrev: "2JN" }, { name: "3-Juan", abrev: "3JN" }, { name: "Judas", abrev: "JUD" },
             { name: "Apocalipsis", abrev: "AP" }
@@ -494,28 +510,6 @@
         closeMenuBtn.addEventListener('click', closeMenu);
         menuOverlay.addEventListener('click', closeMenu);
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' && !slideMenu.classList.contains('open')) {
-                openMenu();
-            } else if (e.key === 'ArrowLeft' && slideMenu.classList.contains('open')) {
-                closeMenu();
-            }
-        });
-
-        let touchStartX = 0;
-        let touchEndX = 0;
-        prédicaContent.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        });
-        prédicaContent.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            if (touchEndX - touchStartX > 100 && !slideMenu.classList.contains('open')) {
-                openMenu();
-            } else if (touchStartX - touchEndX > 100 && slideMenu.classList.contains('open')) {
-                closeMenu();
-            }
-        });
-
         const saveToLocalStorage = () => {
             const versiculosData = [];
             document.querySelectorAll('#versículos-citados-lista li').forEach(li => {
@@ -530,7 +524,7 @@
             });
 
             const puntosContent = Array.from(document.querySelectorAll('#puntos-lista .editable-point')).map(div => {
-                return div.classList.contains('is-placeholder') ? '' : div.textContent;
+                return div.textContent;
             });
 
             const data = {
@@ -707,14 +701,10 @@
         const crearNuevoPunto = (value = '') => {
             const nuevoPunto = document.createElement('li');
             nuevoPunto.className = 'flex items-start group';
-
-            const placeholderText = "Escribe aquí el dato de la prédica...";
-            const initialContent = value || placeholderText;
-            const isPlaceholder = !value;
-
+            
             nuevoPunto.innerHTML = `
-                <div class="flex-grow flex items-start p-2 rounded-lg">
-                    <div contenteditable="true" data-placeholder="${placeholderText}" class="editable-point w-full text-base leading-relaxed text-black relative border-bottom border-[var(--light-blue)] min-h-[1.6rem] py-1 outline-none ${isPlaceholder ? 'is-placeholder' : ''}">${initialContent}</div>
+                <div class="flex-grow flex items-start p-2 rounded-lg editable-point-wrapper">
+                    <div contenteditable="true" data-placeholder="Escribe aquí tu nota" class="editable-point w-full text-base leading-relaxed text-black relative min-h-[1.6rem] py-1 outline-none">${value}</div>
                     <span class="point-number-text text-gray-500 font-medium text-sm ml-2 select-none"></span>
                 </div>
                 <button class="eliminar-punto text-[var(--dark-blue)] hover:text-[var(--blue)] ml-1 p-2 self-center">
@@ -724,19 +714,6 @@
             listaPuntos.appendChild(nuevoPunto);
 
             const editableDiv = nuevoPunto.querySelector('.editable-point');
-            editableDiv.addEventListener('focus', () => {
-                if (editableDiv.classList.contains('is-placeholder')) {
-                    editableDiv.textContent = '';
-                    editableDiv.classList.remove('is-placeholder');
-                }
-            });
-            editableDiv.addEventListener('blur', () => {
-                if (!editableDiv.textContent.trim()) {
-                    editableDiv.textContent = placeholderText;
-                    editableDiv.classList.add('is-placeholder');
-                }
-                saveToLocalStorage();
-            });
             editableDiv.addEventListener('input', saveToLocalStorage);
             editableDiv.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
@@ -783,7 +760,7 @@
             nuevoVersiculo.className = 'flex flex-col relative space-y-2';
             nuevoVersiculo.innerHTML = `
                 <div class="relative w-full flex items-center space-x-2">
-                    <input type="text" placeholder="Ej: Romanos 8:28" class="flex-grow text-gray-800 p-3" value="${refValue}">
+                    <input type="text" placeholder="Romanos 8:28" class="flex-grow text-gray-800 p-3" value="${refValue}">
                     <button class="convert-to-main-verse text-[var(--dark-blue)] hover:text-[var(--blue)] p-2" title="Hacer Versículo Principal">
                         <span class="iconify text-xl" data-icon="mdi:star-outline"></span>
                     </button>
@@ -899,6 +876,19 @@
             }
         });
 
+        // FIX PARA EL TECLADO EN PANTALLA COMPLETA
+        const inputsAndTextareas = document.querySelectorAll('input[type="text"], textarea');
+        inputsAndTextareas.forEach(element => {
+            element.addEventListener('focus', () => {
+                // Si está en pantalla completa, hace scroll para que el input sea visible.
+                if (document.fullscreenElement) {
+                    setTimeout(() => {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300); // Pequeño retraso para que el teclado tenga tiempo de aparecer
+                }
+            });
+        });
+
         // --- LÓGICA DEL BOTÓN DE COMPARTIR A WHATSAPP ---
         shareWhatsappBtn.addEventListener('click', () => {
             const title = document.getElementById('prédica-título').value.trim();
@@ -907,7 +897,7 @@
             const citaPasaje = citaPasajeContainer.textContent.trim();
             
             const puntos = Array.from(document.querySelectorAll('#puntos-lista .editable-point'))
-                                .filter(div => div.textContent.trim() && !div.classList.contains('is-placeholder'))
+                                .filter(div => div.textContent.trim())
                                 .map((div, index) => {
                                     const text = div.textContent.trim();
                                     return `${index + 1}. ${text}`;
@@ -938,7 +928,7 @@
                 message += `\n*Notas:*\n${puntos}\n`;
             }
             if (versiculosCitados) {
-                message += `\n*Otros Versículos:*\n${versiculosCitados}\n`;
+                message += `\n*Versículos:*\n${versiculosCitados}\n`;
             }
 
             if (message.trim() === '') {
