@@ -1,18 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <!---Meta--->
-    <meta charset="UTF-8">
+  <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!---Page Icon---> 
-    <link rel="shortcut icon" href="favicon.svg">
-  <!--CSS Documents-->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+  <link rel="shortcut icon" href="favicon.svg">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
-  <!--Fonts-->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-  <!---Scripts--->
-    <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://code.iconify.design/2/2.2.1/iconify.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -55,7 +50,6 @@
 </head>
 <body class="bg-gray-100">
   <div class="flex h-screen">
-    <!-- Sidebar -->
     <div class="sidebar bg-blue-800 text-white w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out" id="sidebar">
       <div class="text-white flex items-center space-x-2 px-4">
         <i class="fas fa-hand-holding-usd text-2xl"></i>
@@ -73,9 +67,7 @@
       </nav>
     </div>
 
-    <!-- Main Content -->
     <div class="flex-1 flex flex-col overflow-hidden">
-      <!-- Top Navigation -->
       <header class="bg-white shadow-sm">
         <div class="flex justify-between items-center py-4 px-6">
           <button id="menu-toggle" class="md:hidden text-gray-500 focus:outline-none">
@@ -90,9 +82,7 @@
         </div>
       </header>
 
-      <!-- Content Area -->
       <main class="flex-1 overflow-y-auto p-6">
-        <!-- Create Loan Section -->
         <section id="create-loan" class="section-content">
           <div class="bg-white rounded-lg shadow p-6">
             <h2 class="text-xl font-bold mb-6">Crear Nuevo Préstamo</h2>
@@ -141,7 +131,6 @@
                 </div>
               </div>
               
-              <!-- Borrowers Section -->
               <div class="border-t border-gray-200 pt-6">
                 <h3 class="text-lg font-medium mb-4">Prestatarios</h3>
                 <div id="borrowers-container">
@@ -177,12 +166,10 @@
                 </button>
               </div>
               
-              <!-- Guarantors Section -->
               <div class="border-t border-gray-200 pt-6">
                 <h3 class="text-lg font-medium mb-4">Garantes (Opcional)</h3>
                 <div id="guarantors-container">
-                  <!-- Guarantors will be added here -->
-                </div>
+                  </div>
                 <button type="button" onclick="addGuarantor()" class="mt-2 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-md flex items-center">
                   <i class="fas fa-plus mr-2"></i> Agregar Garante
                 </button>
@@ -197,7 +184,6 @@
           </div>
         </section>
 
-        <!-- Loan History Section -->
         <section id="loan-history" class="section-content hidden">
           <div class="bg-white rounded-lg shadow p-6">
             <h2 class="text-xl font-bold mb-6">Historial de Préstamos</h2>
@@ -214,8 +200,7 @@
                   </tr>
                 </thead>
                 <tbody id="loan-history-body" class="bg-white divide-y divide-gray-200">
-                  <!-- Loans will be listed here -->
-                </tbody>
+                  </tbody>
               </table>
             </div>
             
@@ -229,7 +214,6 @@
     </div>
   </div>
 
-  <!-- Contract Preview Modal -->
   <div id="contract-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
       <div class="p-6">
@@ -240,8 +224,7 @@
           </button>
         </div>
         <div id="contract-content" class="p-4 border border-gray-200 rounded">
-          <!-- Contract content will be generated here -->
-        </div>
+          </div>
         <div class="mt-6 flex justify-end space-x-3">
           <button onclick="closeModal()" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-md">
             Cancelar
@@ -254,7 +237,6 @@
     </div>
   </div>
 
-  <!-- Edit Loan Modal -->
   <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
       <div class="p-6">
@@ -265,8 +247,7 @@
           </button>
         </div>
         <div id="edit-form-container" class="p-4">
-          <!-- Edit form will be loaded here -->
-        </div>
+          </div>
       </div>
     </div>
   </div>
@@ -280,7 +261,7 @@
     const paymentTypeSelect = document.getElementById('payment-type');
     const periodLabel = document.getElementById('period-label');
     const periodInput = document.getElementById('period');
-    const startDateInput = document.getElementById('start-date').value;
+    const startDateInput = document.getElementById('start-date'); // Corregido: Obteniendo el elemento
     const currentDateElement = document.getElementById('current-date');
     
     // Set current date
@@ -414,10 +395,9 @@
       const paymentType = document.getElementById('payment-type').value;
       const period = parseInt(document.getElementById('period').value);
       
-      // Corregir la fecha de inicio (añadir un día)
+      // Obtener la fecha de inicio del input
       const startDateInput = document.getElementById('start-date').value;
-      const startDate = new Date(startDateInput);
-      startDate.setDate(startDate.getDate() + 1);
+      const startDate = new Date(startDateInput + 'T00:00:00'); // Usar 'T00:00:00' para evitar problemas de zona horaria
       const correctedStartDate = startDate.toISOString().split('T')[0];
       
       const lenderSelect = document.getElementById('lender');
@@ -522,12 +502,13 @@
     }
 
     function calculateEndDate(startDate, period, paymentType) {
-      const date = new Date(startDate);
+      const date = new Date(startDate + 'T00:00:00');
       
       if (paymentType === 'daily') {
-        date.setDate(date.getDate() + period);
+        date.setDate(date.getDate() + period -1); // Restamos 1 día para que el endDate sea inclusivo con el número de días
       } else {
         date.setMonth(date.getMonth() + period);
+        date.setDate(date.getDate() - 1); // Restamos 1 día para que el pago final sea el día antes del fin del mes
       }
       
       return date.toISOString().split('T')[0];
@@ -545,6 +526,14 @@
       const guarantorTermPlural = loan.guarantors.length > 0 ? 
         (loan.guarantors[0].gender === 'femenino' ? 'GARANTES' : 'GARANTES') : '';
       
+      // Nombres y Prestamista en mayúsculas
+      const lenderNameUpper = loan.lender.name.toUpperCase();
+      const borrowerNamesUpper = loan.borrowers.map(b => b.name.toUpperCase());
+      const guarantorNamesUpper = loan.guarantors.map(g => g.name.toUpperCase());
+
+      // Dirección del Prestamista
+      const lenderAddress = "LIMA/LIMA/ATE/UCV 139B LT. 2 ZONA I HUAYCAN";
+      
       // Generate contract content with bold text for important info and addresses
       let contractHTML = `
         <div class="contract-content">
@@ -553,7 +542,7 @@
           <p class="text-right mb-6">Lima, ${formatDate(loan.startDate)}</p>
           
           <div class="mb-6">
-            <p>CONSTE POR EL PRESENTE DOCUMENTO EL CONTRATO DE PRÉSTAMO QUE CELEBRAN POR UNA PARTE <strong>${loan.lender.name}</strong>, identificado con <strong>DNI N° ${loan.lender.dni}</strong>, con domicilio en <strong>Jr. Pachitea 266, Lima</strong>, en adelante denominado <strong>EL PRESTAMISTA</strong>; DE OTRA PARTE ${loan.borrowers.map(b => `<strong>${b.name}</strong>, identificad${b.gender === 'femenino' ? 'a' : 'o'} con <strong>DNI N° ${b.dni}</strong>, con domicilio en <strong>${b.address}</strong>`).join('; ')} en adelante denominad${loan.borrowers.length > 1 ? 'os' : 'o'} <strong>${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}</strong>; ${loan.guarantors.length > 0 ? `Y DE OTRA PARTE ${loan.guarantors.map(g => `<strong>${g.name}</strong>, identificad${g.gender === 'femenino' ? 'a' : 'o'} con <strong>DNI N° ${g.dni}</strong>, con domicilio en <strong>${g.address}</strong>`).join('; ')} en adelante denominad${loan.guarantors.length > 1 ? 'os' : 'o'} <strong>${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}</strong>` : ''}.</p>
+            <p>CONSTE POR EL PRESENTE DOCUMENTO EL CONTRATO DE PRÉSTAMO QUE CELEBRAN POR UNA PARTE <strong>${lenderNameUpper}</strong>, identificado con <strong>DNI N° ${loan.lender.dni}</strong>, con domicilio en <strong>${lenderAddress}</strong>, en adelante denominado <strong>EL PRESTAMISTA</strong>; DE OTRA PARTE ${loan.borrowers.map((b, index) => `<strong>${borrowerNamesUpper[index]}</strong>, identificad${b.gender === 'femenino' ? 'a' : 'o'} con <strong>DNI N° ${b.dni}</strong>, con domicilio en <strong>${b.address.toUpperCase()}</strong>`).join('; ')} en adelante denominad${loan.borrowers.length > 1 ? 'os' : 'o'} <strong>${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}</strong>; ${loan.guarantors.length > 0 ? `Y DE OTRA PARTE ${loan.guarantors.map((g, index) => `<strong>${guarantorNamesUpper[index]}</strong>, identificad${g.gender === 'femenino' ? 'a' : 'o'} con <strong>DNI N° ${g.dni}</strong>, con domicilio en <strong>${g.address.toUpperCase()}</strong>`).join('; ')} en adelante denominad${loan.guarantors.length > 1 ? 'os' : 'o'} <strong>${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}</strong>` : ''}.</p>
           </div>
           
           <div class="mb-6">
@@ -565,6 +554,10 @@
               `${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} se obliga a pagar la suma total de <strong>S/. ${loan.paymentDetails.totalAmount} (${numberToWords(parseFloat(loan.paymentDetails.totalAmount))} SOLES)</strong>, en <strong>${loan.period} días</strong>, mediante pagos diarios de <strong>S/. ${loan.paymentDetails.dailyPayment} (${numberToWords(parseFloat(loan.paymentDetails.dailyPayment))} SOLES)</strong>.` : 
               `${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} se obliga a pagar intereses mensuales de <strong>S/.${(loan.amount * (loan.interestRate / 100)).toFixed(2)} (${numberToWords(loan.amount * (loan.interestRate / 100))} SOLES)</strong>, durante <strong>${loan.period} meses</strong>, y al final del plazo pagará el monto total del préstamo más el último interés, es decir <strong>S/. ${loan.paymentDetails.finalPayment} (${numberToWords(parseFloat(loan.paymentDetails.finalPayment))} SOLES)</strong>.`}
             El primer pago se realizará el <strong>${loan.paymentType === 'daily' ? formatDate(loan.startDate) : formatDate(getNextMonthDate(loan.startDate))}</strong> y el último pago el <strong>${formatDate(loan.endDate)}</strong>.</p>
+          </div>
+
+          <div class="mb-6">
+            <p><strong>MORAS:</strong> El incumplimiento en la fecha de pago de cualquiera de las cuotas o del pago final generará automáticamente una penalidad por mora de <strong>S/. 5.00 (CINCO SOLES)</strong> por cada día de retraso, sin perjuicio del cobro de la deuda y los intereses generados.</p>
           </div>
           
           ${loan.guarantors.length > 0 ? `
@@ -579,24 +572,24 @@
               <div class="text-center">
                 <div class="signature-space"></div>
                 <p class="font-bold">EL PRESTAMISTA</p>
-                <p><strong>${loan.lender.name}</strong></p>
+                <p><strong>${lenderNameUpper}</strong></p>
                 <p><strong>DNI ${loan.lender.dni}</strong></p>
               </div>
               
-              ${loan.borrowers.map(borrower => `
+              ${loan.borrowers.map((borrower, index) => `
                 <div class="text-center">
                   <div class="signature-space"></div>
                   <p class="font-bold">${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}</p>
-                  <p><strong>${borrower.name}</strong></p>
+                  <p><strong>${borrowerNamesUpper[index]}</strong></p>
                   <p><strong>DNI ${borrower.dni}</strong></p>
                 </div>
               `).join('')}
               
-              ${loan.guarantors.map(guarantor => `
+              ${loan.guarantors.map((guarantor, index) => `
                 <div class="text-center">
                   <div class="signature-space"></div>
                   <p class="font-bold">${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}</p>
-                  <p><strong>${guarantor.name}</strong></p>
+                  <p><strong>${guarantorNamesUpper[index]}</strong></p>
                   <p><strong>DNI ${guarantor.dni}</strong></p>
                 </div>
               `).join('')}
@@ -662,7 +655,18 @@
         const pageHeight = 295; // A4 height in mm
         const imgHeight = canvas.height * imgWidth / canvas.width;
         
-        doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        // Ajuste para evitar que se corte el contenido al final de la página
+        let position = 0;
+        const padding = 10; // Espacio para el margen superior
+        
+        while (position < imgHeight) {
+          doc.addImage(imgData, 'PNG', 0, position === 0 ? 0 : -position + padding, imgWidth, imgHeight);
+          position += (pageHeight - 2 * padding); // Mover a la siguiente página menos el espacio de margen
+          if (position < imgHeight) {
+            doc.addPage();
+          }
+        }
+        
         doc.save(filename);
         document.body.removeChild(tempDiv);
       });
@@ -686,6 +690,14 @@
           (loan.guarantors[0].gender === 'femenino' ? 'GARANTE' : 'GARANTE') : '';
         const guarantorTermPlural = loan.guarantors.length > 0 ? 
           (loan.guarantors[0].gender === 'femenino' ? 'GARANTES' : 'GARANTES') : '';
+          
+        // Nombres y Prestamista en mayúsculas
+        const lenderNameUpper = loan.lender.name.toUpperCase();
+        const borrowerNamesUpper = loan.borrowers.map(b => b.name.toUpperCase());
+        const guarantorNamesUpper = loan.guarantors.map(g => g.name.toUpperCase());
+        
+        // Dirección del Prestamista
+        const lenderAddress = "LIMA/LIMA/ATE/UCV 139B LT. 2 ZONA I HUAYCAN";
         
         // Generate contract content with bold text for important info and addresses
         let contractHTML = `
@@ -695,7 +707,7 @@
             <p class="text-right mb-6">Lima, ${formatDate(loan.startDate)}</p>
             
             <div class="mb-6">
-              <p>CONSTE POR EL PRESENTE DOCUMENTO EL CONTRATO DE PRÉSTAMO QUE CELEBRAN POR UNA PARTE <strong>${loan.lender.name}</strong>, identificado con <strong>DNI N° ${loan.lender.dni}</strong>, con domicilio en <strong>Jr. Pachitea 266, Lima</strong>, en adelante denominado <strong>EL PRESTAMISTA</strong>; DE OTRA PARTE ${loan.borrowers.map(b => `<strong>${b.name}</strong>, identificad${b.gender === 'femenino' ? 'a' : 'o'} con <strong>DNI N° ${b.dni}</strong>, con domicilio en <strong>${b.address}</strong>`).join('; ')} en adelante denominad${loan.borrowers.length > 1 ? 'os' : 'o'} <strong>${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}</strong>; ${loan.guarantors.length > 0 ? `Y DE OTRA PARTE ${loan.guarantors.map(g => `<strong>${g.name}</strong>, identificad${g.gender === 'femenino' ? 'a' : 'o'} con <strong>DNI N° ${g.dni}</strong>, con domicilio en <strong>${g.address}</strong>`).join('; ')} en adelante denominad${loan.guarantors.length > 1 ? 'os' : 'o'} <strong>${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}</strong>` : ''}.</p>
+              <p>CONSTE POR EL PRESENTE DOCUMENTO EL CONTRATO DE PRÉSTAMO QUE CELEBRAN POR UNA PARTE <strong>${lenderNameUpper}</strong>, identificado con <strong>DNI N° ${loan.lender.dni}</strong>, con domicilio en <strong>${lenderAddress}</strong>, en adelante denominado <strong>EL PRESTAMISTA</strong>; DE OTRA PARTE ${loan.borrowers.map((b, index) => `<strong>${borrowerNamesUpper[index]}</strong>, identificad${b.gender === 'femenino' ? 'a' : 'o'} con <strong>DNI N° ${b.dni}</strong>, con domicilio en <strong>${b.address.toUpperCase()}</strong>`).join('; ')} en adelante denominad${loan.borrowers.length > 1 ? 'os' : 'o'} <strong>${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}</strong>; ${loan.guarantors.length > 0 ? `Y DE OTRA PARTE ${loan.guarantors.map((g, index) => `<strong>${guarantorNamesUpper[index]}</strong>, identificad${g.gender === 'femenino' ? 'a' : 'o'} con <strong>DNI N° ${g.dni}</strong>, con domicilio en <strong>${g.address.toUpperCase()}</strong>`).join('; ')} en adelante denominad${loan.guarantors.length > 1 ? 'os' : 'o'} <strong>${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}</strong>` : ''}.</p>
             </div>
           
             <div class="mb-6">
@@ -707,6 +719,10 @@
                 `${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} se obliga a pagar la suma total de <strong>S/. ${loan.paymentDetails.totalAmount} (${numberToWords(parseFloat(loan.paymentDetails.totalAmount))} SOLES)</strong>, en <strong>${loan.period} días</strong>, mediante pagos diarios de <strong>S/. ${loan.paymentDetails.dailyPayment} (${numberToWords(parseFloat(loan.paymentDetails.dailyPayment))} SOLES)</strong>.` : 
                 `${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm} se obliga a pagar intereses mensuales de <strong>S/.${(loan.amount * (loan.interestRate / 100)).toFixed(2)} (${numberToWords(loan.amount * (loan.interestRate / 100))} SOLES)</strong>, durante <strong>${loan.period} meses</strong>, y al final del plazo pagará el monto total del préstamo más el último interés, es decir <strong>S/. ${loan.paymentDetails.finalPayment} (${numberToWords(parseFloat(loan.paymentDetails.finalPayment))} SOLES)</strong>.`}
               El primer pago se realizará el <strong>${loan.paymentType === 'daily' ? formatDate(loan.startDate) : formatDate(getNextMonthDate(loan.startDate))}</strong> y el último pago el <strong>${formatDate(loan.endDate)}</strong>.</p>
+            </div>
+
+            <div class="mb-6">
+              <p><strong>MORAS:</strong> El incumplimiento en la fecha de pago de cualquiera de las cuotas o del pago final generará automáticamente una penalidad por mora de <strong>S/. 5.00 (CINCO SOLES)</strong> por cada día de retraso, sin perjuicio del cobro de la deuda y los intereses generados.</p>
             </div>
             
             ${loan.guarantors.length > 0 ? `
@@ -721,24 +737,24 @@
                 <div class="text-center">
                   <div class="signature-space"></div>
                   <p class="font-bold">EL PRESTAMISTA</p>
-                  <p><strong>${loan.lender.name}</strong></p>
+                  <p><strong>${lenderNameUpper}</strong></p>
                   <p><strong>DNI ${loan.lender.dni}</strong></p>
                 </div>
                 
-                ${loan.borrowers.map(borrower => `
+                ${loan.borrowers.map((borrower, index) => `
                   <div class="text-center">
                     <div class="signature-space"></div>
                     <p class="font-bold">${loan.borrowers.length > 1 ? borrowerTermPlural : borrowerTerm}</p>
-                    <p><strong>${borrower.name}</strong></p>
+                    <p><strong>${borrowerNamesUpper[index]}</strong></p>
                     <p><strong>DNI ${borrower.dni}</strong></p>
                   </div>
                 `).join('')}
                 
-                ${loan.guarantors.map(guarantor => `
+                ${loan.guarantors.map((guarantor, index) => `
                   <div class="text-center">
                     <div class="signature-space"></div>
                     <p class="font-bold">${loan.guarantors.length > 1 ? guarantorTermPlural : guarantorTerm}</p>
-                    <p><strong>${guarantor.name}</strong></p>
+                    <p><strong>${guarantorNamesUpper[index]}</strong></p>
                     <p><strong>DNI ${guarantor.dni}</strong></p>
                   </div>
                 `).join('')}
@@ -777,7 +793,18 @@
           const pageHeight = 295; // A4 height in mm
           const imgHeight = canvas.height * imgWidth / canvas.width;
           
-          doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+          // Ajuste para evitar que se corte el contenido al final de la página
+          let position = 0;
+          const padding = 10; // Espacio para el margen superior
+          
+          while (position < imgHeight) {
+            doc.addImage(imgData, 'PNG', 0, position === 0 ? 0 : -position + padding, imgWidth, imgHeight);
+            position += (pageHeight - 2 * padding); // Mover a la siguiente página menos el espacio de margen
+            if (position < imgHeight) {
+              doc.addPage();
+            }
+          }
+          
           doc.save(filename);
           document.body.removeChild(tempContent);
         });
@@ -899,7 +926,6 @@
               </div>
             </div>
             
-            <!-- Borrowers Section -->
             <div class="border-t border-gray-200 pt-6">
               <h3 class="text-lg font-medium mb-4">Prestatarios</h3>
               <div id="edit-borrowers-container">
@@ -944,7 +970,6 @@
               </button>
             </div>
             
-            <!-- Guarantors Section -->
             <div class="border-t border-gray-200 pt-6">
               <h3 class="text-lg font-medium mb-4">Garantes (Opcional)</h3>
               <div id="edit-guarantors-container">
@@ -1014,9 +1039,8 @@
           const period = parseInt(document.getElementById('edit-period').value);
           const startDateInput = document.getElementById('edit-start-date').value;
           
-          // Corregir la fecha de inicio (añadir un día)
-          const startDate = new Date(startDateInput);
-          startDate.setDate(startDate.getDate() + 1);
+          // Corregir la fecha de inicio
+          const startDate = new Date(startDateInput + 'T00:00:00');
           const correctedStartDate = startDate.toISOString().split('T')[0];
           
           const lenderSelect = document.getElementById('edit-lender');
@@ -1201,40 +1225,71 @@
     }
 
     function formatDate(dateString) {
-      const date = new Date(dateString);
+      const date = new Date(dateString + 'T00:00:00'); // Usar 'T00:00:00' para consistencia
       return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
     }
 
     function numberToWords(num) {
-      // This is a simplified version for Spanish
-      // For a complete solution, you might want to use a library
-      const units = ['', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve'];
-      const teens = ['diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve'];
-      const tens = ['', 'diez', 'veinte', 'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta', 'ochenta', 'noventa'];
-      const hundreds = ['', 'ciento', 'doscientos', 'trescientos', 'cuatrocientos', 'quinientos', 'seiscientos', 'setecientos', 'ochocientos', 'novecientos'];
+      // Función simple para convertir números a palabras en español (parte entera)
+      const units = ['', 'UNO', 'DOS', 'TRES', 'CUATRO', 'CINCO', 'SEIS', 'SIETE', 'OCHO', 'NUEVE'];
+      const teens = ['DIEZ', 'ONCE', 'DOCE', 'TRECE', 'CATORCE', 'QUINCE', 'DIECISÉIS', 'DIECISIETE', 'DIECIOCHO', 'DIECINUEVE'];
+      const tens = ['', 'DIEZ', 'VEINTE', 'TREINTA', 'CUARENTA', 'CINCUENTA', 'SESENTA', 'SETENTA', 'OCHENTA', 'NOVENTA'];
+      const hundreds = ['', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS', 'QUINIENTOS', 'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS'];
       
       num = Math.floor(num);
       
-      if (num === 0) return 'cero';
-      if (num < 10) return units[num];
-      if (num < 20) return teens[num - 10];
-      if (num < 100) {
-        const ten = Math.floor(num / 10);
-        const unit = num % 10;
-        return tens[ten] + (unit !== 0 ? ' y ' + units[unit] : '');
-      }
-      if (num < 1000) {
-        const hundred = Math.floor(num / 100);
-        const remainder = num % 100;
-        return hundreds[hundred] + (remainder !== 0 ? ' ' + numberToWords(remainder) : '');
-      }
-      if (num === 1000) return 'mil';
+      if (num === 0) return 'CERO';
       
-      return num.toString(); // Fallback for numbers > 1000
+      const chunkToWords = (n) => {
+        if (n === 0) return '';
+        if (n < 10) return units[n];
+        if (n < 20) return teens[n - 10];
+        if (n < 100) {
+          const ten = Math.floor(n / 10);
+          const unit = n % 10;
+          let result = tens[ten];
+          if (ten === 2 && unit !== 0) result = 'VEINTI' + units[unit]; // VEINTIUNO, VEINTIDOS, etc.
+          else if (unit !== 0) result += ' Y ' + units[unit];
+          return result;
+        }
+        if (n === 100) return 'CIEN';
+        if (n < 1000) {
+          const hundred = Math.floor(n / 100);
+          const remainder = n % 100;
+          let result = hundreds[hundred];
+          if (hundred === 1 && remainder !== 0) result = 'CIENTO ' + chunkToWords(remainder);
+          else if (remainder !== 0) result += ' ' + chunkToWords(remainder);
+          return result;
+        }
+        return n.toString(); // Fallback
+      };
+      
+      let words = '';
+      
+      // Millones
+      let millions = Math.floor(num / 1000000);
+      if (millions > 0) {
+        words += chunkToWords(millions) + (millions === 1 ? ' MILLÓN ' : ' MILLONES ');
+        num %= 1000000;
+      }
+      
+      // Miles
+      let thousands = Math.floor(num / 1000);
+      if (thousands > 0) {
+        words += (thousands === 1 ? 'MIL ' : chunkToWords(thousands) + ' MIL ');
+        num %= 1000;
+      }
+      
+      // Cientos/Unidades
+      if (num > 0) {
+        words += chunkToWords(num);
+      }
+      
+      return words.trim();
     }
     
     function getNextMonthDate(dateString) {
-        const date = new Date(dateString);
+        const date = new Date(dateString + 'T00:00:00');
         date.setMonth(date.getMonth() + 1);
         return date.toISOString().split('T')[0];
     }
